@@ -37,10 +37,10 @@ class TLData
 		int GetTrackCount();
 		void AddTrack();
 
-		TLItem *AddItem(TLSample *sample, int Position, int TrackNr);
-		TLItem *AddItem(wxString filename, int Position, int TrackNr);
-		TLItem *ItemAtPos(int Position, int TrackNr);
-		void SetItemPosition(TLItem *item,int Position);
+		TLItem *AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr);
+		TLItem *AddItem(wxString& filename, gg_tl_dat Position, int TrackNr);
+		TLItem *ItemAtPos(gg_tl_dat Position, int TrackNr);
+		void SetItemPosition(TLItem *item, gg_tl_dat Position);
 		void DeleteItem(TLItem *item, int TrackNr);
 		void SetTrackMute(bool mute, int TrackNr);
 		void SetTrackVolume(double vol, int TrackNr);
@@ -52,9 +52,9 @@ class TLData
 		bool IsBlocked();
 
 		unsigned int FillBuffer(float* outBuffer, unsigned int count);
-		void SetPlaybackPosition(long Position);
-		long GetPlaybackPosition();
-		int GetLength();
+		void SetPlaybackPosition(gg_tl_dat Position);
+		gg_tl_dat GetPlaybackPosition();
+		gg_tl_dat GetLength();
 
 		TLColourManager *GetColourManager();
 
@@ -72,7 +72,7 @@ class TLData
 		long GetSnapValue();
 	private:
 		long m_snapValue;
-		int mixChannels(float *A, float *B, float* out);
+		unsigned int MixChannels(float *A, float *B, float* out, unsigned int count);
 		void printXML(wxString filename);
 		void loadXML(wxString filename);
 		void ResetOffsets();
@@ -81,9 +81,9 @@ class TLData
 		wxString m_filename;
 		bool m_changed;
 		bool m_blocked;
-		long m_playbackPosition;
-		long m_position;/*Wird während des Abspielens inkrementiert*/
-		int m_length;
+		gg_tl_dat m_playbackPosition;
+		gg_tl_dat m_position;/*Wird während des Abspielens inkrementiert*/
+		gg_tl_dat m_length;
 		UpdateListener *m_updateListener;
 };
 

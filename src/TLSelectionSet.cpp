@@ -26,6 +26,7 @@
     #include "wx/wx.h"
 #endif
 
+#include "stuff.h"
 #include "TLSample.h"
 #include "TLItem.h"
 #include "TLData.h"
@@ -55,7 +56,7 @@ TLItem *TLSelectionItem::GetItem()
 {
 	return m_item;
 }
-long TLSelectionItem::GetPosition()
+gg_tl_dat TLSelectionItem::GetPosition()
 {
 	return m_item->GetPosition();
 }
@@ -100,7 +101,7 @@ void TLSelectionSet::DeleteFrom(TLData* data)
 	}
 	Clear(data);
 }
-TLSelectionSet *TLSelectionSet::AddTo(TLData* data, int offsetPosition, int track)
+TLSelectionSet *TLSelectionSet::AddTo(TLData* data, gg_tl_dat offsetPosition, int track)
 {
 //	CalcBounds();
 	TLSelectionSet *selSet = new TLSelectionSet();
@@ -167,11 +168,11 @@ int TLSelectionSet::GetTrack2()
 {
 	return m_trackNr2;
 }
-long TLSelectionSet::GetX1()
+gg_tl_dat TLSelectionSet::GetX1()
 {
 	return m_x1;
 }
-long TLSelectionSet::GetX2()
+gg_tl_dat TLSelectionSet::GetX2()
 {
 	return m_x2;
 }

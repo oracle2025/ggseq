@@ -22,6 +22,7 @@
     #include "wx/wx.h"
 #endif
 #include "wx/encconv.h"
+#include "stuff.h"
 
 #include "TLData.h"
 #include "TLSampleManager.h"
@@ -122,7 +123,8 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 	int trackNr = 0;
 	while (element) {
 		int id;
-		int pos;
+//		int pos;
+		char buffer[100];
 		int mute;
 		int volume;
 		/*Volume und Mute einlesen*/
@@ -142,10 +144,12 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 					Error(filename);
 					return;
 				}
-				if (element_item->Attribute("pos",&pos)==NULL) {
+				strncpy(buffer,element_item->Attribute("pos"),sizeof(buffer));
+				if (buffer==NULL) {
 					Error(filename);
 					return;
 				}
+				gg_tl_dat pos = strtoll(buffer,NULL,10);
 				TLSample *sample=m_sampleManager->GetSample(id);
 				if (sample)
 					m_data->AddItem(sample,pos,trackNr);

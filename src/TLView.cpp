@@ -28,6 +28,7 @@
 
 #include <iostream>
 
+#include "stuff.h"
 #include "TLTrack.h"
 #include "TLView.h"
 #include "TLData.h"
@@ -153,28 +154,28 @@ void TLView::SetVisibleFrame(long width, long height, long x, long y)
 	m_FrameWidth=width;
 	m_FrameHeight=height;
 	m_Faktor=(float)m_FrameWidth/(float)m_LengthVisible;
-	m_Length=2000000;
+//	m_Length=2000000;
 	SetVisibleLength(m_FrameWidth);/*--*/
 }
-void TLView::SetVisibleLength(long Length)
+void TLView::SetVisibleLength(gg_tl_dat Length)
 {
 	m_LengthVisible=(Length*117600)/31;
 	m_Faktor=(float)m_FrameWidth/(float)m_LengthVisible;
 }
-void TLView::SetPosition(long Position)
+void TLView::SetPosition(gg_tl_dat Position)
 {
 	m_PositionVisible=(Position*117600)/31;
 }
-long TLView::GetPosition()
+gg_tl_dat TLView::GetPosition()
 {
 	return (m_PositionVisible*31)/117600;
 }
 
-long TLView::GetScrollBarRange()
+gg_tl_dat TLView::GetScrollBarRange()
 {
 	return (m_TlData->GetLength()/117600)*31;//m_Length;
 }
-long TLView::GetScrollBarThumbSize()
+gg_tl_dat TLView::GetScrollBarThumbSize()
 {
 	return (m_LengthVisible/117600)*31;
 }
@@ -196,7 +197,7 @@ void TLView::Draw(wxDC& dc/*_screen*/)
 }
 long TLView::DrawTrack(wxDC& dc, long yoffset, TLTrack* track)
 {
-	long start,end;
+	gg_tl_dat start,end;
 	dc.SetBrush(*wxGREY_BRUSH);
 	
 	wxBrush brush1=dc.GetBrush();
@@ -336,13 +337,13 @@ void TLView::DeleteItem(TLItem *item, long trackNr)
 	m_TlData->DeleteItem(item,trackNr);
 }
 
-long TLView::FromScreenXtoTL(long x)
+gg_tl_dat TLView::FromScreenXtoTL(long x)
 {
-
-	long f = m_PositionVisible+(((long)(x-m_FrameX))*((long)m_LengthVisible/m_FrameWidth));
+	
+	gg_tl_dat f = m_PositionVisible+( ((gg_tl_dat)(x-m_FrameX)) * ( (gg_tl_dat)m_LengthVisible / (gg_tl_dat)m_FrameWidth ) );
 	return f;
 }
-long TLView::FromTLtoScreenX(long x)
+long TLView::FromTLtoScreenX(gg_tl_dat x)
 {
 	double a;
 	double b;
@@ -402,10 +403,10 @@ void TLView::SnapItem(TLItem *item)
 {
 	if (m_TlData->IsBlocked())
 		return;
-	long pos=item->GetPosition()%m_TlData->GetSnapValue()/*m_SnapPosition*/;
+	gg_tl_dat pos=item->GetPosition()% (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
 	if (pos) {
 		if (pos>m_TlData->GetSnapValue()/*m_SnapPosition*//2)
-			m_TlData->SetItemPosition(item,item->GetPosition()-pos+m_TlData->GetSnapValue()/*m_SnapPosition*/);
+			m_TlData->SetItemPosition(item,item->GetPosition()-pos+ (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/);
 		else
 			m_TlData->SetItemPosition(item,item->GetPosition()-pos);
 	}
@@ -430,11 +431,11 @@ TLSample *TLView::GetSample(long position, long trackNr)
 
 long TLView::GetScreenSnapPosition(long position)
 {	
-	long pos1=FromScreenXtoTL(position);
-	long pos=pos1%m_TlData->GetSnapValue()/*m_SnapPosition*/;
+	gg_tl_dat pos1=FromScreenXtoTL(position);
+	gg_tl_dat pos=pos1% (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
 	if (pos) {
-		if (pos>m_TlData->GetSnapValue()/*m_SnapPosition*//2)
-			pos1=pos1-pos+m_TlData->GetSnapValue()/*m_SnapPosition*/;
+		if (pos> (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*//2)
+			pos1=pos1-pos+ (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
 		else
 			pos1=pos1-pos;
 	}
@@ -446,7 +447,7 @@ long TLView::GetCaretPosition()
 	return FromTLtoScreenX(m_TlData->GetPlaybackPosition()/*m_CaretPosition*/);	
 }
 
-long TLView::GetCaretPosition(long Position)
+long TLView::GetCaretPosition(gg_tl_dat Position)
 {
 	return FromTLtoScreenX(Position);	
 }
@@ -458,8 +459,8 @@ void TLView::Select(long x,long y,long width,long height)
 	int scndTrackNr;
 	GetTracksSurroundedBy(firstTrackNr, scndTrackNr, y,y+height );
 	/*FromScreenXtoTL*/
-	long TL_X1=FromScreenXtoTL(x);
-	long TL_X2=FromScreenXtoTL(x+width);
+	gg_tl_dat TL_X1=FromScreenXtoTL(x);
+	gg_tl_dat TL_X2=FromScreenXtoTL(x+width);
 
 //	m_selectionSet->SetBounds(firstTrackNr, scndTrackNr,TL_X1,TL_X2);
 
@@ -511,7 +512,7 @@ bool TLView::IsSelectionAt(int x, int y, int& x_offset, int& y_offset, int& widt
 		return false;
 	if (!m_selectionSet->IsActive())
 		return false;
-	long TL_x=FromScreenXtoTL(x);
+	gg_tl_dat TL_x=FromScreenXtoTL(x);
 	int track=GetTrackByY(y);
 
 //	x_offset=FromTLtoScreenX(m_selectionSet->GetX1());
@@ -538,11 +539,11 @@ void TLView::DrawSelection(wxDC *dc)
 }
 void TLView::EndSelectionDrag(int x, int y, bool copy, long x_offset)
 {
-	long TL_x=FromScreenXtoTL(x);
-	long pos=TL_x%m_TlData->GetSnapValue()/*m_SnapPosition*/;
+	gg_tl_dat TL_x=FromScreenXtoTL(x);
+	gg_tl_dat pos=TL_x% (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
 	if (pos) {
 		if (pos>m_TlData->GetSnapValue()/*m_SnapPosition*//2)
-			TL_x=TL_x-pos+m_TlData->GetSnapValue()/*m_SnapPosition*/;
+			TL_x=TL_x-pos+ (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
 		else
 			TL_x=TL_x-pos;
 	}

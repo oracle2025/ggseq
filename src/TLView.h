@@ -34,11 +34,11 @@ class TLView
 		~TLView();
 
 		void SetVisibleFrame(long width, long height, long x=0, long y=0);
-		void SetVisibleLength(long Length);
-		void SetPosition(long Position);
-		long GetPosition();
-		long GetScrollBarRange();
-		long GetScrollBarThumbSize();
+		void SetVisibleLength(gg_tl_dat Length);
+		void SetPosition(gg_tl_dat Position);
+		gg_tl_dat GetPosition();
+		gg_tl_dat GetScrollBarRange();
+		gg_tl_dat GetScrollBarThumbSize();
 
 		void Draw(wxDC& dc_screen);
 
@@ -57,35 +57,32 @@ class TLView
 
 		void SetPlaybackPosition(long Position);
 		long GetCaretPosition();
-		long GetCaretPosition(long Position);
+		long GetCaretPosition(gg_tl_dat Position);
 
-		long FromScreenXtoTL(long x);
-		long FromTLtoScreenX(long x);
+		gg_tl_dat FromScreenXtoTL(long x);
+		long FromTLtoScreenX(gg_tl_dat x);
 		TLSample *GetSample(long position, long trackNr);
 		long GetScreenSnapPosition(long position);
 		
-//		bool HasSelection();
 		bool IsSelectionAt(int x, int y, int& x_offset, int& y_offset, int& width, int& height);
 		void DrawSelection(wxDC *dc);
 		static void Draw3dRect(wxDC *dc, wxCoord x, wxCoord y, wxCoord width, wxCoord height, wxColour colour);
 		void EndSelectionDrag(int x, int y, bool copy, long x_offset);
-		/*wxPoint Snap(wxPoint)*/
 		void SetSnapValue(long snapValue);
 		long GetSnapValue();
 
 		static wxColour GetDarkColour(wxColour colour);
 		static wxColour GetLightColour(wxColour colour);
 		
-//		int m_SnapPosition;
 	private:
 		void SnapItem(TLItem *item);/*kommt evtl. nach TLData*/
 		long DrawTrack(wxDC& dc_screen, long yoffset, TLTrack* track);
 		TLData *m_TlData;
 		TLSelectionSet *m_selectionSet;
-		long m_LengthVisible;
-		long m_PositionVisible;
+		gg_tl_dat m_LengthVisible;
+		gg_tl_dat m_PositionVisible;
 		float m_Faktor;
-		long m_Length;
+//		gg_tl_dat m_Length;
 		long m_FrameX;
 		long m_FrameY;
 		long m_FrameWidth;

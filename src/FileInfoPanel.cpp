@@ -30,7 +30,7 @@ enum
 	ID_TEXTCTRL
 };
 
-FileInfoPanel::FileInfoPanel(wxWindow* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE)
+FileInfoPanel::FileInfoPanel(wxWindow* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN)
 {
 	InfoPanel(this);
 }
@@ -71,7 +71,7 @@ wxString FileInfoPanel::GenerateLengthString(long frames, long sampleRate)
 	result << tmp;
 //	snprintf (str + strlen (str), sizeof (str) - strlen (str) - 1, "%02d.", seconds) ;
 
-	loff_t f; /*nötig um mit großen Zahlen zu hantieren ?*/
+	long long f; //loff_t f; /*nötig um mit großen Zahlen zu hantieren ?*/
 	f=frames;
 	seconds = ((1000 * f) / sampleRate) % 1000 ;
 	tmp.Printf(wxT("%03d"), seconds) ;

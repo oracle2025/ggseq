@@ -23,6 +23,7 @@
 #endif
 #include <wx/config.h>
 #include <wx/filename.h>
+#include "stuff.h"
 
 #include "TLLoadSaveManager.h"
 #include "TLData.h"

@@ -183,7 +183,7 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	:wxFrame((wxFrame *)NULL, -1, title, pos, size,wxDEFAULT_FRAME_STYLE|GG_WINDOW_FLAGS)
 {
 	MakeToolBar();
-	wxPanel *panel1=new wxPanel(this,-1,wxDefaultPosition,wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE); /*Für richtige Hintergrundfarbe in osx und win32*/
+	wxPanel *panel1=new wxPanel(this,-1,wxDefaultPosition,wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN); /*Für richtige Hintergrundfarbe in osx und win32*/
 	wxBoxSizer *panelSizer = new wxBoxSizer( wxHORIZONTAL );
 
 //	wxAcceleratorEntry entries[2];
@@ -255,14 +255,14 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 //	MiniFiler *mf=new MiniFiler(SplitView);
 /*Hier kommt der neue Minifiler rein.*/
 
-	wxPanel* SplitView2 = new wxPanel(SplitView);
+	wxPanel* SplitView2 = new wxPanel(SplitView,-1,wxDefaultPosition,wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
 	wxBoxSizer * SplitV2Sizer = new wxBoxSizer(wxVERTICAL);
 
 //	wxSplitterWindow* SplitView2 = new wxSplitterWindow(SplitView,-1,wxDefaultPosition,wxDefaultSize,wxSP_LIVE_UPDATE|wxSP_NOBORDER|wxNO_FULL_REPAINT_ON_RESIZE/*|wxSP_3DSASH| wxSP_FULLSASH*/);
 //	MakeTlPanel(SplitView2);
 //	SplitView2->SetMinimumPaneSize(20);
 
-	wxPanel *panel1 = new wxPanel(SplitView2,-1,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE);
+	wxPanel *panel1 = new wxPanel(SplitView2,-1,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
 
 	wxBoxSizer * tlPanelSizer = new wxBoxSizer(wxVERTICAL);
 	wxScrollBar *sb = new wxScrollBar(panel1,ID_ScrollBar);
@@ -282,10 +282,10 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 //	m_tp = new TLPanel(SplitView2);/*TODO Lautstärke regler einbauen*/
 
 
-	wxPanel *miniplayerPanel = new wxPanel(SplitView2,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE);
+	wxPanel *miniplayerPanel = new wxPanel(SplitView2,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
 	SplitV2Sizer->Add(miniplayerPanel,1,wxEXPAND);
 	
-	wxPanel *sidePanelHolder = new wxPanel(miniplayerPanel,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE);
+	wxPanel *sidePanelHolder = new wxPanel(miniplayerPanel,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
 
 	
 	

@@ -24,15 +24,15 @@ class TLSample;
 class TLItem
 {
 	public:
-		TLItem(TLSample *sample, int trackNr,int position/* = 0*/);
+		TLItem(TLSample *sample, int trackNr, gg_tl_dat position);
 		~TLItem();
-		int FillBuffer(float* outBuffer, int pos, int count, bool mute, double volume);
-		int GetLength();
-		const int GetPosition();
+		unsigned int FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int count, bool mute, double volume);
+		gg_tl_dat GetLength();
+		gg_tl_dat GetPosition();
+		gg_tl_dat GetEndPosition();
 		int GetTrack();
-		int GetEndPosition();
-		void SetPosition(int position);
-		int m_position;
+		void SetPosition(gg_tl_dat position);
+		gg_tl_dat m_position; /*TODO: über friend Klassen*/
 		TLSample *GetSample();
 		void Select();
 		void UnSelect();

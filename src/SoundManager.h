@@ -50,7 +50,7 @@ class SoundManager// : public wxEvtHandler
 		void Play(TLSample *sample);
 		void Stop();
 		bool Done();
-		long GetPosition();
+		gg_tl_dat GetPosition();
 		
 		unsigned int FillBuffer_TL(float* outBuffer, unsigned int count);
 		unsigned int FillBuffer_Sample(float* outBuffer, unsigned int count);
@@ -60,7 +60,7 @@ class SoundManager// : public wxEvtHandler
 		TLData *m_data;
 		bool m_tlPlaying;
 		bool m_samplePlaying;
-		long m_position;
+		gg_tl_dat m_position;
 		TLSample *m_sample;
 //		DECLARE_EVENT_TABLE()
 };

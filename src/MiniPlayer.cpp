@@ -21,6 +21,7 @@
     #include "wx/wx.h"
 #endif
 
+#include "stuff.h"
 #include "SoundManager.h"
 #include "MiniPlayer.h"
 #include "TLSample.h"
@@ -48,7 +49,7 @@ MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListe
 		const wxSize& size,
 		long style,
 		const wxString& name)
-		:wxPanel(parent, id, pos, size, style|wxNO_FULL_REPAINT_ON_RESIZE , name)
+		:wxPanel(parent, id, pos, size, style|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN , name)
 {
 	MakeMiniPlayerWindow(this);
 	m_soundManager=soundManager;
@@ -56,6 +57,7 @@ MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListe
 	m_updateListener = updateListener;
 	m_fileInfoListener = fiListener;
 	m_sample=NULL;
+	m_length=100;
 }
 void MiniPlayer::MakeMiniPlayerWindow(wxWindow *parent)
 {
@@ -104,7 +106,8 @@ void MiniPlayer::Play()
 	if (m_sample) {
 		wxLogStatus(wxT("Playing Sample: %s"),m_sample->GetFilename().c_str());
 		if (m_fileInfoListener) {m_fileInfoListener->SetInfo(m_sample->GetFilename(),m_sample->m_infoFrames,m_sample->m_infoChannels,m_sample->m_infoSampleRate);}
-		m_slider->SetRange(0,m_sample->GetLength());
+//		m_slider->SetRange(0,m_sample->GetLength());
+		m_length=m_sample->GetLength();
 		m_soundManager->Play(m_sample);
 	} else {
 		wxLogStatus(wxT("Playing Sample: %s"),m_filename.c_str());
@@ -115,7 +118,8 @@ void MiniPlayer::Play()
 		m_soundManager->Play(m_filename,length,frames,channels,sampleRate,m_updateListener);
 		if (m_fileInfoListener) {m_fileInfoListener->SetInfo(m_filename,frames,channels,sampleRate);}
 //		std::cout << "length: " << length << std::endl;
-		m_slider->SetRange(0,length);
+//		m_slider->SetRange(0,length);
+		m_length=length;
 	}
 	m_slider->SetValue(0);
 	m_timer->Start(100);
@@ -125,7 +129,8 @@ void MiniPlayer::OnTimer(wxTimerEvent &event)
 	if (m_soundManager->Done()) {
 		Stop();
 	} else {
-		m_slider->SetValue(m_soundManager->GetPosition());
+		//m_slider->SetValue(m_soundManager->GetPosition());
+		SetPosition(m_soundManager->GetPosition());
 	}
 }
 void MiniPlayer::OnPlay(wxCommandEvent *event)
@@ -146,4 +151,7 @@ void MiniPlayer::Stop()
 	m_soundManager->Stop();
 	m_sample=NULL;
 }
-
+void MiniPlayer::SetPosition(gg_tl_dat position)
+{
+	m_slider->SetValue((position*100)/m_length);
+}

@@ -31,7 +31,7 @@ class TLSelectionItem
 		~TLSelectionItem();
 		TLSample *GetSample();
 		TLItem *GetItem();
-		long GetPosition();
+		gg_tl_dat GetPosition();
 		int GetTrack();
 	private:
 		TLSample *m_sample;
@@ -47,20 +47,20 @@ class TLSelectionSet
 		void AddSample(TLSample *sample, TLItem *item/*, int position, int trackNr*/);
 		void Clear(TLData* data);
 		void DeleteFrom(TLData* data);
-		TLSelectionSet *AddTo(TLData* data, int offsetPosition, int track); /*Für TLView*/
+		TLSelectionSet *AddTo(TLData* data, gg_tl_dat offsetPosition, int track); /*Für TLView*/
 		TLSelItemList::Node *GetFirst();
 		bool IsActive();
 		void CalcBounds();
 		int GetTrack1();
 		int GetTrack2();
-		long GetX1();
-		long GetX2();
+		gg_tl_dat GetX1();
+		gg_tl_dat GetX2();
 	private:
 		TLSelItemList m_itemList;
 		int m_trackNr1;
 		int m_trackNr2;
-		long m_x1;
-		long m_x2;
+		gg_tl_dat m_x1;
+		gg_tl_dat m_x2;
 /*		int m_trackOffset;
 		long m_offset*/
 };

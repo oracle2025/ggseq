@@ -24,7 +24,7 @@
 #endif
 
 #include <portaudio.h>
-
+#include "stuff.h"
 #include "TLData.h"
 #include "TLTrack.h"
 #include "TLItem.h"
@@ -192,10 +192,7 @@ void SoundManager::StopStream()
 	return;
 }
 
-long SoundManager::GetPosition()
-{
-	return m_position;
-}
+gg_tl_dat SoundManager::GetPosition() { return m_position; }
 bool SoundManager::Done()
 {
 	if (!m_tlPlaying && !m_samplePlaying)

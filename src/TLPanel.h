@@ -131,6 +131,13 @@ class TLPanel : public wxPanel
 		Ruler *m_ruler;
 		int m_CaretPosition;
 		bool m_CaretVisible;
+		int FromTLtoSB(gg_tl_dat x);
+		gg_tl_dat FromSBtoTL(int x);
+		/*
+		m_position 0<= x <= 1000    -  position*1000 /length
+		m_scrollBarRange = 1000
+		m_thumbSize = ?             -  thumbSize*1000 /length
+		*/
 		DECLARE_EVENT_TABLE()
 };
 

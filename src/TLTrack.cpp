@@ -22,6 +22,7 @@
     #include "wx/wx.h"
 #endif
 
+#include "stuff.h"
 #include "TLTrack.h"
 #include "TLItem.h"
 #include "TLSample.h"
@@ -49,21 +50,20 @@ TLItemList::Node *TLTrack::GetFirst()
 {
 	return m_itemList.GetFirst();
 }
-TLItem *TLTrack::ItemAtPos(int Position)
+TLItem *TLTrack::ItemAtPos(gg_tl_dat Position)
 {
 	for ( TLItemList::Node *node = m_itemList.GetLast(); node; node = node->GetPrevious() ) {
 		TLItem *current = node->GetData();
-		if ((current->GetPosition()<Position)&&(current->GetPosition()+current->GetLength()>Position))
+		if ((current->GetPosition()<Position)&&(current->GetEndPosition()/*+current->GetLength()*/>Position))
 			return current;
 	}
 	return (TLItem*)NULL;
 }
 void TLTrack::DeleteItem(TLItem *item)
 {
-	/*if (*/m_itemList.DeleteObject(item);/*)
-		delete item;*/ //Weil die Liste das schon löscht
+	m_itemList.DeleteObject(item);
 }
-TLItem *TLTrack::AddItem(TLSample *sample, int position)
+TLItem *TLTrack::AddItem(TLSample *sample, gg_tl_dat position)
 {
 	TLItem *tmp = new TLItem(sample,m_trackNr,position);
 	m_itemList.Append(tmp);
@@ -81,7 +81,7 @@ void TLTrack::SortItems()
 		m_length=item->GetLength()+item->GetPosition();
 	}
 }
-long TLTrack::GetLength()
+gg_tl_dat TLTrack::GetLength()
 {
 	return m_length;
 }
@@ -98,7 +98,7 @@ void TLTrack::ResetOffsets()
 {
 	m_currentNode = m_itemList.GetFirst();
 }
-unsigned int TLTrack::FillBuffer(float* outBuffer, unsigned int count, long position)
+unsigned int TLTrack::FillBuffer(float* outBuffer, unsigned int count, gg_tl_dat position)
 {
 	unsigned int inc;
 	unsigned int written=0;
@@ -131,7 +131,10 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 	for ( TLItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		TLItem *current = node->GetData();
 		wxString tmp;
-		tmp << current->GetPosition();
+//		char buffer[100];
+		tmp.Printf(wxT("%lld"),current->GetPosition());
+//		tmp << (unsigned long)current->GetPosition();/*TODO richtig umwandeln*/
+		
 		wxString tmp2;
 		tmp2 << current->GetSample()->GetId();
 		TiXmlElement *item = new TiXmlElement("item");
@@ -143,7 +146,6 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 }
 void TLTrack::Clear()
 {
-//	m_itemList.DeleteContents(true);
 	m_itemList.Clear();
 }
 

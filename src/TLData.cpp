@@ -26,6 +26,8 @@
 //#include <iostream>
 #include <fstream>
 
+#include "stuff.h"
+
 #include "TLXmlLoader2.h"
 #include "UpdateListener.h"
 
@@ -68,7 +70,7 @@ TLTrackList::Node *TLData::GetFirst()
 	return m_trackList.GetFirst();
 }
 
-TLItem *TLData::ItemAtPos(int Position, int TrackNr)
+TLItem *TLData::ItemAtPos(gg_tl_dat Position, int TrackNr)
 {
 	TLTrack *tlTrack = m_trackList.Item(TrackNr)->GetData();
 	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::ItemAtPos!" );
@@ -93,7 +95,7 @@ void TLData::ClearSample(TLSample *sample)
 	m_sampleManager->Clear(sample);
 }
 
-TLItem *TLData::AddItem(TLSample *sample, int Position, int TrackNr)
+TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr)
 {
 	TLTrackList::Node *node =  m_trackList.Item(TrackNr);
 	if (!node)
@@ -110,7 +112,7 @@ TLItem *TLData::AddItem(TLSample *sample, int Position, int TrackNr)
 
 	return tlTrack->AddItem(sample, Position);
 }
-TLItem *TLData::AddItem(wxString filename, int Position, int TrackNr)
+TLItem *TLData::AddItem(wxString& filename, gg_tl_dat Position, int TrackNr)
 {
 	TLTrack *tlTrack = m_trackList.Item(TrackNr)->GetData();
 	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::AddItem!" );
@@ -272,7 +274,7 @@ void TLData::SaveWAV(wxString filename)
 		return;/*mit wxLog arbeiten*/
 	}
 	float buffer[512];
-	int tmp=m_playbackPosition;
+	gg_tl_dat tmp=m_playbackPosition;
 	SetPlaybackPosition(0);
 	SortAll();
 	unsigned int res=FillBuffer(buffer,512);
@@ -301,7 +303,7 @@ void TLData::SaveWAV(wxString filename)
 	sf_close(sndfile);
 	SetPlaybackPosition(tmp);
 }
-void TLData::SetItemPosition(TLItem *item,int Position)
+void TLData::SetItemPosition(TLItem *item,gg_tl_dat Position)
 {
 	item->SetPosition(Position);
 	m_changed=true;
@@ -310,17 +312,17 @@ void TLData::SetItemPosition(TLItem *item,int Position)
 	}
 
 }
-int TLData::GetLength()
+gg_tl_dat TLData::GetLength()
 {
 	return m_length;
 }
 
-void TLData::SetPlaybackPosition(long Position)
+void TLData::SetPlaybackPosition(gg_tl_dat Position)
 {
 	m_playbackPosition=Position;
 	m_position=m_playbackPosition;
 }
-long TLData::GetPlaybackPosition()
+gg_tl_dat TLData::GetPlaybackPosition()
 {
 	return m_playbackPosition;
 }
@@ -351,24 +353,24 @@ unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 	rv=node->GetData()->FillBuffer(buffer2,count,m_position);/*second Track*/
 	if (rv>maxResultCount)
 		maxResultCount=rv;
-	mixChannels(buffer1,buffer2,outBuffer);
+	MixChannels(buffer1,buffer2,outBuffer,count);
 	node = node->GetNext();
 	while(node) {
 	/*	if (!node->GetData()->IsMuted()){*/
 			rv=node->GetData()->FillBuffer(buffer1,count,m_position);
 			if (rv>maxResultCount)
 				maxResultCount=rv;
-			mixChannels(outBuffer,buffer1,outBuffer);
+			MixChannels(outBuffer,buffer1,outBuffer,count);
 		/*}*/
 		node = node->GetNext();
 	}
 	m_position+=maxResultCount;
 	return maxResultCount;
 }
-int TLData::mixChannels(float *A, float *B, float* out)/*Mix function for (-1)-(1) float audio*/
-{/*TODO für andere Längen anpassen*/
+unsigned int TLData::MixChannels(float *A, float *B, float* out, unsigned int count)/*Mix function for (-1)-(1) float audio*/
+{
 	int i;
-	for ( i=0; i < 512;i++){
+	for ( i=0; i < count;i++){
 		if (A[i]<0 && B[i]<0) {
 			out[i]=(A[i]+1)*(B[i]+1)-1;
 		} else {
@@ -376,7 +378,7 @@ int TLData::mixChannels(float *A, float *B, float* out)/*Mix function for (-1)-(
 		}
 
 	}
-	return 512;
+	return count;
 }
 TLColourManager *TLData::GetColourManager()
 {

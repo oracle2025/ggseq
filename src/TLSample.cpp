@@ -26,6 +26,7 @@
 #include <sndfile.h>
 #include <samplerate.h>
 
+#include "stuff.h"
 #include "TLSample.h"
 #include "TLColourManager.h"
 #include "UpdateListener.h"
@@ -63,8 +64,8 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 		sf_close(sndfile);
 		return;
 	}
-	m_length = sfinfo.frames*2;
-	m_buffer=new float[m_length];
+	m_bufferLength = sfinfo.frames*2;
+	m_buffer=new float[m_bufferLength];
 
 	int factors;
 	if (sfinfo.samplerate==44100 && sfinfo.channels==2) {
@@ -118,7 +119,7 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 		SRC_DATA src_data;
 		src_data.src_ratio=44100.0/sfinfo.samplerate; /*output_sample_rate / input_sample_rate*/
 		src_data.input_frames=100000;//m_length/2;
-		src_data.output_frames=((m_length/2)*src_data.src_ratio)+25;
+		src_data.output_frames=((m_bufferLength/2)*src_data.src_ratio)+25;
 		src_data.data_in=m_buffer;
 		float *out_buffer=new float[src_data.output_frames*2];
 		src_data.data_out=out_buffer;
@@ -129,7 +130,7 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 		
 //		src_simple(&src_data,SRC_SINC_MEDIUM_QUALITY,2);/*dieser aufruf ist zeitkritisch*/
 		/*100000*/
-		long buffer_length=m_length/2;
+		long buffer_length=m_bufferLength/2;
 		long frames_generated=0;
 //		for (long i=0;src_data.input_frames_used;i+=src_data.input_frames_used) {
 		src_data.end_of_input=0;
@@ -146,7 +147,7 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 			src_data.data_in+=src_data.input_frames_used*2;
 			buffer_length-=src_data.input_frames_used;
 			if (updateListener)
-				if (updateListener->Update(prog_offset+(i*factors)/(m_length/2))==false) {
+				if (updateListener->Update(prog_offset+(i*factors)/(m_bufferLength/2))==false) {
 					delete out_buffer;
 					src_delete(src_state);
 					return;
@@ -157,7 +158,7 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 		src_delete(src_state);
 		delete m_buffer;
 		m_buffer=out_buffer;//src_data.data_out;
-		m_length=frames_generated*2;//src_data.output_frames_gen*2;
+		m_bufferLength=frames_generated*2;//src_data.output_frames_gen*2;
 //		return;
 	}
 	
@@ -181,7 +182,7 @@ TLSample::~TLSample()
 
 wxIcon TLSample::GetIcon()
 {
-	int width=m_length/3793;
+	int width=m_bufferLength/3793;
 	wxBitmap b1(width,25);
 	wxMemoryDC dc1;
 	dc1.SelectObject(b1);
@@ -199,7 +200,7 @@ void TLSample::Draw(wxDC& dc)
 	wxBrush b1=dc.GetBrush();
 /*	b1.SetColour(GetColour());
 	dc.SetBrush(b1);*/
-	int width=m_length/3793;
+	int width=m_bufferLength/3793;
 //	dc.DrawRectangle(0,0,width,25);
 
 	TLView::Draw3dRect(&dc,0,0,width,25,GetColour());
@@ -216,7 +217,7 @@ wxColour TLSample::GetColour()
 	return m_colourMan->GetColour(m_filename);
 }
 float *TLSample::GetBuffer()     { return m_buffer; }
-int TLSample::GetLength()        { return m_length; }
+gg_tl_dat TLSample::GetLength()        { return m_bufferLength; }
 bool TLSample::IsValid()         { return m_valid; }
 void TLSample::Ref()             { m_refCount++; }
 void TLSample::UnRef()           { m_refCount--; }

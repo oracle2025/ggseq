@@ -52,13 +52,15 @@ class MiniPlayer : public wxPanel, public MiniPlayerInterface
 		void OnStop(wxCommandEvent *event);
 		void OnTimer(wxTimerEvent &event);
 	private:
+		void SetPosition(gg_tl_dat position);
 		wxButton *m_playButton;
 		wxButton *m_stopButton;
-		wxGauge *m_gauge;
+//		wxGauge *m_gauge;
 		wxSlider *m_slider;
 		wxTimer *m_timer;
 		wxString m_filename;
 		TLSample *m_sample;
+		gg_tl_dat m_length;
 		SoundManager *m_soundManager;
 		UpdateListener *m_updateListener;
 		FileInfoListener *m_fileInfoListener;

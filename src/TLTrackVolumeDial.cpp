@@ -21,6 +21,7 @@
 #ifndef WX_PRECOMP
     #include "wx/wx.h"
 #endif
+#include "stuff.h"
 
 #include "dial.h"
 #include "TLTrack.h"

@@ -33,15 +33,14 @@ class TLTrack
 		~TLTrack();
 
 		TLItemList::Node *GetFirst();
-		TLItem *ItemAtPos(int Position);
-		TLItem *AddItem(TLSample *sample, int position);
+		TLItem *ItemAtPos(gg_tl_dat Position);
+		TLItem *AddItem(TLSample *sample, gg_tl_dat position);
 		void DeleteItem(TLItem *item);
 
 		int GetHeight();
-		long GetLength();
+		gg_tl_dat GetLength();
 
-//		void SetPlaybackPosition(int Position);
-		unsigned int FillBuffer(float* outBuffer, unsigned int count, long position);
+		unsigned int FillBuffer(float* outBuffer, unsigned int count, gg_tl_dat position);
 		void ResetOffsets();
 		void Clear();
 		void SortItems();
@@ -54,10 +53,9 @@ class TLTrack
 		TLItemList m_itemList;
 		int m_height;
 		int m_trackNr;
-//		int m_pos;
 		bool m_mute;
 		double m_volume;
-		long m_length;
+		gg_tl_dat m_length;
 		TLItemList::Node *m_currentNode;
 };
 

@@ -27,6 +27,7 @@
 /*XML*/
 #include "tinyxml.h"
 
+#include "stuff.h"
 #include "TLSampleManager.h"
 #include "TLSample.h"
 #include "TLColourManager.h"

@@ -22,6 +22,7 @@
     #include "wx/wx.h"
 #endif
 #include <wx/tglbtn.h>
+#include "stuff.h"
 
 #include "TLTrack.h"
 #include "TLMuteButton.h"

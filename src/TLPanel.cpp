@@ -33,6 +33,7 @@
 #include <wx/filename.h>
 #include <iostream>
 
+#include "stuff.h"
 #include "TLView.h"
 #include "TLPanel.h"
 #include "TLItem.h"
@@ -119,8 +120,11 @@ TLPanel::TLPanel(wxWindow* parent, wxScrollBar *scrollbar, wxWindowID id, const 
 //	m_data->GetTrackCount
 
 //	m_scrollBar->SetSize(0,GetSize().GetHeight()-20,GetSize().GetWidth(),20);
-	m_scrollBar->SetScrollbar(0,m_TlView->GetScrollBarThumbSize() ,m_TlView->GetScrollBarRange() , m_TlView->GetScrollBarThumbSize());
-	m_TlView->SetVisibleFrame(GetSize().GetWidth(),GetSize().GetHeight()/*-m_scrollBar->GetSize().GetHeight()*/);
+
+//	m_scrollBar->SetScrollbar(0,m_TlView->GetScrollBarThumbSize() ,m_TlView->GetScrollBarRange() , m_TlView->GetScrollBarThumbSize());
+	ResetScrollBar();
+
+	m_TlView->SetVisibleFrame(GetSize().GetWidth(),GetSize().GetHeight());
 	m_CaretPosition=0;
 	m_CaretVisible=true;//false;
 	m_sampleDrag=false;
@@ -155,10 +159,8 @@ void TLPanel::OnSize(wxSizeEvent& event)
 {
 #ifdef __WXMSW__
 	m_TlView->SetVisibleFrame(GetSize().GetWidth()-11-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-22-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
-//	m_scrollBar->SetSize(0,GetSize().GetHeight()-22,GetSize().GetWidth()-6,16);
 #else
-	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()/*-m_scrollBar->GetSize().GetHeight()*/-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
-//	m_scrollBar->SetSize(0,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-2,GetSize().GetWidth()-4,20);
+	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
 #endif
 	m_ruler->SetSize(5+LEFT_OFFSET_TRACKS,2,GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,15);
 
@@ -503,7 +505,7 @@ void TLPanel::HideFrame(wxRect& rect, wxDC* dc)
 }
 void TLPanel::OnScroll(wxScrollEvent& event)
 {
-	m_TlView->SetPosition(event.GetPosition());
+	m_TlView->SetPosition(FromSBtoTL(event.GetPosition()));
 	m_CaretPosition = m_TlView->GetCaretPosition();
 	UpdateRulerTicks();
 #ifdef __WXMSW__
@@ -521,13 +523,14 @@ void TLPanel::DrawCaret(wxDC& dc)
 #ifdef __WXMSW__
 	dc.DrawRectangle(m_CaretPosition,0,1,GetSize().GetHeight());
 #else
-	dc.DrawRectangle(m_CaretPosition,0,1,GetSize().GetHeight()/*-m_scrollBar->GetSize().GetHeight()*/);
+	dc.DrawRectangle(m_CaretPosition,0,1,GetSize().GetHeight());
 #endif
 }
 
 void TLPanel::ResetScrollBar()
 {
-	m_scrollBar->SetScrollbar(m_scrollBar->GetThumbPosition(),m_TlView->GetScrollBarThumbSize() ,m_TlView->GetScrollBarRange() , m_TlView->GetScrollBarThumbSize());
+	int ts = FromTLtoSB(m_TlView->GetScrollBarThumbSize());
+	m_scrollBar->SetScrollbar(FromTLtoSB(m_TlView->GetPosition())/*m__scrollBar->GetThumbPosition()*/, ts,100000 , ts);
 }
 
 /*void TLPanel::HideFrame(int x, int y, wxDC* dc)
@@ -696,22 +699,23 @@ bool TLPanel::UpdateCaret()
 	}
 //	SetCaretPosition(m_soundManager->GetPlaybackPosition());
 	DrawCaret(dc);
-	int pos=m_soundManager->GetPosition();
-	int pos2=(pos/117600)*31;
-	if (pos2<m_scrollBar->GetThumbPosition()) {
-		m_scrollBar->SetThumbPosition(pos2);
-		m_TlView->SetPosition(m_scrollBar->GetThumbPosition());
+	gg_tl_dat pos=m_soundManager->GetPosition();
+//	int pos2=(pos/117600)*31;
+	int sbPos=FromTLtoSB((pos/117600)*31);
+	if (sbPos<m_scrollBar->GetThumbPosition()) {
+		m_scrollBar->SetThumbPosition(sbPos);
+		m_TlView->SetPosition(FromSBtoTL(m_scrollBar->GetThumbPosition()));
 #ifdef __WXMSW__
 		Refresh(true);
 #else
 		Refresh(false);
 #endif
-	} else if (pos2>=m_scrollBar->GetThumbPosition()+m_scrollBar->GetThumbSize()) {
+	} else if (sbPos>=m_scrollBar->GetThumbPosition()+m_scrollBar->GetThumbSize()) {
 		int newPos = m_scrollBar->GetThumbPosition()+m_scrollBar->GetThumbSize();
 		if (newPos>m_scrollBar->GetRange())
 			newPos=m_scrollBar->GetRange();
 		m_scrollBar->SetThumbPosition(newPos);
-		m_TlView->SetPosition(m_scrollBar->GetThumbPosition());
+		m_TlView->SetPosition(FromSBtoTL(m_scrollBar->GetThumbPosition()));
 #ifdef __WXMSW__
 		Refresh(true);
 #else
@@ -811,6 +815,14 @@ void TLPanel::UpdateButtons()
 void TLPanel::SetUpdateListener(UpdateListener *updateListener)
 {
 	m_data->SetUpdateListener(updateListener);
+}
+int TLPanel::FromTLtoSB(gg_tl_dat x)
+{
+	return (int)((x*100000)/m_TlView->GetScrollBarRange());
+}
+gg_tl_dat TLPanel::FromSBtoTL(int x)
+{
+	return (( (gg_tl_dat)x *m_TlView->GetScrollBarRange())/100000);
 }
 void TLPanel::UpdateRulerTicks()
 {

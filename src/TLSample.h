@@ -30,7 +30,7 @@ class TLSample
 		TLSample(const wxString &filename, int id,TLColourManager *colourMan, UpdateListener* updateListener=NULL);
 		~TLSample();
 		float *GetBuffer();
-		int GetLength();
+		gg_tl_dat GetLength();
 		bool IsValid();
 		void Ref();
 		void UnRef();
@@ -40,13 +40,14 @@ class TLSample
 		wxIcon GetIcon();
 		void Draw(wxDC& dc_screen);
 		wxColour GetColour();
-		long m_infoFrames;
+		
+		gg_tl_dat m_infoFrames;
 		long m_infoSampleRate;
 		long m_infoChannels;
 	private:
 		int m_id; /*Für die Zuordnung im XML-File*/
 		int m_refCount;/*Ums zu löschen sobald es keine Referenzen mehr gibt.*/
-		int m_length;
+		gg_tl_dat m_bufferLength;
 		float *m_buffer;
 		wxString m_filename;
 		bool m_valid;

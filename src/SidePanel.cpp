@@ -33,7 +33,7 @@ BEGIN_EVENT_TABLE(SidePanel, wxPanel)
 END_EVENT_TABLE()
 
 SidePanel::SidePanel(wxWindow* parent,wxPanel* panel, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
-	: wxPanel(parent,id,pos,size,style,name)
+	: wxPanel(parent,id,pos,size,style|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN,name)
 {
 	m_hidden = true;
 	m_contentPanel = panel;
