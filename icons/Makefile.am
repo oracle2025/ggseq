@@ -10,3 +10,8 @@
 
 EXTRA_DIST = colours2.xpm       new1.xpm  play.xpm    save.xpm dir.xpm        null.xpm  rewind.xpm  stop.xpm dndfile.xpm     open.xpm  saveas.xpm  wav_export.xpm ggseq_32.xpm snap.xpm  mute_off.xpm mute_on.xpm play_12.xpm stop_12.xpm prefs_misc.xpm
 SUBDIRS =
+# -- the following would install the app icon, but I have to
+# -- ask georg if this is the 'right' way to do things :)
+# install-data-local:
+#	$(mkinstalldirs) $(prefix)/share/icons/
+#	$(INSTALL_DATA) $(srcdir)/ggseq_32.xpm $(prefix)/share/icons/ggseq_32.xpm

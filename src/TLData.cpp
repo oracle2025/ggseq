@@ -369,7 +369,7 @@ unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 }
 unsigned int TLData::MixChannels(float *A, float *B, float* out, unsigned int count)/*Mix function for (-1)-(1) float audio*/
 {
-	int i;
+	unsigned int i;
 	for ( i=0; i < count;i++){
 		if (A[i]<0 && B[i]<0) {
 			out[i]=(A[i]+1)*(B[i]+1)-1;

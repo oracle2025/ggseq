@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=Gungirl Sequenser
-Comment=PCM Audio Seqenser
+Name=Gungirl Sequencer
+Comment=PCM Audio Seqencer
 Exec=/usr/bin/ggseq
 Icon=/usr/share/icons/ggseq_32.xpm
 Terminal=0

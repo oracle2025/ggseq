@@ -77,7 +77,7 @@ BEGIN_EVENT_TABLE(TLPanel, wxPanel)
 END_EVENT_TABLE()
 
 TLPanel::TLPanel(wxWindow* parent, wxScrollBar *scrollbar, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
-:wxPanel(parent, id, pos, size, style/*|wxSUNKEN_BORDER*/ , name)
+:wxPanel(parent, id, pos, size, style|wxCLIP_CHILDREN/*|wxSUNKEN_BORDER*/ , name)
 {
 
 	m_data = new TLData();
@@ -426,8 +426,10 @@ void TLPanel::StartSelectionDrag(int x, int y, int width, int height)
 	dc.SetPen(pen);
 	m_TlView->DrawSelection(&dc);
 
+#ifndef __WXMSW__
 	wxMask *mask = new wxMask(bitmap,*wxGREEN);
 	bitmap.SetMask(mask);
+#endif
 
 #ifdef __WXMSW__ 
 	m_dragImage = new wxGenericDragImage(bitmap);
@@ -712,8 +714,8 @@ bool TLPanel::UpdateCaret()
 #endif
 	} else if (sbPos>=m_scrollBar->GetThumbPosition()+m_scrollBar->GetThumbSize()) {
 		int newPos = m_scrollBar->GetThumbPosition()+m_scrollBar->GetThumbSize();
-		if (newPos>m_scrollBar->GetRange())
-			newPos=m_scrollBar->GetRange();
+		if (newPos>m_scrollBar->GetRange()-m_scrollBar->GetThumbSize())
+			newPos=m_scrollBar->GetRange()-m_scrollBar->GetThumbSize();
 		m_scrollBar->SetThumbPosition(newPos);
 		m_TlView->SetPosition(FromSBtoTL(m_scrollBar->GetThumbPosition()));
 #ifdef __WXMSW__

@@ -59,11 +59,26 @@ MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListe
 	m_sample=NULL;
 	m_length=100;
 }
+
+/*class tmpEventHandler : public wxEvtHandler
+{
+	public:
+		tmpEventHandler() :wxEvtHandler(){}
+		void OnEraseBackground(wxPaintEvent& event){}
+	private:
+		DECLARE_EVENT_TABLE()
+};
+BEGIN_EVENT_TABLE(tmpEventHandler, wxEvtHandler)
+	EVT_ERASE_BACKGROUND(tmpEventHandler::OnEraseBackground)
+	EVT_CUSTOM(wxEVT_PAINT,ID_StaticBox,tmpEventHandler::OnEraseBackground)
+END_EVENT_TABLE()*/
 void MiniPlayer::MakeMiniPlayerWindow(wxWindow *parent)
 {
 	wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
 	wxStaticBox *item2 = new wxStaticBox( parent, ID_StaticBox, wxT("") ,wxDefaultPosition, wxDefaultSize, wxNO_FULL_REPAINT_ON_RESIZE);
+//	item2->PushEventHandler(new tmpEventHandler());
+	
 	wxStaticBoxSizer *item1 = new wxStaticBoxSizer( item2, wxHORIZONTAL );
 	wxStaticText *item3 = new wxStaticText( parent, -1, wxT("Miniplayer"), wxDefaultPosition, wxDefaultSize, 0 );
 	item1->Add( item3, 0, wxALIGN_CENTRE|wxLEFT|wxRIGHT, 5 );

@@ -195,13 +195,14 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	panel1->SetFocus();
 //	panel1->Enable(false);
 
+	MakeMainWindow(panel1);
+
 	StatusProgressBar *cc = new StatusProgressBar(this,-1);
 	SetStatusBar(cc);
 	m_updateListener=cc;
 
 	cc->SetDisableListener(new DoubleDisabler(panel1,GetToolBar()));
 
-	MakeMainWindow(panel1);
 	
 	m_tp->SetUpdateListener(cc);
 
@@ -313,7 +314,7 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 	
 	
 	m_DirTree = NULL;
-	m_DirTree = new wxGenericDirCtrl(SplitView,ID_DirTree,wxDirDialogDefaultFolderStr,wxDefaultPosition,wxDefaultSize,wxDIRCTRL_DIR_ONLY|wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE);
+	m_DirTree = new wxGenericDirCtrl(SplitView,ID_DirTree,wxDirDialogDefaultFolderStr,wxDefaultPosition,wxDefaultSize,wxDIRCTRL_DIR_ONLY|wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
 	wxConfig config(wxT("ggseq"));
 	m_DirTree->SetPath(config.Read(wxT("MiniFilerDirectory"), wxT("/")));
 
