@@ -61,6 +61,7 @@ public:
     long style, wxWindowID id, const wxString& name);
 private:
     // WDR: method declarations for MyFrame
+    wxSplitterWindow* GetTimelineSplitter()  { return (wxSplitterWindow*) FindWindow( ID_TIMELINE_SPLITTER ); }
     wxSplitterWindow* GetMainSplitter()  { return (wxSplitterWindow*) FindWindow( ID_MAIN_SPLITTER ); }
     wxGenericDirCtrl* GetDirtree()  { return (wxGenericDirCtrl*) FindWindow( ID_DIRTREE ); }
     FileInfoPanel* GetFileInfoPanel()  { return (FileInfoPanel*) FindWindow( ID_TL_SIDEPANEL ); }
@@ -82,6 +83,7 @@ private:
 
 private:
     // WDR: handler declarations for MyFrame
+    void OnTimelineSplitterChanging( wxSplitterEvent &event );
     void OnExportPack( wxCommandEvent &event );
     void OnImportPack( wxCommandEvent &event );
     void OnZoom150( wxCommandEvent &event );

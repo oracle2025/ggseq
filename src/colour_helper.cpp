@@ -2,6 +2,9 @@
 #include <wx/colour.h>
 #include "colour_helper.h"
 
+//#define MIN(X,Y) ((X) < (Y) ? : (X) : (Y))
+// minimum: a <? b      maximum: a >? b
+
 float MAX(float a, float b, float c)
 {
 	if (a>=b && a>=c)

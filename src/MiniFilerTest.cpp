@@ -441,7 +441,7 @@ void TestFrame1::OnScroll(wxScrollEvent& event)
 }
 void TestFrame1::OnPreferences(wxCommandEvent& event)
 {
-#ifndef _DISABLE_CONFIG_SHORTCUTS_
+#ifndef _DISABLE_CONFIG_SHORTCUTS_   //What the hell is this??
 	ShortcutsDialog dlg(this);
 	dlg.Centre();
 	if (dlg.ShowModal()==wxID_OK) {

@@ -26,6 +26,7 @@
 #include <wx/config.h>
 
 #include "TLColourManager.h"
+#include "stdio.h"
 
 #include <wx/listimpl.cpp>
 WX_DEFINE_LIST(TLDirColourList);
@@ -84,6 +85,7 @@ TLColourManager::~TLColourManager()
 		conf->Write(str,(long)var);
 	}
 	m_colourList.Clear();
+	conf->Flush();  //Eigentlich sollte es auch ohne das funktionieren!!!
 	//config.Flush();
 }
 wxColour TLColourManager::GetColour(wxString dirname)

@@ -39,6 +39,8 @@ EnvelopeDragHandler::EnvelopeDragHandler( wxWindow* canvas, TLView *view,
 	m_item = item;
 	m_envelopeHandle = envelopeHandle;
 	m_itemBoundaries = m_view->GetItemBoundaries( item );
+
+	m_canvas->CaptureMouse(); //TODO Put me in Base Class
 	
 	m_xOffset = x - ( m_itemBoundaries.x + m_envelopeHandle->x );
 	m_yOffset = y - ( m_itemBoundaries.y + m_envelopeHandle->y );
@@ -56,6 +58,9 @@ void EnvelopeDragHandler::OnDrag( int x, int y )
 }
 void EnvelopeDragHandler::OnDrop( int x, int y, bool copy )
 {
+	m_item->GuiEnvToDataEnv();
+	m_canvas->ReleaseMouse();
+	//TODO Calculate Real Envelope Data
 }
 wxPoint EnvelopeDragHandler::FitInside( wxPoint handlePos )
 {
@@ -79,9 +84,15 @@ void EnvelopeDragHandler::FixEnvelopeCtrls()
 	}
 	if ( m_envelopeHandle == (&(m_item->m_rightFadeIn)) ) {
 		m_item->m_leftFadeOut.y = m_envelopeHandle->y;
+		if (m_item->m_leftFadeOut.x < m_item->m_rightFadeIn.x ) {
+			m_item->m_leftFadeOut.x = m_item->m_rightFadeIn.x;
+		}
 	}
 	if ( m_envelopeHandle == (&(m_item->m_leftFadeOut)) ) {
 		m_item->m_rightFadeIn.y = m_envelopeHandle->y;
+		if (m_item->m_leftFadeOut.x < m_item->m_rightFadeIn.x ) {
+			m_item->m_rightFadeIn.x = m_item->m_leftFadeOut.x;
+		}
 	}
 }
 void EnvelopeDragHandler::Draw( wxDC &dc )

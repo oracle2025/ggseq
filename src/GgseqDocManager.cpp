@@ -218,12 +218,16 @@ void GgseqMoveItemCommand::Do()
 		item = m_document->GetItem(m_referenceId);
 	}
 	m_filename = item->GetSample()->GetFilename();
+	m_FadeInOut[0] = item->m_leftFadeIn;
+	m_FadeInOut[1] = item->m_rightFadeIn;
+	m_FadeInOut[2] = item->m_leftFadeOut;
+	m_FadeInOut[3] = item->m_rightFadeOut;
 	int64_t oldPositon = item->GetPosition();
 	unsigned int oldTrackId = item->GetTrack();
 	TLSample *sample = item->GetSample();
 	sample->Ref();
 	m_document->DeleteItem( item, oldTrackId );
-	m_document->AddItem( sample, m_position, m_trackId , m_referenceId );
+	m_document->AddItem( sample, m_position, m_trackId , m_referenceId, m_FadeInOut ); //TODO: 5 Values needed for Envelope!
 	m_position = oldPositon;
 	m_trackId = oldTrackId;
 	sample->UnRef();
@@ -237,7 +241,7 @@ void GgseqMoveItemCommand::Undo()
 	TLSample *sample = item->GetSample();
 	sample->Ref();
 	m_document->DeleteItem( item, newTrackId );
-	m_document->AddItem( sample, m_position, m_trackId, m_referenceId );
+	m_document->AddItem( sample, m_position, m_trackId, m_referenceId, m_FadeInOut );
 	m_position = newPositon;
 	m_trackId = newTrackId;
 	sample->UnRef();

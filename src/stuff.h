@@ -6,7 +6,7 @@
 //#define ID_PLAY    8000
 //#define ID_STOP    8001
 //#define ID_REWIND  8002
-#define GG_VERSION "0.2.0"
+#define GG_VERSION "0.2.0cvs"
 #define ID_BIG_SCROLLBAR 20001
 #define ID_SCROLLBAR2 20002
 #define TOP_OFFSET_TRACKS 3

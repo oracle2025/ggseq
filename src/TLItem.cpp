@@ -22,6 +22,7 @@
     #include "wx/wx.h"
 #endif
 #include <sndfile.h>
+#include <soundtouch/SoundTouch.h>
 
 #include "stuff.h"
 #include "TLItem.h"
@@ -35,15 +36,19 @@ TLItem::TLItem(TLSample *sample/*, int trackNr*/ , gg_tl_dat position, long refe
 	m_position=position;
 	m_sample->Ref();
 	m_selected=false;
+	m_toggleEnvelope = false;
 	//m_trackNr = trackNr;
 	m_referenceId = reference;
 	m_trackListener = trackListener;
-	m_x_test = 10;
-	m_y_test = 10;
+	//m_x_test = 10;
+	//m_y_test = 10;
 	m_leftFadeIn   = wxRect( 0, 0, 7, 7 );
 	m_rightFadeIn  = wxRect( 10, 0, 7, 7 );
 	m_leftFadeOut  = wxRect( 20, 0, 7, 7 );
 	m_rightFadeOut = wxRect( (int)(m_sample->GetLength() / ( 117600.0 / 31.0 )-7), 0, 7, 7 );
+	m_rightFadeIn.x = m_rightFadeOut.x / 2;
+	m_leftFadeOut.x = m_rightFadeIn.x;
+	GuiEnvToDataEnv();
 
 }
 void DrawWxRect( wxDC &dc, const wxRect &rect ) // TODO make Helper Functions File
@@ -86,10 +91,129 @@ TLItem::~TLItem()
 //	std::cout << "Deleting Item: " << (const char*)m_sample->GetFilename().mb_str() << std::endl;
 	m_sample->UnRef();
 }
+float *get_keys(int a, int b, int size)
+{
+	float *result = new float[size];
+	float diff = (float)b-a;
+	float inc = (float)diff / (size - 1);
+	result[0] = (float)a;
+	for ( int i = 1; i < size; ++i ) {
+		result[i] = result[i-1]+inc;
+	}
+	return result;
+}
+/*
+ *       
+ *         <------------------>
+ *              width
+ *                             []
+ *        []                   ^
+ *        ^                    |end_level
+ *        |                    |
+ *        |start_level         |
+ *        |                    |
+ *        v____________________v______
+ *              
+ *                 size v
+ *              |----------|
+ *              ^position
+ */
+/*
+float* Generate_envelope(float* env ,start_level, width, end_level, position, size)
+{
+	int a;
+	int b;
+	int diff = end_level - start_level;
+	float inc = (float)diff / (float)width;
+	a = start_level + ( position * inc );
+	b = start_level + ( ( position + size ) * inc );
+	float *keys = get_keys(a, b, size)
+	for ( int i = 0; i < size; i++ )
+		env[i] = keys[i];
+	delete [] keys;
+}
+float TLItem::FadeInStartLevel() {}
+float TLItem::FadeInEndLevel() {}
+gg_tl_dat TLItem::FadeInEndPosition() {}
+float TLItem::FadeOutStartLevel() {}
+float TLItem::FadeOutEndLevel() {}
+gg_tl_dat TLItem::FadeOutStartPosition() {}
+
+//TODO: Stereo berücksichtigen
+void TLItem::Envelope(float *buffer, gg_tl_dat position_in_sample, gg_tl_dat len )
+{
+  // Buffer:        |-------------|
+  // Sample:  |--------------------------|
+  //          +-----+ <- position_in_sample
+  //                
+  //                +-------------+ <- len
+	if ( position_in_sample < FadeInEndPosition ) {
+		Generate_envelope( buffer, FadeInStartLevel(),
+		                   FadeInEndPosition(), FadeInEndLevel(),
+		                   position_in_sample, len ); //TODO: Achtung schreibt über das Ende von EndPosition hinaus.
+	}
+	if ( position_in_sample + len > FadeOutStartPosition ) {
+		Generate_envelope( buffer + ( FadeOutStartPosition() - position_in_sample ),
+		                   FadeOutStartLevel(), m_length - FadeOutStartPosition(),
+		                   FadeOutEndLevel(),position_in_sample + what_was_written_before,
+				   len - what_was_written_before );
+	}
+} 
+typdef struct {
+	int x;    // Position in Samples
+	float y;  // 0.0 bis 1.0
+} Env;
+
+void TLItem::GuiEnvToDataEnv()
+{
+	m_realEnvelope[0].x = 0;
+	m_realEnvelope[0].y = float(m_leftFadeIn.y) / 18.0; //Trackhöhe;
+	m_realEnvelope[1].x = m_rightFadeIn.x * ( 117600.0 / 31.0 );
+	m_realEnvelope[1].y = float(m_rightFadeIn.y) / 18.0;
+	m_realEnvelope[2].x = m_leftFadeOut.x * ( 117600.0 / 31.0 );
+	m_realEnvelope[2].y = float(m_leftFadeOut.y)  / 18.0;
+	m_realEnvelope[3].x = m_rightFadeOut.x * ( 117600.0 / 31.0 );
+	m_realEnvelope[3].y = float(m_rightFadeOut.y)  / 18.0;
+}
+
+Env envelope[LEN_ENVELOPE];
+*/
+#define LEN_ENVELOPE 4
+float TLItem::GetEnvelopValue( int position )
+{
+	if ( !m_toggleEnvelope ) {
+		return 1.0;
+	}
+	Env *envelope = m_realEnvelope;
+	int p = 0;
+	while ( envelope[p + 1].x < position) {
+		p++;
+		if ( LEN_ENVELOPE - 1 == p ) {
+			return 0.0; // Error
+		}
+	}
+	float diff = envelope[p + 1].y - envelope[p].y;
+	int width = envelope[p + 1].x - envelope[p].x;
+	float inc = diff / float(width);
+	return envelope[p].y + inc * ( position - envelope[p].x );
+}
+void TLItem::GuiEnvToDataEnv()
+{
+	m_realEnvelope[0].x = 0;
+	m_realEnvelope[0].y = float(18 - m_leftFadeIn.y) / 18.0; //Trackhöhe;
+	m_realEnvelope[1].x = int(m_rightFadeIn.x * ( 117600.0 / 31.0 ) );
+	m_realEnvelope[1].y = float(18 - m_rightFadeIn.y) / 18.0;
+	m_realEnvelope[2].x = int(m_leftFadeOut.x * ( 117600.0 / 31.0 ) );
+	m_realEnvelope[2].y = float(18 - m_leftFadeOut.y)  / 18.0;
+	m_realEnvelope[3].x = m_sample->GetLength();//int(m_rightFadeOut.x * ( 117600.0 / 31.0 ) );
+	m_realEnvelope[3].y = float(18 - m_rightFadeOut.y)  / 18.0;
+}
+
 unsigned int TLItem::FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int count, bool mute, double volume)
 {
 	unsigned int written=0;
 	float *buffer = m_sample->GetBuffer();
+	//float env[count];
 	if (m_position+GetLength()<pos)
 	{
 		return 0;
@@ -103,14 +227,30 @@ unsigned int TLItem::FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int co
 		}
 	}
 	gg_tl_dat playingOffset = pos-m_position;
-	if (playingOffset<0)
+	if (playingOffset<0) //ASSERT: shouldn't happen ?
 		playingOffset=0;
+	//TODO: Generate Envelope
+	/*
+	 * Wir sind genau hier im OutputFrame:
+	 *  |----------------|
+	 *     ^playingOffset
+	 *  Wenn rightFadeIn innerhalb des Frames liegt, dann nur bis dahin berechnen.
+	 *
+	 * (18 - m_leftFadeIn.y)/18 = start_level
+	 * m_rightFadeIn.m_x* X = width
+	 * (18 - m_rightFadeIn.m_y)/18 = end_level
+	 * position
+	 * size
+	 * Rest mit 1 auffüllen
+	 */
 	while(written<count && playingOffset<GetLength())
 	{
 		if (mute) {
 			outBuffer[written]=0.0;
 		} else {
-			outBuffer[written]=buffer[playingOffset]*volume;
+			//Generate_envelope(env, ...)
+			outBuffer[written]=buffer[playingOffset] * volume * GetEnvelopValue(playingOffset);
+			//TODO: implement Envelope here
 		}
 		written++;
 		playingOffset++;
@@ -158,4 +298,17 @@ bool TLItem::IsSelected()
 	return m_selected;
 }
 long TLItem::GetReference() { return m_referenceId; }
+/*void TLItem::Stretch(float amount)
+{
+	float *new = new_buffer float[length*amount];
 
+	SoundTouch soundTouch;
+	soundTouch.setSampleRate( 44100 );
+	soundTouch.setChannels( 2 );
+	soundTouch.setTempo(); // +/- 1.0
+	//pSoundTouch->putSamples(m_sample->m_buffer, m_sample->length);
+	//m_length = pSoundTouch->receiveSamples(new_buffer, length*amount);
+
+
+	
+}*/

@@ -66,7 +66,7 @@ dnl ---------------
 
 AC_PATH_PROG(WXWIN_CONFIG,wx-config,no)
 if test "x$WXWIN_CONFIG" == "xno";then
-  AC_MSG_ERROR([*** wxWIN not installed but needed - http://www.wxwindows.org/***])
+  AC_MSG_ERROR([*** wxWidgets not installed but needed - http://www.wxwidgets.org/***])
 fi
 
 dnl checking for optional featues (sould we compile for i386 or i686 etc..)

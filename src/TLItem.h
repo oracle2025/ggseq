@@ -20,11 +20,20 @@
 #ifndef _TLITEM_H_
 #define _TLITEM_H_
 
+typedef struct {
+	int x;    // Position in Samples
+	float y;  // 0.0 bis 1.0
+} Env;
+
 class TLSample;
 class GetItemTrackListener;
 class TLItem
 {
 	public:
+/*		TLItem( TLItem *item, gg_tl_dat position,
+			long referenceId,
+			GetItemTrackListener* trackListener
+		);*/
 		TLItem( TLSample *sample,
 		//	int trackNr,
 			gg_tl_dat position,
@@ -45,15 +54,20 @@ class TLItem
 		bool IsSelected();
 		long GetReference();
 //    bool HandleInternal(gg_tl_dat x, float y);
-		long m_x_test;
-		long m_y_test;
+//		long m_x_test;
+//		long m_y_test;
 		wxRect m_leftFadeIn;
 		wxRect m_rightFadeIn;
 		wxRect m_leftFadeOut;
 		wxRect m_rightFadeOut;
 		void DrawEnvelope( wxDC &dc, int xOffset, int yOffset );
 		wxRect *TouchingEnvelopeCtrl( int x, int y );
+		void GuiEnvToDataEnv();
+//		void Stretch(float amount);
+		bool m_toggleEnvelope;
 	private:
+		float GetEnvelopValue( int position );
+		Env m_realEnvelope[4];
 		long m_referenceId;
 		TLSample *m_sample;
 		bool m_selected;

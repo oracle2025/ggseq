@@ -419,6 +419,7 @@ void PreferencesDialog::OnColourAddButton( wxCommandEvent &event )
     gr->SelectRow( gr->GetRows()-1 );
     gr->SetGridCursor( gr->GetRows()-1, 0 );
     SetColourButtons(gr->GetRows()-1);
+    gr->AutoSizeColumns();
 
 }
 

@@ -119,6 +119,7 @@ BEGIN_EVENT_TABLE(MyFrame,wxFrame)
     EVT_MENU( ID_ZOOM_150, MyFrame::OnZoom150 )
     EVT_MENU( ID_IMPORT_PACK, MyFrame::OnImportPack )
     EVT_MENU( ID_SAVEAS_PACK, MyFrame::OnExportPack )
+    EVT_SPLITTER_SASH_POS_CHANGING( ID_TIMELINE_SPLITTER, MyFrame::OnTimelineSplitterChanging )
 END_EVENT_TABLE()
 
 MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
@@ -161,6 +162,7 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     GetMenuBar()->Enable( ID_SHOW_MIXER, false );
     SetSizeHints(470,500);
     GetMainSplitter()->SetSashPosition(200);
+    GetTimelineSplitter()->SetSashPosition(200);
     GetTlPanel()->SetFocus();//Nötig, damit unter wxGTK die Cursor funktionieren.
 }
 MyFrame::~MyFrame()
@@ -231,6 +233,15 @@ void MyFrame::Stop()
 
 // WDR: handler implementations for MyFrame
 
+void MyFrame::OnTimelineSplitterChanging( wxSplitterEvent &event )
+{
+    if ( event.GetSashPosition() < 290 ) {
+        event.SetSashPosition( 290 );
+    } else {
+        event.Skip();
+    }
+}
+
 void MyFrame::OnExportPack( wxCommandEvent &event )
 {
     GetTlPanel()->ExportPackage();
@@ -242,8 +253,8 @@ void MyFrame::OnImportPack( wxCommandEvent &event )
     if ( dlg.ShowModal()==wxID_OK ) {
         //puts(dlg.GetContentsPath().mb_str());
         //puts(dlg.GetPackageFile().mb_str());
-	GetTlPanel()->ImportPackage(dlg.GetPackageFile(), dlg.GetContentsPath());
-    	RefreshWindowTitle();
+    GetTlPanel()->ImportPackage(dlg.GetPackageFile(), dlg.GetContentsPath());
+        RefreshWindowTitle();
     }
 }
 
@@ -408,7 +419,7 @@ void MyFrame::OnNew( wxCommandEvent &event )
 
 void MyFrame::OnAbout( wxCommandEvent &event )
 {
-    wxMessageDialog dialog( this, wxT("Welcome to Gungirl Sequencer " GG_VERSION "\n(C)opyright Richard Spindler\n\nhttp://ggseq.sourceforge.net/"),
+    wxMessageDialog dialog( this, wxT("Welcome to Gungirl Sequencer " GG_VERSION "\n(C)opyright Richard Spindler\n\nGungirl Sequencer is free software (GPL)\n\nhttp://ggseq.sourceforge.net/"),
         wxT("About Gungirl Sequencer"), wxOK|wxICON_INFORMATION );
     dialog.ShowModal();
 }
@@ -458,17 +469,17 @@ bool GgseqApp::OnInit()
     if (m_fnames.GetCount()>0) {
         frame->LoadFile(m_fnames[0]);
     } else {
-    	wxConfigBase *conf=wxConfigBase::Get();
-    	conf->SetPath(wxT("/"));
-	bool loadLastProject=false;
-	conf->Read(wxT("LoadLastProject"), &loadLastProject);
-	if (loadLastProject) {
-	    wxString lastFile;
-	    conf->Read(wxT("LastProject"), &lastFile );
-	    if (wxFileExists(lastFile)) {
+        wxConfigBase *conf=wxConfigBase::Get();
+        conf->SetPath(wxT("/"));
+    bool loadLastProject=false;
+    conf->Read(wxT("LoadLastProject"), &loadLastProject);
+    if (loadLastProject) {
+        wxString lastFile;
+        conf->Read(wxT("LastProject"), &lastFile );
+        if (wxFileExists(lastFile)) {
                 frame->LoadFile(lastFile);
             }
-	}
+    }
     }/* else LoadLastProject? */
     //frame->argv0=argv[0];
 

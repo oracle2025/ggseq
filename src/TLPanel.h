@@ -54,6 +54,8 @@ class TLPanel : public wxPanel
 		void OnDoubleClick(wxMouseEvent& event);
 		void OnScroll(wxScrollEvent& event);
 		void OnScroll2(wxScrollEvent& event);
+		void OnEdit(wxMenuEvent& event);
+		void OnToggleEnvelope(wxMenuEvent& event);
 		void ResetScrollBar();
 		void DropFileAt(int x, int y, wxString filename);
 		bool New();
@@ -90,7 +92,7 @@ class TLPanel : public wxPanel
 		wxScrollBar *m_scrollBar2;
 		TLData *m_data;
 		TLLoadSaveManager *m_loadSaveManager;
-		TLItem *m_DragItem;
+		TLItem *m_EditItem;
 #ifdef __WXMSW__ 
 		wxGenericDragImage *m_dragImage;
 #else

@@ -68,6 +68,7 @@ class GgseqSingleItemCommand : public GgseqCommand
 		wxString m_filename;
 		int64_t m_position;
 		unsigned int m_trackId; /*Track ID*/
+		wxRect m_FadeInOut[4];
 };
 
 class GgseqAddItemCommand : public GgseqSingleItemCommand

@@ -21,6 +21,10 @@ ggseq_SOURCES = PreferencesDialog.h\
                 ggseq_ui.h\
 								EnvelopeDragHandler.h\
 								EnvelopeDragHandler.cpp\
+								TrimmerDialog.h\
+								TrimmerDialog.cpp\
+								WaveEditor.h\
+								WaveEditor.cpp\
                 ggseq_ui_wdr.cpp\
 								colour_helper.h\
 								colour_helper.cpp\

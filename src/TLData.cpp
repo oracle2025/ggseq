@@ -118,7 +118,7 @@ void TLData::ClearSample(TLSample *sample)
 	m_sampleManager->Clear(sample);
 }
 
-TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long referenceId )
+TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long referenceId, wxRect* env )
 {
 	TLTrackList::Node *node =  m_trackList->Item(TrackNr);
 	if (!node)
@@ -132,6 +132,12 @@ TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long 
 		m_length=Position+sample->GetLength()+LENGTH_TO_ADD;
 	}
 	TLItem *item = tlTrack->AddItem(sample, Position, referenceId);
+	if ( env ) {
+		item->m_leftFadeIn   = env[0];
+		item->m_rightFadeIn  = env[1];
+		item->m_leftFadeOut  = env[2];
+		item->m_rightFadeOut = env[3];
+	}
 	m_allItemsHash[referenceId]=item;
 	return item;
 }

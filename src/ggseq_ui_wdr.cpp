@@ -129,42 +129,23 @@ wxSizer *TimelinePanelFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     return item0;
 }
 
-wxSizer *m_sidebarSizer;
 wxSizer *TimelinePanelFunc2( wxWindow *parent, bool call_fit, bool set_sizer )
 {
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
-    wxBoxSizer *item1 = new wxBoxSizer( wxHORIZONTAL );
+    wxSplitterWindow *item1 = new wxSplitterWindow( parent, ID_TIMELINE_SPLITTER, wxDefaultPosition, wxSize(200,160), wxSP_LIVE_UPDATE|wxCLIP_CHILDREN );
+    item1->SetMinimumPaneSize( 1 );
+    wxPanel *item2 = new wxPanel( item1, -1 );
+    TimelineFunc( item2, FALSE, TRUE );
+    wxPanel *item3 = new wxPanel( item1, -1 );
+    SampleListFunc( item3, FALSE, TRUE );
+    item1->SplitHorizontally( item2, item3 );
+    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
 
-    wxWindow *item2 = MakeTlPanel(parent, ID_TL_PANEL);
-//wxWindow *item2 = parent->FindWindow( ID_TL_PANEL );
-    wxASSERT( item2 );
-    item1->Add( item2, 1, wxALIGN_CENTER|wxRIGHT, 5 );
-
-    wxSlider *item3 = new wxSlider( parent, ID_VOLUME_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(20,100), wxSL_VERTICAL );
-    item1->Add( item3, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
-
-    item0->Add( item1, 0, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
-
-    wxBoxSizer *item4 = new wxBoxSizer( wxHORIZONTAL );
-    m_sidebarSizer = item4;
-
-    wxWindow *item5 = MakeFileList(parent, ID_TL_FILELIST);
-//wxWindow *item5 = parent->FindWindow( ID_TL_FILELIST );
-    wxASSERT( item5 );
-    item4->Add( item5, 1, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
-
-    wxWindow *item6 = MakeSidePanel(parent, ID_TL_SIDEPANEL, (wxBoxSizer*)m_sidebarSizer );
-//wxWindow *item6 = parent->FindWindow( ID_TL_SIDEPANEL );
-    wxASSERT( item6 );
-    item4->Add( item6, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
-
-    item0->Add( item4, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxTOP, 5 );
-
-    wxWindow *item7 = MakeMiniPlayer(parent, ID_TL_MINIPLAYER );
-//wxWindow *item7 = parent->FindWindow( ID_TL_MINIPLAYER );
-    wxASSERT( item7 );
-    item0->Add( item7, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxTOP, 5 );
+    wxWindow *item4 = MakeMiniPlayer(parent, ID_TL_MINIPLAYER );
+//wxWindow *item4 = parent->FindWindow( ID_TL_MINIPLAYER );
+    wxASSERT( item4 );
+    item0->Add( item4, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxTOP, 5 );
 
     if (set_sizer)
     {
@@ -324,11 +305,11 @@ wxSizer *PreferencesFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     wxBoxSizer *item8 = new wxBoxSizer( wxHORIZONTAL );
 
     wxButton *item9 = new wxButton( parent, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    item8->Add( item9, 0, wxALIGN_CENTER|wxRIGHT, 5 );
+    item8->Add( item9, 0, wxALIGN_CENTER|wxRIGHT|wxTOP|wxBOTTOM, 5 );
 
     wxButton *item10 = new wxButton( parent, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
     item10->SetDefault();
-    item8->Add( item10, 0, wxALIGN_CENTER, 5 );
+    item8->Add( item10, 0, wxALIGN_CENTER|wxALL, 5 );
 
     item0->Add( item8, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxTOP|wxBOTTOM, 5 );
 
@@ -440,6 +421,162 @@ wxSizer *MiscOptsDlgFunc( wxWindow *parent, bool call_fit, bool set_sizer )
 
     wxCheckBox *item1 = new wxCheckBox( parent, ID_LOAD_LAST_CHECKBOX, wxT("Load last File on startup"), wxDefaultPosition, wxDefaultSize, 0 );
     item0->Add( item1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    if (set_sizer)
+    {
+        parent->SetSizer( item0 );
+        if (call_fit)
+            item0->SetSizeHints( parent );
+    }
+    
+    return item0;
+}
+
+wxSizer *TrimmerDialogFunc( wxWindow *parent, bool call_fit, bool set_sizer )
+{
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    wxBoxSizer *item1 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxWindow *item2 = parent->FindWindow( ID_WAVE_EDITOR );
+    wxASSERT( item2 );
+    item1->Add( item2, 1, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+    wxBoxSizer *item3 = new wxBoxSizer( wxVERTICAL );
+
+    wxStaticText *item4 = new wxStaticText( parent, ID_TEXT, wxT("Zoom"), wxDefaultPosition, wxDefaultSize, 0 );
+    item3->Add( item4, 0, wxALIGN_CENTER|wxBOTTOM, 5 );
+
+    wxButton *item5 = new wxButton( parent, ID_BUTTON, wxT("+"), wxDefaultPosition, wxSize(20,-1), 0 );
+    item3->Add( item5, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5 );
+
+    wxButton *item6 = new wxButton( parent, ID_BUTTON, wxT("-"), wxDefaultPosition, wxSize(20,-1), 0 );
+    item3->Add( item6, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5 );
+
+    wxButton *item7 = new wxButton( parent, ID_BUTTON, wxT("Fit"), wxDefaultPosition, wxSize(20,-1), 0 );
+    item3->Add( item7, 0, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
+
+    item1->Add( item3, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxLEFT, 5 );
+
+    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxBoxSizer *item8 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxBoxSizer *item9 = new wxBoxSizer( wxVERTICAL );
+
+    wxBoxSizer *item10 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxBitmapButton *item11 = new wxBitmapButton( parent, ID_BITMAPBUTTON, GgseqBitmapsFunc( 10 ), wxDefaultPosition, wxDefaultSize );
+    item10->Add( item11, 0, wxALIGN_CENTER|wxRIGHT, 5 );
+
+    wxBitmapButton *item12 = new wxBitmapButton( parent, ID_BITMAPBUTTON, GgseqBitmapsFunc( 2 ), wxDefaultPosition, wxDefaultSize );
+    item10->Add( item12, 0, wxALIGN_CENTER|wxRIGHT, 5 );
+
+    wxBitmapButton *item13 = new wxBitmapButton( parent, ID_BITMAPBUTTON, GgseqBitmapsFunc( 14 ), wxDefaultPosition, wxDefaultSize );
+    item10->Add( item13, 0, wxALIGN_CENTER|wxRIGHT, 5 );
+
+    wxButton *item14 = new wxButton( parent, ID_BUTTON, wxT("Loop"), wxDefaultPosition, wxSize(50,-1), 0 );
+    item10->Add( item14, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+    item9->Add( item10, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5 );
+
+    wxBoxSizer *item15 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxStaticBitmap *item16 = new wxStaticBitmap( parent, ID_STATICBITMAP, GgseqBitmapsFunc( 5 ), wxDefaultPosition, wxDefaultSize );
+    item15->Add( item16, 0, wxALIGN_CENTER|wxRIGHT, 5 );
+
+    wxStaticText *item17 = new wxStaticText( parent, ID_TEXT, wxT("Name:"), wxDefaultPosition, wxDefaultSize, 0 );
+    item15->Add( item17, 0, wxALIGN_CENTER|wxRIGHT, 5 );
+
+    wxTextCtrl *item18 = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), 0 );
+    item15->Add( item18, 1, wxALIGN_CENTER, 5 );
+
+    item9->Add( item15, 0, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
+
+    item8->Add( item9, 0, wxALIGN_CENTER, 5 );
+
+    item8->Add( 20, 20, 1, wxALIGN_CENTER, 5 );
+
+    wxFlexGridSizer *item19 = new wxFlexGridSizer( 2, 5, 5 );
+
+    wxStaticText *item20 = new wxStaticText( parent, ID_TEXT, wxT("Timestrech"), wxDefaultPosition, wxDefaultSize, 0 );
+    item19->Add( item20, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    wxTextCtrl *item21 = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), 0 );
+    item19->Add( item21, 0, wxALIGN_CENTER, 5 );
+
+    wxStaticText *item22 = new wxStaticText( parent, ID_TEXT, wxT("Volume"), wxDefaultPosition, wxDefaultSize, 0 );
+    item19->Add( item22, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    wxTextCtrl *item23 = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), 0 );
+    item19->Add( item23, 0, wxALIGN_CENTER, 5 );
+
+    item8->Add( item19, 0, wxALIGN_CENTER|wxLEFT, 5 );
+
+    item0->Add( item8, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 5 );
+
+    wxStaticLine *item24 = new wxStaticLine( parent, ID_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL );
+    item0->Add( item24, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5 );
+
+    wxBoxSizer *item25 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxButton *item26 = new wxButton( parent, ID_BUTTON, wxT("?"), wxDefaultPosition, wxSize(25,-1), 0 );
+    item25->Add( item26, 0, wxALIGN_CENTER|wxTOP|wxBOTTOM, 5 );
+
+    wxButton *item27 = new wxButton( parent, ID_BUTTON, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    item25->Add( item27, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxButton *item28 = new wxButton( parent, ID_BUTTON, wxT("Apply and Close"), wxDefaultPosition, wxSize(130,-1), 0 );
+    item28->SetDefault();
+    item25->Add( item28, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    item0->Add( item25, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    if (set_sizer)
+    {
+        parent->SetSizer( item0 );
+        if (call_fit)
+            item0->SetSizeHints( parent );
+    }
+    
+    return item0;
+}
+
+wxSizer *TimelineFunc( wxWindow *parent, bool call_fit, bool set_sizer )
+{
+    wxBoxSizer *item0 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxWindow *item1 = MakeTlPanel(parent, ID_TL_PANEL);
+//wxWindow *item1 = parent->FindWindow( ID_TL_PANEL );
+    wxASSERT( item1 );
+    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxRIGHT, 5 );
+
+    wxSlider *item2 = new wxSlider( parent, ID_VOLUME_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(20,100), wxSL_VERTICAL );
+    item0->Add( item2, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+    if (set_sizer)
+    {
+        parent->SetSizer( item0 );
+        if (call_fit)
+            item0->SetSizeHints( parent );
+    }
+    
+    return item0;
+}
+
+wxSizer *SampleListFunc( wxWindow *parent, bool call_fit, bool set_sizer )
+{
+    wxBoxSizer *item0 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxWindow *item1 = MakeFileList(parent, ID_TL_FILELIST);
+//wxWindow *item1 = parent->FindWindow( ID_TL_FILELIST );
+    wxASSERT( item1 );
+    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+    wxWindow *item2 = MakeSidePanel(parent, ID_TL_SIDEPANEL, (wxBoxSizer*)item0 );
+//wxWindow *item2 = parent->FindWindow( ID_TL_SIDEPANEL );
+    wxASSERT( item2 );
+    item0->Add( item2, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
 
     if (set_sizer)
     {

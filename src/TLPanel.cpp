@@ -59,12 +59,15 @@
 #include "SelectionDragHandler.h"
 #include "RubberDragHandler.h"
 #include "EnvelopeDragHandler.h"  //TODO Alle Handler in MouseDragHandler.h?
+#include "TrimmerDialog.h"
 
 #define LEFT_OFFSET_TRACKS 52
 
 enum
 {
 		ID_ScrollBar = 1,
+		ID_PopupMenu,
+		ID_PopupMenuEnvelope
 };
 
 BEGIN_EVENT_TABLE(TLPanel, wxPanel)
@@ -78,12 +81,15 @@ BEGIN_EVENT_TABLE(TLPanel, wxPanel)
 	EVT_SIZE(TLPanel::OnSize)
 	EVT_COMMAND_SCROLL_THUMBTRACK(ID_ScrollBar,TLPanel::OnScroll)
 	EVT_ERASE_BACKGROUND(TLPanel::OnEraseBackground)
+	EVT_MENU(ID_PopupMenu, TLPanel::OnEdit)
+	EVT_MENU(ID_PopupMenuEnvelope, TLPanel::OnToggleEnvelope)
 END_EVENT_TABLE()
 
 TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar, Ruler *ruler, wxScrollBar *scrollbar2, wxWindowID id)
 :wxPanel(parent, id, wxDefaultPosition, wxDefaultSize, wxCLIP_CHILDREN)
 {
 	m_view = 0;
+	m_EditItem = 0;
 	m_data = new TLData();
 	m_data->SetPanel( this );
 	m_view = new TLView(m_data);
@@ -196,7 +202,7 @@ void TLPanel::OnMouseMotion( wxMouseEvent& event )
 	wxRect tmp_rect = m_view->GetItemBoundaries( item );
 	wxRect *envelopeHandle = item->TouchingEnvelopeCtrl( event.m_x - tmp_rect.x,
 			event.m_y - tmp_rect.y );
-	if ( envelopeHandle ) {
+	if ( envelopeHandle && item->m_toggleEnvelope ) {
 		m_dragHandler = new EnvelopeDragHandler(
 			this, m_view, item, event.m_x, event.m_y,
 			envelopeHandle
@@ -217,7 +223,7 @@ void TLPanel::OnMouseUp( wxMouseEvent& event )
 		return;
 	}*/
   if ( m_dragHandler ) {
-    m_dragHandler->OnDrop( event.m_x, event.m_y, event.RightUp() );
+    m_dragHandler->OnDrop( event.m_x, event.m_y, event.ControlDown()/*event.RightUp()*/ );
     delete m_dragHandler;
     m_dragHandler = NULL;
     ResetScrollBar();
@@ -238,10 +244,22 @@ void TLPanel::OnMouseUp( wxMouseEvent& event )
 void TLPanel::OnMouseDown( wxMouseEvent& event )
 {
 	//TODO: Prüfen ob Cursor im kleinen menü-Eck ist, und ggfls. POP-Up öffnen
+	
 	m_DragX = event.m_x;
 	m_DragY = event.m_y;
 	if( g_ggseqProps.GetMiniPlayer() )
 		g_ggseqProps.GetMiniPlayer()->Stop();
+	if ( event.RightDown() )
+	{
+		m_EditItem = m_view->GetDragItem( m_DragX, m_DragY );
+		if (!m_EditItem)
+			return;
+		wxMenu popup;
+		popup.Append( ID_PopupMenu, wxT("Edit Sample...") );
+		popup.AppendCheckItem( ID_PopupMenuEnvelope, wxT("Envelope") );
+		popup.Check( ID_PopupMenuEnvelope, m_EditItem->m_toggleEnvelope );
+		PopupMenu( &popup, event.m_x, event.m_y );
+	}
 }
 void TLPanel::OnDoubleClick( wxMouseEvent& event )
 {
@@ -615,4 +633,22 @@ void TLPanel::SetZoom( float zoom )
 	ResetScrollBar();
 	m_ruler->SetSnap( (long)( m_view->GetSnapValue() / m_view->GetRealZoom() ) );
 	m_view->SetPosition( m_scrollBar->GetBigThumbPosition() );
+}
+void TLPanel::OnToggleEnvelope(wxMenuEvent& event)
+{
+	m_EditItem->m_toggleEnvelope = !m_EditItem->m_toggleEnvelope;
+	m_EditItem = 0;
+	Refresh();
+}
+void TLPanel::OnEdit(wxMenuEvent& event)
+{
+	//Open super funky Sample-Editor Window
+	//m_EditItem;
+	TrimmerDialog dlg( this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(), m_EditItem );
+	dlg.Centre();
+	if (dlg.ShowModal()==wxID_OK) {
+		
+	}
+
+	m_EditItem = 0;
 }

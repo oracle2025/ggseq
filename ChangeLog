@@ -1,3 +1,15 @@
+2005-01-19  Richard Spindler <richard.spindler AT gmail.com>
+
+ * Fade In/Out stays if item is dragged
+
+2005-01-15  Richard Spindler <richard.spindler AT gmail.com>
+
+ * Fade In/Out finally Works :)
+
+2004-12-21  Richard Spindler <richard.spindler AT gmail.com>
+
+ * Changed Behavior to use Ctrl+Klick for Copy instead of right Mouse-Button
+
 2004-11-29  Richard Spindler <richard.spindler AT gmail.com>
 
  * Implemented Envelope Editing (incomplete, and won't affect Audio)

@@ -42,80 +42,90 @@ wxSizer *DirTreePanelFunc( wxWindow *parent, bool call_fit = TRUE, bool set_size
 #define ID_BITMAPBUTTON 10006
 wxSizer *TimelinePanelFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-#define ID_VOLUME_SLIDER 10007
-extern wxSizer *m_sidebarSizer;
-#define ID_TL_FILELIST 10008
-#define ID_TL_SIDEPANEL 10009
-#define ID_TL_MINIPLAYER 10010
+#define ID_TIMELINE_SPLITTER 10007
+#define ID_TL_MINIPLAYER 10008
 wxSizer *TimelinePanelFunc2( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-#define ID_FRAMES_CTRL 10011
-#define ID_SECONDS_CTRL 10012
-#define ID_BPM_CTRL 10013
-#define ID_PRESET_LISTBOX 10014
-#define ID_PRESET_NAME_TEXTCTRL 10015
-#define ID_DELETE_BUTTON 10016
-#define ID_NEW_BUTTON 10017
+#define ID_FRAMES_CTRL 10009
+#define ID_SECONDS_CTRL 10010
+#define ID_BPM_CTRL 10011
+#define ID_PRESET_LISTBOX 10012
+#define ID_PRESET_NAME_TEXTCTRL 10013
+#define ID_DELETE_BUTTON 10014
+#define ID_NEW_BUTTON 10015
 wxSizer *SetSnapFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-#define ID_COLOUR_DIRTREE 10018
-#define ID_COLOUR_GRID 10019
-#define ID_COLOUR_ADD_BUTTON 10020
-#define ID_COLOUR_REMOVE_BUTTON 10021
-#define ID_COLOUR_BUTTON 10022
+#define ID_COLOUR_DIRTREE 10016
+#define ID_COLOUR_GRID 10017
+#define ID_COLOUR_ADD_BUTTON 10018
+#define ID_COLOUR_REMOVE_BUTTON 10019
+#define ID_COLOUR_BUTTON 10020
 wxSizer *SetColourFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-#define ID_NOTEBOOK 10023
+#define ID_NOTEBOOK 10021
 wxSizer *PreferencesFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-#define ID_ACCELS_GRID 10024
+#define ID_ACCELS_GRID 10022
 wxSizer *SetAccelsFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-#define ID_LINE 10025
-#define ID_PACKAGE_TEXTCTRL 10026
-#define ID_PACKAGE_BUTTON 10027
-#define ID_CONTENTS_TEXTCTRL 10028
-#define ID_CONTENTS_BUTTON 10029
+#define ID_LINE 10023
+#define ID_PACKAGE_TEXTCTRL 10024
+#define ID_PACKAGE_BUTTON 10025
+#define ID_CONTENTS_TEXTCTRL 10026
+#define ID_CONTENTS_BUTTON 10027
 wxSizer *ImportPackDlgFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-#define ID_TREECTRL 10030
+#define ID_TREECTRL 10028
 wxSizer *HelpProgsFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-#define ID_LOAD_LAST_CHECKBOX 10031
+#define ID_LOAD_LAST_CHECKBOX 10029
 wxSizer *MiscOptsDlgFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
+
+#define ID_WAVE_EDITOR 10030
+#define ID_BUTTON 10031
+#define ID_STATICBITMAP 10032
+#define ID_TEXTCTRL 10033
+wxSizer *TrimmerDialogFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
+
+#define ID_VOLUME_SLIDER 10034
+wxSizer *TimelineFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
+
+#define ID_TL_FILELIST 10035
+#define ID_TL_SIDEPANEL 10036
+wxSizer *SampleListFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
 // Declare menubar functions
 
-#define ID_MENU 10032
-#define ID_NEW 10033
-#define ID_OPEN 10034
-#define ID_SAVE 10035
-#define ID_SAVEAS 10036
-#define ID_WAV_EXPORT 10037
-#define ID_SAVEAS_PACK 10038
-#define ID_IMPORT_PACK 10039
-#define ID_QUIT 10040
-#define ID_UNDO 10041
-#define ID_REDO 10042
-#define ID_ADD_TRACK 10043
-#define ID_DELETE_TRACK 10044
-#define ID_MOVE_TRACK_UP 10045
-#define ID_MOVE_TRACK_DOWN 10046
-#define ID_PREFERENCES 10047
-#define ID_SHOW_MIXER 10048
-#define ID_ZOOM_50 10049
-#define ID_ZOOM_100 10050
-#define ID_ZOOM_150 10051
-#define ID_ABOUT 10052
+#define ID_MENU 10037
+#define ID_NEW 10038
+#define ID_OPEN 10039
+#define ID_SAVE 10040
+#define ID_SAVEAS 10041
+#define ID_WAV_EXPORT 10042
+#define ID_SAVEAS_PACK 10043
+#define ID_IMPORT_PACK 10044
+#define ID_QUIT 10045
+#define ID_UNDO 10046
+#define ID_REDO 10047
+#define ID_ADD_TRACK 10048
+#define ID_DELETE_TRACK 10049
+#define ID_MOVE_TRACK_UP 10050
+#define ID_MOVE_TRACK_DOWN 10051
+#define ID_PREFERENCES 10052
+#define ID_SHOW_MIXER 10053
+#define ID_ZOOM_50 10054
+#define ID_ZOOM_100 10055
+#define ID_ZOOM_150 10056
+#define ID_ABOUT 10057
 wxMenuBar *MyMenuBarFunc();
 
 // Declare toolbar functions
 
-#define ID_REWIND 10053
-#define ID_PLAY 10054
-#define ID_STOP 10055
-#define ID_CHOICE 10056
-#define ID_HELP 10057
+#define ID_REWIND 10058
+#define ID_PLAY 10059
+#define ID_STOP 10060
+#define ID_CHOICE 10061
+#define ID_HELP 10062
 void MyToolBarFunc( wxToolBar *parent );
 
 // Declare bitmap functions
