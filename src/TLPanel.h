@@ -41,12 +41,9 @@ class BigScrollBar;
 class TLPanel : public wxPanel
 {
 	public:
-		TLPanel(wxWindow* parent, BigScrollBar *scrollbar/*,
-				wxWindowID id = -1,
-				const wxPoint& pos = wxDefaultPosition,
-				const wxSize& size = wxDefaultSize,
-				long style = wxTAB_TRAVERSAL,
-				const wxString& name = wxT("panel")*/);
+		TLPanel(wxWindow* parent, BigScrollBar *scrollbar );
+
+		/*,wxWindowID id = -1,const wxPoint& pos = wxDefaultPosition,const wxSize& size = wxDefaultSize,long style = wxTAB_TRAVERSAL,const wxString& name = wxT("panel")*/
 		~TLPanel();
 
 		void OnPaint(wxPaintEvent& event);

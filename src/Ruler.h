@@ -19,6 +19,11 @@
 
 #ifndef _RULER_H_
 #define _RULER_H_
+class LoopSetupListener
+{
+	public:
+		virtual void SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2)=0;
+};
 
 class Ruler: public wxPanel
 {
@@ -37,11 +42,14 @@ class Ruler: public wxPanel
 		void OnLeftUp(wxMouseEvent& event);
 		void OnMouseMotion(wxMouseEvent& event);
 		void GetLoop(int* pos1, int* pos2);
+		void SetListener(LoopSetupListener *listener);
 	private:
 		long m_snap;
+		long m_zoomFactor;
 		gg_tl_dat m_position;
 		long m_pos1;
 		long m_pos2;
+		LoopSetupListener *m_listener;
 		DECLARE_EVENT_TABLE()
 };
 #endif /* _RULER_H_ */

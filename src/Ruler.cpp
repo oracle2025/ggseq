@@ -47,6 +47,7 @@ Ruler::Ruler(wxWindow* parent,
 	m_position=1;
 	m_pos1=0;
 	m_pos2=0;
+	m_listener=0;
 }
 void Ruler::OnPaint(wxPaintEvent& event)
 {
@@ -90,6 +91,8 @@ void Ruler::GetLoop(int* pos1, int* pos2)
 void Ruler::OnLeftUp(wxMouseEvent& event)
 {
 	m_pos2=event.GetX()+m_position;
+	if (m_listener)
+		m_listener->SetLoopSnaps((m_pos1*117600)/31, (m_pos2*117600)/31);
 	Refresh();
 }
 void Ruler::OnMouseMotion(wxMouseEvent& event)
@@ -112,6 +115,10 @@ void Ruler::SetPosition(gg_tl_dat position)
 void Ruler::OnEraseBackground(wxEraseEvent& event)
 {
 //	event.Skip();
+}
+void Ruler::SetListener(LoopSetupListener *listener)
+{
+	m_listener=listener;
 }
 
 

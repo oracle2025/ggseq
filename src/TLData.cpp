@@ -33,6 +33,7 @@
 
 #include "tinyxml.h"
 
+#include "Ruler.h"
 #include "TLData.h"
 #include "TLTrack.h"
 #include "TLItem.h"
@@ -54,6 +55,7 @@ TLData::TLData()
 	m_length=2000000;
 	m_updateListener=NULL;
 	m_masterVolume=1.0;
+	m_loop_enabled=false;
 }
 
 TLData::~TLData()
@@ -65,6 +67,14 @@ TLData::~TLData()
 int TLData::GetTrackCount()
 {
 	return m_trackList.GetCount();
+}
+void TLData::SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2)
+{
+	m_loopPos1=pos1;/* Umrechnen nach abc, was auch immer(Wird im Ruler gemacht)*/
+	m_loopPos2=pos2;
+	m_loop_enabled=true;
+	m_playbackPosition=m_loopPos1;
+	puts("abc-Test");
 }
 TLTrackList::Node *TLData::GetFirst()
 {
@@ -327,6 +337,7 @@ void TLData::SetPlaybackPosition(gg_tl_dat Position)
 {
 	m_playbackPosition=Position;
 	m_position=m_playbackPosition;
+	m_loop_enabled=false;
 }
 gg_tl_dat TLData::GetPlaybackPosition()
 {
@@ -334,7 +345,19 @@ gg_tl_dat TLData::GetPlaybackPosition()
 }
 unsigned int TLData::FillLoopBuffer(float* outBuffer, unsigned int count)
 {
-	unsigned int result = FillBuffer(outBuffer, count);
+	if ( !m_loop_enabled ) {
+		return FillBuffer(outBuffer, count);
+	}
+	unsigned int result;
+	if (m_position+count>m_loopPos2) {
+		unsigned int cnt_to_play = count-(m_loopPos2-m_position);
+		result = FillBuffer(outBuffer, cnt_to_play);
+		m_position=m_playbackPosition;
+		ResetOffsets();
+		FillBuffer(outBuffer+result, count-result);
+		return count;
+	}
+	result = FillBuffer(outBuffer, count);
 	if (result<count) {
 		m_position=m_playbackPosition;
 		ResetOffsets();

@@ -139,6 +139,7 @@ TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar/*, wxWindowID id, con
 	UpdateButtons();
 	m_miniPlayer=NULL;
 	SetSizeHints(100, 200);
+	m_ruler->SetListener(m_data);
 }
 TLPanel::~TLPanel()
 {

@@ -28,7 +28,10 @@ class TLColourManager;
 class UpdateListener;
 WX_DECLARE_LIST(TLTrack, TLTrackList);
 
-class TLData
+#include "Ruler.h"
+
+
+class TLData: public LoopSetupListener
 {
 	public:
 		TLData();
@@ -36,6 +39,7 @@ class TLData
 		TLTrackList::Node *GetFirst(); /*Soll weg*/
 		int GetTrackCount();
 		void AddTrack();
+		virtual void SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2);
 
 		TLItem *AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr);
 		TLItem *AddItem(wxString& filename, gg_tl_dat Position, int TrackNr);
@@ -76,6 +80,7 @@ class TLData
 	private:
 		gg_tl_dat m_loopPos1;
 		gg_tl_dat m_loopPos2;
+		bool m_loop_enabled;
 		long m_snapValue;
 		unsigned int MixChannels(float *A, float *B, float* out, unsigned int count);
 		bool printXML(wxString filename);
