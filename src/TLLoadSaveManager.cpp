@@ -21,6 +21,7 @@
 #ifndef WX_PRECOMP
     #include "wx/wx.h"
 #endif
+#include <wx/config.h>
 
 #include "TLLoadSaveManager.h"
 #include "TLData.h"
@@ -59,7 +60,10 @@ bool TLLoadSaveManager::Save() /*return true on success*/
 }
 bool TLLoadSaveManager::SaveAs()/*Datei auf existenz prüfen*/
 {
-	wxFileDialog dlg1(m_parent, wxT("Save File as"),wxT(""),wxT(""),wxT("*.*"),wxSAVE);
+	wxConfig config(wxT("ggseq"));
+	wxString lastFolder = config.Read(wxT("LastSaveFolder"), wxT(""));
+	wxFileDialog dlg1(m_parent, wxT("Save File as"),lastFolder,wxT(""),wxT("Gungirl files (*.ggseq)|*.ggseq"),wxSAVE);
+	
 	if (dlg1.ShowModal()==wxID_OK) {
 		wxString filename = dlg1.GetDirectory() +wxT("/")+ dlg1.GetFilename();
 		if (wxFileExists(filename)) {
@@ -67,6 +71,7 @@ bool TLLoadSaveManager::SaveAs()/*Datei auf existenz prüfen*/
 			if (msg_dlg.ShowModal()==wxID_NO)
 				return false;
 		}
+		config.Write(wxT("LastSaveFolder"),dlg1.GetDirectory());
 		m_data->Save(filename);
 		return true;
 	}
@@ -74,6 +79,8 @@ bool TLLoadSaveManager::SaveAs()/*Datei auf existenz prüfen*/
 }
 void TLLoadSaveManager::Load()
 {
+
+
 	if (m_data->UnsavedChanges()) {
 		wxMessageDialog msg_dlg(m_parent,wxT("Save Changes?"), wxT("Unsaved Changes"), wxYES_NO | wxCANCEL|wxICON_QUESTION );
 
@@ -87,8 +94,11 @@ void TLLoadSaveManager::Load()
 				break;
 		}
 	}
-	wxFileDialog dlg1(m_parent, wxT("Open File"),wxT(""),wxT(""),wxT("*.*"),wxOPEN|wxHIDE_READONLY);
+	wxConfig config(wxT("ggseq"));
+	wxString lastFolder = config.Read(wxT("LastLoadFolder"), wxT(""));
+	wxFileDialog dlg1(m_parent, wxT("Open File"),lastFolder,wxT(""),wxT("Gungirl files (*.ggseq)|*.ggseq"),wxOPEN|wxHIDE_READONLY);
 	if (dlg1.ShowModal()==wxID_OK) {
+		config.Write(wxT("LastLoadFolder"),dlg1.GetDirectory());
 		m_data->Load(dlg1.GetDirectory() +wxT("/")+ dlg1.GetFilename());
 	}
 }

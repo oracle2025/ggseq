@@ -28,6 +28,7 @@
 #endif
 
 #include <wx/listctrl.h>
+#include <wx/config.h>
 #include <iostream>
 
 #include "TLView.h"
@@ -595,7 +596,10 @@ void TLPanel::StopAll()
 void TLPanel::WavExport()
 {
 	m_soundManager->Stop_TL();
-	wxFileDialog dlg1(this, wxT("Save WAV-File as"),wxT(""),wxT(""),wxT("*.*"),wxSAVE);
+	wxConfig config(wxT("ggseq"));
+	wxString lastFolder = config.Read(wxT("LastExportFolder"), wxT(""));
+	
+	wxFileDialog dlg1(this, wxT("Save WAV-File as"),lastFolder,wxT(""),wxT("WAV files (*.wav)|*.wav"),wxSAVE);
 	if (dlg1.ShowModal()==wxID_OK) {
 		wxString filename = dlg1.GetDirectory() +wxT("/")+ dlg1.GetFilename();
 		if (wxFileExists(filename)) {
@@ -603,6 +607,7 @@ void TLPanel::WavExport()
 			if (msg_dlg.ShowModal()==wxID_NO)
 				return;
 		}
+		config.Write(wxT("LastExportFolder"),dlg1.GetDirectory());
 		m_data->SaveWAV(filename);
 	}
 

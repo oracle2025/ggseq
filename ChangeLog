@@ -1,3 +1,7 @@
+2003-11-13  Richard Spindler <oracle2025@gmx.de>
+
+ *  fixed Load- and Save-Dialogs to remember their last Folder and to use '*.ggseq' as file-extension
+
 2003-11-09  Richard Spindler <oracle2025@gmx.de>
 
  *  added TLTrackVolumeDial.h .cpp
