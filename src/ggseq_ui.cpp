@@ -216,7 +216,7 @@ void MyFrame::CreateMyMenuBar()
 
 void MyFrame::CreateMyToolBar()
 {
-    wxToolBar *tb = CreateToolBar( wxTB_HORIZONTAL|wxNO_BORDER /* |wxTB_FLAT */ );
+    wxToolBar *tb = CreateToolBar( wxTB_HORIZONTAL|wxNO_BORDER |wxTB_FLAT );
     
     MyToolBarFunc( tb );
 }

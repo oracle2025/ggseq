@@ -29,11 +29,12 @@
 #include "mute_off.xpm"
 #include "mute_on.xpm"
 
-BEGIN_EVENT_TABLE(TLMuteButton, wxBitmapButton)
 #ifdef __WXMSW__
+BEGIN_EVENT_TABLE(TLMuteButton, wxToggleButton)
 	EVT_TOGGLEBUTTON(-1,TLMuteButton::OnToggle)
 	EVT_ERASE_BACKGROUND(TLMuteButton::OnEraseBackground)
 #else
+BEGIN_EVENT_TABLE(TLMuteButton, wxBitmapButton)
 	EVT_BUTTON(-1,TLMuteButton::OnClick)
 #endif
 END_EVENT_TABLE()

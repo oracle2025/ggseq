@@ -25,7 +25,7 @@ class NoBgEvtHandler : public wxEvtHandler
 {
 	public:
 		NoBgEvtHandler() :wxEvtHandler(){}
-		void OnEraseBackground(wxPaintEvent& event){}
+		void OnEraseBackground(wxEraseEvent& event){}
 	private:
 		DECLARE_EVENT_TABLE()
 };
