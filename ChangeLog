@@ -1,3 +1,13 @@
+2005-02-22  Richard Spindler <richard.spindler AT gmail.com>
+
+ * redesigned SoundManager
+ * Improvements to Sample Editor
+
+2005-02-19  Georg E Schneider <georg AT georgs.org>
+
+ * Corrected spec - file
+ * Changed rpmbuild script that userbuild is possible
+
 2005-01-19  Richard Spindler <richard.spindler AT gmail.com>
 
  * Fade In/Out stays if item is dragged
@@ -17,7 +27,7 @@
 2004-11-24  Richard Spindler <richard.spindler AT gmail.com>
 
  * Did the same as yesterday to Rubber Frame Selection
- * Changed Email Address in Changeloh ;)
+ * Changed Email Address in Changelog ;)
 
 2004-11-23  Richard Spindler <oracle2025@gmx.de>
 
