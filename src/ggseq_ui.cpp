@@ -23,9 +23,18 @@
 
 // For compilers that support precompilation
 #include "wx/wxprec.h"
+#ifndef WX_PRECOMP
+    #include "wx/wx.h"
+#endif
 
 #ifdef __BORLANDC__
     #pragma hdrstop
+#endif
+
+#ifdef __WXMSW__ 
+#include <wx/generic/dragimgg.h>
+#else
+#include <wx/dragimag.h>
 #endif
 
 #include <wx/dirctrl.h>
@@ -34,7 +43,6 @@
 #include <wx/filesys.h>
 #include <wx/fs_zip.h>
 #include <wx/cmdline.h>
-#include <wx/dragimag.h>
 #include <wx/config.h>
 #include <wx/html/helpctrl.h>
 
@@ -142,8 +150,11 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     // insert main window here
     wxPanel *panel1 = new wxPanel(this, -1);
     MainFrameFunc(panel1);
-
+#ifdef __WXMSW__
+    m_dragImage = new wxGenericDragImage(wxBitmap(dndfile_xpm));
+#else
     m_dragImage = new wxDragImage(wxBitmap(dndfile_xpm));
+#endif
     m_DraggingFile=false;
 
 

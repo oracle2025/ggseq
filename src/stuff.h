@@ -3,6 +3,9 @@
 
 #define GG_WINDOW_FLAGS wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN
 
+#include <stdint.h>
+
+
 //#define ID_PLAY    8000
 //#define ID_STOP    8001
 //#define ID_REWIND  8002

@@ -33,6 +33,7 @@
 #include <wx/filename.h>
 #include <wx/dcbuffer.h>
 #include <wx/dir.h>
+#include <wx/dirctrl.h>
 //#include <iostream>
 
 #include "tinyxml.h"

@@ -24,6 +24,7 @@
     #include "wx/wx.h"
 #endif
 #include <wx/listimpl.cpp>
+#include <wx/hashmap.h>
 
 #include "stuff.h"
 #include "TLData.h"

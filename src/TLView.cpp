@@ -25,6 +25,7 @@
 #include <wx/dnd.h>
 #include <wx/filename.h>
 #include <wx/config.h>
+#include <wx/tglbtn.h>
 
 #include <iostream>
 

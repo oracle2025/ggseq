@@ -29,6 +29,7 @@ class TLColourManager;
 class UpdateListener;
 class GgseqDocManager;
 WX_DECLARE_LIST(TLTrack, TLTrackList);
+#include <wx/hashmap.h>
 WX_DECLARE_HASH_MAP( unsigned int, TLItem*, wxIntegerHash, wxIntegerEqual, TLItemHash );
 WX_DECLARE_HASH_MAP( unsigned int, TLTrack*, wxIntegerHash, wxIntegerEqual, TLTrackHash );
 

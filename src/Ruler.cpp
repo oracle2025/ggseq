@@ -61,7 +61,6 @@ void Ruler::OnPaint(wxPaintEvent& event)
 	wxBufferedPaintDC dc(this);
 	dc.SetBrush(wxBrush(GetBackgroundColour(),wxSOLID));
 	dc.SetPen(*wxTRANSPARENT_PEN);
-	int width, height;
 	GetClientSize(&width, &height);
 	dc.DrawRectangle(0,0,width,height);
 #else

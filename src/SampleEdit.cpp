@@ -43,7 +43,7 @@ void SampleEdit::SetTrims( int start, int end )
 }
 float *SampleEdit::Convert( int &len )
 {
-	SoundTouch pSoundTouch;
+	soundtouch::SoundTouch pSoundTouch;
 	pSoundTouch.setSampleRate( 44100 );
 	pSoundTouch.setChannels( 2 );
 	pSoundTouch.setTempo( m_tempo );

@@ -1,9 +1,13 @@
 import os
 
 env = Environment(CC = 'g++',
-	CCFLAGS='-D_WIN32_IE=0x400 -D__WXMSW__ -mthreads  -fno-pcc-struct-return -O2 -MMD -mthreads -Wall -ID:\\wxWindows-2.4.2\\lib\\wx\\include\\mswu-2.4 -ID:\\wxWindows-2.4.2\\include',
+		CCFLAGS='-D_WIN32_IE=0x400 -D__WXMSW__ -mthreads  -fno-pcc-struct-return -O2 -MMD -mthreads -IC:\\wxWindows-2.4.2\\lib\\wx\\include\\mswu-2.4 -IC:\\wxWindows-2.4.2\\include -Iportaudio_win32 -ID:\\ggseq\\ggseq_win32_tools\\libsamplerate-0.1.2\\src -ID:\\ggseq\\ggseq_win32_tools\\libsndfile-1.0.11\\src -ID:\\ggseq\\ggseq_win32_tools\\SoundTouch-1.3.0\\include -I../icons',
 	LINKFLAGS = '-Wl,--subsystem,windows -mwindows -mthreads',
 	ENV = {'PATH' : os.environ['PATH']}, tools=['mingw'])
+
+cenv = Environment(CC = 'gcc',
+		CCFlags='-Iportaudio_win32',
+		ENV = {'PATH' : os.environ['PATH']}, tools=['mingw'])
 
 src_list = Split("""BigScrollBar.cpp
 	colour_helper.cpp
@@ -17,7 +21,6 @@ src_list = Split("""BigScrollBar.cpp
 	GgseqDocManager.cpp
 	GgseqGlobalProps.cpp
 	ImportPackDialog.cpp
-	MiniFilerTest.cpp
 	MiniPlayer.cpp
 	MouseDragHandler.cpp
 	PlayerInterface.cpp
@@ -26,7 +29,6 @@ src_list = Split("""BigScrollBar.cpp
 	Ruler.cpp
 	SampleEdit.cpp
 	SelectionDragHandler.cpp
-	ShortcutsDialog.cpp
 	SidePanel.cpp
 	SoundManager.cpp
 	StatusProgressBar.cpp
@@ -43,7 +45,6 @@ src_list = Split("""BigScrollBar.cpp
 	TLPanel.cpp
 	TLSample.cpp
 	TLSampleManager.cpp
-	TLSelectColourDialog.cpp
 	TLSelectionSet.cpp
 	TLSetSnapDialog.cpp
 	TLTrack.cpp
@@ -53,7 +54,9 @@ src_list = Split("""BigScrollBar.cpp
 	TrimmerDialog.cpp
 	ui_helper.cpp
 	UpdateListener.cpp
-	WaveEditor.cpp""")
+	WaveEditor.cpp
+	#portaudio_win32/pa_lib.o
+	#portaudio_win32/pa_win_wmme.o""")
 
 lib_list = Split("""wxmsw242u
 	rpcrt4
@@ -66,11 +69,17 @@ lib_list = Split("""wxmsw242u
 	comctl32
 	ctl3d32
 	advapi32
-	wsock32""")
+	wsock32
+	SoundTouch
+	sndfile
+	samplerate""")
+
+cenv.Object('#portaudio_win32/pa_lib.c')
+cenv.Object('#portaudio_win32/pa_win_wmme.c')
 
 env.Program('ggseq', src_list,
-	lib_list,
-	LIBPATH=['D:\\wxWindows-2.4.2\\lib'] )
+	LIBS = lib_list,
+	LIBPATH=['C:\\wxWindows-2.4.2\\lib', 'D:\\ggseq\\ggseq_win32_tools\\SoundTouch-1.3.0\\source\\SoundTouch\\.libs', 'D:\\ggseq\\ggseq_win32_tools\\libsndfile-1.0.11\\src\\.libs', 'D:\\ggseq\\ggseq_win32_tools\\libsamplerate-0.1.2'] )
 
 
 
