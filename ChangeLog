@@ -1,3 +1,8 @@
+2004-01-16  Richard Spindler <oracle2025@gmx.de>
+
+ *  Fixed a couple of win32 issues
+ *  If Save On Exit fails, it won't exit any more
+
 2004-01-13  Richard Spindler <oracle2025@gmx.de>
 
  *  Added BigScrollBar.cpp .h

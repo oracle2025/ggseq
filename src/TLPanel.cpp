@@ -115,7 +115,12 @@ TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar, wxWindowID id, const
 		m_dials[i] = new TLTrackVolumeDial(this, -1, current,wxPoint(31,TOP_OFFSET_TRACKS+i*30),wxSize(25,25));
 		i++;
 	}
+#ifdef __WXMSW__
+	m_ruler = new Ruler(this,-1,wxPoint(LEFT_OFFSET_TRACKS,2),wxSize(GetSize().GetWidth()-5-LEFT_OFFSET_TRACKS,15));
+#else
 	m_ruler = new Ruler(this,-1,wxPoint(LEFT_OFFSET_TRACKS,2),wxSize(GetSize().GetWidth()-5-LEFT_OFFSET_TRACKS,15),wxRAISED_BORDER);
+#endif
+	
 	m_ruler->SetSnap((m_TlView->GetSnapValue()/*m_SnapPosition*/ *31)/117600);
 	
 	
@@ -163,11 +168,11 @@ void TLPanel::OnEraseBackground(wxPaintEvent& event)
 }
 void TLPanel::OnSize(wxSizeEvent& event)
 {
-#ifdef __WXMSW__
-	m_TlView->SetVisibleFrame(GetClientSize().GetWidth()-11-LEFT_OFFSET_TRACKS,GetClientSize().GetHeight()-22-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
-#else
+//#ifdef __WXMSW__
+//	m_TlView->SetVisibleFrame(GetClientSize().GetWidth()-11-LEFT_OFFSET_TRACKS,GetClientSize().GetHeight()-/*22-*/TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
+//#else
 	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
-#endif
+//#endif
 	m_ruler->SetSize(5+LEFT_OFFSET_TRACKS,2,GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,15);
 
 	ResetScrollBar();

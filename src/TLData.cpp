@@ -207,9 +207,10 @@ void TLData::Clear()
 	m_changed=false;
 	m_filename=wxT("");
 }
-void TLData::printXML(wxString filename)
+bool TLData::printXML(wxString filename)
 {
 	TiXmlDocument doc(filename.mb_str());
+	
 	TiXmlDeclaration *dec = new TiXmlDeclaration("1.0","","no");
 	doc.LinkEndChild(dec);
 	TiXmlElement *el = new TiXmlElement("song");
@@ -230,11 +231,14 @@ void TLData::printXML(wxString filename)
 		current->addXmlData(tracks);
 	}
 
-	if(!doc.SaveFile())
-		wxLogError(wxT("Could not save File \"%s\""),filename.c_str());	
+	if(!doc.SaveFile()) {
+		wxLogError(wxT("Could not save File \"%s\""),filename.c_str());
+		return false;
+	}
 
 	m_filename=filename;
 	m_changed=false;
+	return true;
 }
 
 bool TLData::UnsavedChanges()
@@ -245,15 +249,15 @@ wxString TLData::GetFilename()
 {
 	return m_filename;
 }
-void TLData::Save(wxString filename)
+bool TLData::Save(wxString filename)
 {
-	printXML(filename);
+	return printXML(filename);
 //	m_filename=filename;
 //	m_changed=false;
 }
-void TLData::Save()
+bool TLData::Save()
 {
-	printXML(m_filename);
+	return printXML(m_filename);
 //	m_changed=false;
 }
 void TLData::Load(wxString filename)

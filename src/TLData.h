@@ -61,8 +61,8 @@ class TLData
 		/* -- Load, Save -- */
 		wxString GetFilename();
 		bool UnsavedChanges();
-		void Save(wxString filename);
-		void Save();
+		bool Save(wxString filename);
+		bool Save();
 		void Load(wxString filename);
 		void SaveWAV(wxString filename);
 
@@ -74,7 +74,7 @@ class TLData
 	private:
 		long m_snapValue;
 		unsigned int MixChannels(float *A, float *B, float* out, unsigned int count);
-		void printXML(wxString filename);
+		bool printXML(wxString filename);
 		void loadXML(wxString filename);
 		void ResetOffsets();
 		TLTrackList m_trackList;

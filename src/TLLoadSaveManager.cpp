@@ -57,9 +57,8 @@ bool TLLoadSaveManager::Save() /*return true on success*/
 	if (m_data->GetFilename().IsEmpty()) {
 		return SaveAs();
 	} else {
-		m_data->Save();
+		return m_data->Save();
 	}
-	return true;
 }
 bool TLLoadSaveManager::SaveAs()/*Datei auf existenz prüfen*/
 {
@@ -76,8 +75,7 @@ bool TLLoadSaveManager::SaveAs()/*Datei auf existenz prüfen*/
 		wxString dir;
 		wxFileName::SplitPath(filename, &dir, NULL, NULL);
 		config.Write(wxT("LastSaveFolder"),dir);
-		m_data->Save(filename);
-		return true;
+		return m_data->Save(filename);
 
 	}
 	return false;

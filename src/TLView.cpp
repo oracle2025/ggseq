@@ -279,7 +279,8 @@ long TLView::DrawTrack(wxDC& dc, long yoffset, TLTrack* track)
 			wxFileName fn(current->GetSample()->GetFilename());
 //#ifndef __WXMSW__ 
 			if ( (long)(end*m_Faktor)+m_FrameX>(long)(start*m_Faktor)+1+m_FrameX ) //TODO Evil Hack ;)
-				dc.DrawText(fn.GetName(),(long)(start*m_Faktor)+1+m_FrameX,yoffset+1);
+				dc.DrawText(fn.GetName(),(long)((current->GetPosition()-m_PositionVisible)/*start*/ *m_Faktor)+1+m_FrameX,yoffset+1);
+				
 //#endif
 			dc.DestroyClippingRegion();
 		}
