@@ -67,6 +67,7 @@ class TLView
 //		bool HasSelection();
 		bool IsSelectionAt(int x, int y, int& x_offset, int& y_offset, int& width, int& height);
 		void DrawSelection(wxDC *dc);
+		void Draw3dRect(wxDC *dc, wxCoord x, wxCoord y, wxCoord width, wxCoord height, wxColour colour);
 		void EndSelectionDrag(int x, int y, bool copy);
 		/*wxPoint Snap(wxPoint)*/
 		void SetSnapValue(long snapValue);
@@ -74,6 +75,8 @@ class TLView
 		
 //		int m_SnapPosition;
 	private:
+		wxColour GetDarkColour(wxColour colour);
+		wxColour GetLightColour(wxColour colour);
 		void SnapItem(TLItem *item);/*kommt evtl. nach TLData*/
 		long DrawTrack(wxDC& dc_screen, long yoffset, TLTrack* track);
 		TLData *m_TlData;
