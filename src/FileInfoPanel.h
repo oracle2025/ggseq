@@ -1,4 +1,4 @@
-/* StatusProgressBar.h
+/* FileInfoPanel.h
  *
  *  Copyright (C) 2003 Richard Spindler <oracle2025@gmx.de>
  *
@@ -16,28 +16,28 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _STATUSPROGRESSBAR_H_
-#define _STATUSPROGRESSBAR_H_
-class DisableListener;
+ 
+#ifndef _FILE_INFO_PANEL_H_
+#define _FILE_INFO_PANEL_H_
 
-class StatusProgressBar: public wxStatusBar, public UpdateListener
+class FileInfoListener
 {
 	public:
-		StatusProgressBar(wxWindow* parent, wxWindowID id, long style = wxST_SIZEGRIP, const wxString& name = wxT("statusBar"));
-		~StatusProgressBar();
-		virtual bool Update(int status);
-		virtual void StartUpdateProcess();
-		virtual void EndUpdateProcess();
-		void OnSize(wxSizeEvent &event);
-		void OnCancelButton(wxCommandEvent &event);
-		void SetDisableListener(DisableListener *disableListener);
-		void OnEraseBackground(wxPaintEvent &event);
-	private:
-		wxGauge *m_gauge;
-		wxButton *m_cancelButton;
-		bool m_continue;
-		DisableListener *m_disableListener;
-		DECLARE_EVENT_TABLE()
+		virtual void SetInfo(const wxString &filename, long frames, long channels, long sampleRate)=0;
 };
 
-#endif /* _STATUSPROGRESSBAR_H_ */
+class FileInfoPanel : public wxPanel, public FileInfoListener
+{
+	public:
+		FileInfoPanel(wxWindow* parent);
+		void SetInfo(const wxString &filename, long frames, long channels, long sampleRate);
+	private:
+		wxSizer *InfoPanel( wxWindow *parent, bool call_fit = true, bool set_sizer = true );
+		wxTextCtrl *m_fileNameTC;
+		wxTextCtrl *m_lengthTC;
+		wxTextCtrl *m_framesTC;
+		wxTextCtrl *m_channelsTC;
+		wxTextCtrl *m_sampleRateTC;
+};
+
+#endif /* _FILE_INFO_PANEL_H_ */

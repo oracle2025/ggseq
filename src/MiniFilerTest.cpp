@@ -29,12 +29,16 @@
 #include <wx/config.h>
 #include <wx/dragimag.h>
 
+#include "stuff.h"
+
 #include "TLPanel.h"
 #include "TLMiniFiler2.h"
 #include "MiniPlayer.h"
 #include "UpdateListener.h"
 #include "StatusProgressBar.h"
 #include "DisableListener.h"
+#include "SidePanel.h"
+#include "FileInfoPanel.h"
 
 #include "new1.xpm"
 #include "open.xpm"
@@ -48,6 +52,7 @@
 #include "dndfile.xpm"
 #include "snap.xpm"
 #include "ggseq_32.xpm"
+
 enum
 {
 	ID_But = 1,
@@ -63,7 +68,8 @@ enum
 	ID_DirTree,
 	ID_SetColours,
 	ID_SetSnap,
-	ID_A_Test
+	ID_A_Test,
+	ID_ScrollBar
 };
 
 class TestFrame1: public wxFrame
@@ -95,6 +101,7 @@ class TestFrame1: public wxFrame
 		void OnSelChanged(wxTreeEvent& event);
 		void OnMouseLeftUp(wxMouseEvent& event);
 		void OnMouseMotion(wxMouseEvent& event);
+		void OnScroll(wxScrollEvent& event);
 	private:
 		void MakeToolBar();
 		void MakeTlPanel(wxWindow *parent);
@@ -134,7 +141,7 @@ BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
 	EVT_LIST_ITEM_ACTIVATED(ID_FileList,TestFrame1::OnFLItemActivated)	
 	EVT_LIST_ITEM_SELECTED(ID_FileList,TestFrame1::OnFLItemSelected)
 	EVT_TREE_SEL_CHANGED(-1,TestFrame1::OnSelChanged)
-	
+	EVT_COMMAND_SCROLL_THUMBTRACK(ID_ScrollBar,TestFrame1::OnScroll)
 	EVT_MENU(ID_A_Test, TestFrame1::OnA_Test)
 	
 	EVT_TIMER(-1,TestFrame1::OnTimer)
@@ -145,10 +152,10 @@ BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
 END_EVENT_TABLE()
 
 TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& size)
-	:wxFrame((wxFrame *)NULL, -1, title, pos, size)
+	:wxFrame((wxFrame *)NULL, -1, title, pos, size,wxDEFAULT_FRAME_STYLE|GG_WINDOW_FLAGS)
 {
 	MakeToolBar();
-	wxPanel *panel1=new wxPanel(this); /*Für richtige Hintergrundfarbe in osx und win32*/
+	wxPanel *panel1=new wxPanel(this,-1,wxDefaultPosition,wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE); /*Für richtige Hintergrundfarbe in osx und win32*/
 	wxBoxSizer *panelSizer = new wxBoxSizer( wxHORIZONTAL );
 
 	wxAcceleratorEntry entries[1];
@@ -191,7 +198,7 @@ void TestFrame1::OnA_Test(wxCommandEvent& event)
 }
 void TestFrame1::MakeMainWindow(wxWindow *parent)
 {
-	wxSplitterWindow* SplitView = new wxSplitterWindow(parent,-1,wxDefaultPosition,wxDefaultSize,wxSP_LIVE_UPDATE|wxSP_NOBORDER/*|wxSP_3DSASH| wxSP_FULLSASH*/);
+	wxSplitterWindow* SplitView = new wxSplitterWindow(parent,-1,wxDefaultPosition,wxDefaultSize,wxSP_LIVE_UPDATE|wxSP_NOBORDER|wxNO_FULL_REPAINT_ON_RESIZE/*|wxSP_3DSASH| wxSP_FULLSASH*/);
 	SplitView->SetMinimumPaneSize(20);
 	wxBoxSizer *topsizer = new wxBoxSizer( wxHORIZONTAL );
 	topsizer->Add(SplitView,1,wxEXPAND|wxALL,5);
@@ -200,18 +207,43 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 //	MiniFiler *mf=new MiniFiler(SplitView);
 /*Hier kommt der neue Minifiler rein.*/
 
-	wxSplitterWindow* SplitView2 = new wxSplitterWindow(SplitView,-1,wxDefaultPosition,wxDefaultSize,wxSP_LIVE_UPDATE|wxSP_NOBORDER/*|wxSP_3DSASH| wxSP_FULLSASH*/);
+	wxSplitterWindow* SplitView2 = new wxSplitterWindow(SplitView,-1,wxDefaultPosition,wxDefaultSize,wxSP_LIVE_UPDATE|wxSP_NOBORDER|wxNO_FULL_REPAINT_ON_RESIZE/*|wxSP_3DSASH| wxSP_FULLSASH*/);
 //	MakeTlPanel(SplitView2);
 	SplitView2->SetMinimumPaneSize(20);
-	m_tp = new TLPanel(SplitView2);/*TODO Lautstärke regler einbauen*/
+
+	wxPanel *panel1 = new wxPanel(SplitView2,-1,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE);
+	wxBoxSizer * tlPanelSizer = new wxBoxSizer(wxVERTICAL);
+	wxScrollBar *sb = new wxScrollBar(panel1,ID_ScrollBar);
+	m_tp = new TLPanel(panel1,sb);
+	tlPanelSizer->Add(m_tp,1,wxEXPAND);
+	tlPanelSizer->Add(sb,0,wxEXPAND);
+	panel1->SetSizer(tlPanelSizer);
+//	sb->SetSizeHints(-1,25,-1,25);
+	
+//	m_tp = new TLPanel(SplitView2);/*TODO Lautstärke regler einbauen*/
 
 
-	wxPanel *miniplayerPanel = new wxPanel(SplitView2);
-	m_fileList = new FileList(miniplayerPanel,ID_FileList);
+	wxPanel *miniplayerPanel = new wxPanel(SplitView2,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE);
+	
+	wxPanel *sidePanelHolder = new wxPanel(miniplayerPanel,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE);
+
+	
+	
+	m_fileList = new FileList(sidePanelHolder,ID_FileList);
+	wxBoxSizer *bs2 = new wxBoxSizer(wxHORIZONTAL);
+	bs2->Add(m_fileList,1,wxEXPAND);
+	FileInfoPanel *fp = new FileInfoPanel(sidePanelHolder);
+	SidePanel* sm1= new SidePanel(sidePanelHolder, fp);
+	bs2->Add(sm1,0,wxEXPAND);
+	
+	sidePanelHolder->SetSizer(bs2);
+	bs2->Fit(sidePanelHolder);
+	bs2->SetSizeHints(sidePanelHolder);
+	
 	wxBoxSizer *miniPanSizer = new wxBoxSizer(wxVERTICAL);
-	miniPanSizer->Add(m_fileList,1,wxEXPAND);
+	miniPanSizer->Add(sidePanelHolder,1,wxEXPAND);
 //--
-	MiniPlayer *mP = new MiniPlayer(miniplayerPanel,m_tp->GetSoundManager(),m_updateListener );
+	MiniPlayer *mP = new MiniPlayer(miniplayerPanel,m_tp->GetSoundManager(),m_updateListener ,fp);
 	miniPanSizer->Add(mP,0,wxEXPAND|wxTOP,5);
 	m_miniPlayer = mP;
 	m_tp->SetMiniPlayer(m_miniPlayer);
@@ -221,15 +253,19 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 	
 	
 	m_DirTree = NULL;
-	m_DirTree = new wxGenericDirCtrl(SplitView,ID_DirTree,wxDirDialogDefaultFolderStr,wxDefaultPosition,wxDefaultSize,wxDIRCTRL_DIR_ONLY|wxSUNKEN_BORDER);
+	m_DirTree = new wxGenericDirCtrl(SplitView,ID_DirTree,wxDirDialogDefaultFolderStr,wxDefaultPosition,wxDefaultSize,wxDIRCTRL_DIR_ONLY|wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE);
 	wxConfig config(wxT("ggseq"));
 	m_DirTree->SetPath(config.Read(wxT("MiniFilerDirectory"), wxT("/")));
 
 	SplitView->SplitVertically(m_DirTree,SplitView2);
-	SplitView2->SplitHorizontally(m_tp,miniplayerPanel);
+	SplitView2->SplitHorizontally(/*m_tp*/panel1,miniplayerPanel);
 	SplitView->SetSashPosition(200);
 	SplitView2->SetSashPosition(280);
 	
+}
+void TestFrame1::OnScroll(wxScrollEvent& event)
+{
+	m_tp->OnScroll(event);
 }
 void TestFrame1::OnFLStartDrag(wxListEvent& event)
 {
@@ -333,7 +369,7 @@ void TestFrame1::MakeTlPanel(wxWindow *parent)
 	tv->SetVisibleFrame(100,100);
 	tv->SetVisibleLength(1420000);
 	tv->SetPosition(0);*/
-	m_tp = new TLPanel(parent,-1,wxPoint(0,50),wxSize(150,150));
+//	m_tp = new TLPanel(parent,-1,wxPoint(0,50),wxSize(150,150));
 }
 void TestFrame1::OnBut(wxCommandEvent& event)
 {

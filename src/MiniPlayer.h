@@ -22,6 +22,7 @@
 
 class TLSample;
 class UpdateListener;
+class FileInfoListener;
 
 class MiniPlayerInterface
 {
@@ -36,7 +37,7 @@ class MiniPlayer : public wxPanel, public MiniPlayerInterface
 {
 	public:
 		MiniPlayer(wxWindow* parent, SoundManager *soundManager,
-				UpdateListener *updateListener=NULL,
+				UpdateListener *updateListener=NULL, FileInfoListener *fiListener=NULL,
 				wxWindowID id = -1,
 				const wxPoint& pos = wxDefaultPosition,
 				const wxSize& size = wxDefaultSize,
@@ -60,6 +61,7 @@ class MiniPlayer : public wxPanel, public MiniPlayerInterface
 		TLSample *m_sample;
 		SoundManager *m_soundManager;
 		UpdateListener *m_updateListener;
+		FileInfoListener *m_fileInfoListener;
 		DECLARE_EVENT_TABLE()
 
 };

@@ -29,6 +29,7 @@
 
 #include <wx/listctrl.h>
 #include <wx/config.h>
+#include <wx/tglbtn.h>
 #include <iostream>
 
 #include "TLView.h"
@@ -73,8 +74,8 @@ BEGIN_EVENT_TABLE(TLPanel, wxPanel)
 #endif
 END_EVENT_TABLE()
 
-TLPanel::TLPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
-:wxPanel(parent, id, pos, size, style|wxSUNKEN_BORDER , name)
+TLPanel::TLPanel(wxWindow* parent, wxScrollBar *scrollbar, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+:wxPanel(parent, id, pos, size, style/*|wxSUNKEN_BORDER*/ , name)
 {
 
 	m_data = new TLData();
@@ -92,28 +93,33 @@ TLPanel::TLPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSi
 	m_TlView->SetVisibleLength(1420000);
 	m_TlView->SetPosition(0);
 
-	m_loadSaveManager = new TLLoadSaveManager(this,m_data);
+	m_loadSaveManager = new TLLoadSaveManager(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),m_data);
 	m_soundManager = new SoundManager(m_data);
 
 
-	m_scrollBar = new wxScrollBar(this,ID_ScrollBar,wxPoint(0,0),wxSize(GetSize().GetWidth(),0));	
+	m_scrollBar = scrollbar;//new wxScrollBar(this,ID_ScrollBar,wxPoint(0,0),wxSize(GetSize().GetWidth(),0));	
 
 	int i=0;
 	for ( TLTrackList::Node *node = m_data->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
+#ifdef __WXMSW__
+		/*TLMuteButton *button =*/m_buttons[i] = new TLMuteButton( this, -1,current,wxT("M"), wxPoint(5,TOP_OFFSET_TRACKS+i*30),wxSize(25,25));
+#else
 		/*TLMuteButton *button =*/m_buttons[i] = new TLMuteButton( this, -1,current,mute_off_xpm, wxPoint(5,TOP_OFFSET_TRACKS+i*30),wxSize(25,25));
+#endif
+		
 		m_dials[i] = new TLTrackVolumeDial(this, -1, current,wxPoint(31,TOP_OFFSET_TRACKS+i*30),wxSize(25,25));
 		i++;
 	}
 	m_ruler = new Ruler(this,-1,wxPoint(LEFT_OFFSET_TRACKS,2),wxSize(GetSize().GetWidth()-5-LEFT_OFFSET_TRACKS,15),wxRAISED_BORDER);
-	m_ruler->SetSnap((m_TlView->m_SnapPosition*31)/117600);
+	m_ruler->SetSnap((m_TlView->GetSnapValue()/*m_SnapPosition*/*31)/117600);
 	
 	
 //	m_data->GetTrackCount
 
 //	m_scrollBar->SetSize(0,GetSize().GetHeight()-20,GetSize().GetWidth(),20);
 	m_scrollBar->SetScrollbar(0,m_TlView->GetScrollBarThumbSize() ,m_TlView->GetScrollBarRange() , m_TlView->GetScrollBarThumbSize());
-	m_TlView->SetVisibleFrame(GetSize().GetWidth(),GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight());
+	m_TlView->SetVisibleFrame(GetSize().GetWidth(),GetSize().GetHeight()/*-m_scrollBar->GetSize().GetHeight()*/);
 	m_CaretPosition=0;
 	m_CaretVisible=true;//false;
 	m_sampleDrag=false;
@@ -147,10 +153,10 @@ void TLPanel::OnSize(wxSizeEvent& event)
 {
 #ifdef __WXMSW__
 	m_TlView->SetVisibleFrame(GetSize().GetWidth()-11-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-22-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
-	m_scrollBar->SetSize(0,GetSize().GetHeight()-22,GetSize().GetWidth()-6,16);
+//	m_scrollBar->SetSize(0,GetSize().GetHeight()-22,GetSize().GetWidth()-6,16);
 #else
-	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
-	m_scrollBar->SetSize(0,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-2,GetSize().GetWidth()-4,20);
+	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()/*-m_scrollBar->GetSize().GetHeight()*/-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
+//	m_scrollBar->SetSize(0,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-2,GetSize().GetWidth()-4,20);
 #endif
 	m_ruler->SetSize(5+LEFT_OFFSET_TRACKS,2,GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,15);
 
@@ -514,9 +520,9 @@ void TLPanel::DrawCaret(wxDC& dc)
 	dc.SetLogicalFunction(wxINVERT);
 	dc.SetPen(*wxTRANSPARENT_PEN);
 #ifdef __WXMSW__
-	dc.DrawRectangle(m_CaretPosition,0,1,GetSize().GetHeight()-22);
+	dc.DrawRectangle(m_CaretPosition,0,1,GetSize().GetHeight());
 #else
-	dc.DrawRectangle(m_CaretPosition,0,1,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight());
+	dc.DrawRectangle(m_CaretPosition,0,1,GetSize().GetHeight()/*-m_scrollBar->GetSize().GetHeight()*/);
 #endif
 }
 
@@ -624,7 +630,7 @@ void TLPanel::WavExport()
 	wxConfig config(wxT("ggseq"));
 	wxString lastFolder = config.Read(wxT("LastExportFolder"), wxT(""));
 	
-	wxFileDialog dlg1(this, wxT("Save WAV-File as"),lastFolder,wxT(""),wxT("WAV files (*.wav)|*.wav"),wxSAVE);
+	wxFileDialog dlg1(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(), wxT("Save WAV-File as"),lastFolder,wxT(""),wxT("WAV files (*.wav)|*.wav"),wxSAVE);
 	if (dlg1.ShowModal()==wxID_OK) {
 		wxString filename = dlg1.GetDirectory() +wxT("/")+ dlg1.GetFilename();
 		if (wxFileExists(filename)) {
@@ -706,7 +712,7 @@ wxString TLPanel::GetFilename()
 }
 void TLPanel::SetColours(wxString path)
 {
-	TLSelectColourDialog dlg(this,-1,m_data->GetColourManager(),wxT("Setup Colours for Folders"));
+	TLSelectColourDialog dlg(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),-1,m_data->GetColourManager(),wxT("Setup Colours for Folders"));
 	dlg.SetPath(path);
 	dlg.SetSize(wxSize(500,400));
 	dlg.Centre();
@@ -721,12 +727,12 @@ void TLPanel::SetColours(wxString path)
 }
 void TLPanel::SetSnap()
 {
-	TLSetSnapDialog dlg(this,-1,m_TlView->m_SnapPosition,wxT("Set Sample Snapping Position"));
+	TLSetSnapDialog dlg(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),-1,m_TlView->GetSnapValue()/*m_SnapPosition*/,wxT("Set Sample Snapping Position"));
 	dlg.Centre();
 	if (dlg.ShowModal()==wxID_OK) {
-		m_TlView->m_SnapPosition=dlg.m_SnapPosition;
+		m_TlView->SetSnapValue(/*m_SnapPosition=*/dlg.m_SnapPosition);
 	}
-	m_ruler->SetSnap((m_TlView->m_SnapPosition*31)/117600);
+	m_ruler->SetSnap((m_TlView->GetSnapValue()/*m_SnapPosition*/*31)/117600);
 	m_ruler->Refresh();
 }
 

@@ -1,6 +1,13 @@
+2003-12-06  Richard Spindler <oracle2025@gmx.de>
+
+ *  added stuff.h
+ *  added SidePanel.cpp .h
+ *  added FileInfoPanel.cpp .h
+ *  ProgressBar for Exporting to WAV added
+
 2003-11-30  Richard Spindler <oracle2025@gmx.de>
 
- *  added StatusProgressBar.cpp .h and UpdateListener.cpp .h
+ *  added StatusProgressBar.cpp .h and UpdateListener.cpp .h and DisableListener.h .cpp
  *  Progressbars for Loading of Samples and Songs implemented
 
 2003-11-26  Richard Spindler <oracle2025@gmx.de>

@@ -139,11 +139,13 @@ TLItem *TLData::AddItem(wxString filename, int Position, int TrackNr)
 	}
 	return NULL;
 }
-void TLData::SortAll()
+void TLData::SortAll()/*m_length aktualisieren*/
 {
+	m_length=0;
 	for ( TLTrackList::Node *node = m_trackList.GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
 		current->SortItems();
+		if (current->GetLength()>m_length) { m_length=current->GetLength(); }
 	}
 	ResetOffsets();
 }
@@ -221,6 +223,7 @@ void TLData::printXML(wxString filename)
 	TiXmlElement *el = new TiXmlElement("song");
 	doc.LinkEndChild(el);
 	el->SetAttribute("version","0.1");
+	el->SetAttribute("snap", m_snapValue);
 
 	TiXmlElement *samples = new TiXmlElement("samples");
 	el->LinkEndChild(samples);
@@ -286,6 +289,9 @@ void TLData::SaveWAV(wxString filename)
 	SetPlaybackPosition(0);
 	SortAll();
 	unsigned int res=FillBuffer(buffer,512);
+	/*m_length*/
+	m_updateListener->StartUpdateProcess();
+	long cnt=0;
 	while(res>=512) {
 		sf_write_float(sndfile,buffer,512);
 		if (SF_ERR_NO_ERROR!=sf_error(sndfile))
@@ -294,8 +300,12 @@ void TLData::SaveWAV(wxString filename)
 			return;
 		}
 		res=FillBuffer(buffer,512);
+		cnt+=res;
+		if (!(cnt%51200))
+			m_updateListener->Update((cnt*100)/m_length);
 	}
 	sf_write_float(sndfile,buffer,res);
+	m_updateListener->EndUpdateProcess();
 	if (SF_ERR_NO_ERROR!=sf_error(sndfile))
 	{
 		return;
@@ -409,4 +419,12 @@ void TLData::SetTrackVolume(double vol, int TrackNr)
 void TLData::SetUpdateListener(UpdateListener *updateListener)
 {
 	m_updateListener=updateListener;
+}
+void TLData::SetSnapValue(long snapValue)
+{
+	m_snapValue=snapValue;
+}
+long TLData::GetSnapValue()
+{
+	return m_snapValue;
 }

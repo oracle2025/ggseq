@@ -76,8 +76,16 @@ static int TlListCompare(const TLItem **arg1, const TLItem **arg2);
 void TLTrack::SortItems()
 {
 	m_itemList.Sort(TlListCompare);
+	TLItemList::Node *node= m_itemList.GetLast();
+	if (node) {
+		TLItem *item=node->GetData();
+		m_length=item->GetLength()+item->GetPosition();
+	}
 }
-
+long TLTrack::GetLength()
+{
+	return m_length;
+}
 static int TlListCompare(const TLItem **arg1, const TLItem **arg2)
 {
 //	return ( (*arg1)->m_position > (*arg2)->m_position );

@@ -44,16 +44,24 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 	sndfile=sf_open(filename.mb_str(),SFM_READ,&sfinfo);
 	if (SF_ERR_NO_ERROR!=sf_error(sndfile)) { /*TODO Error loggen !*/
 //		std::cerr << sf_strerror(sndfile) << std::endl;
+		wxLogError(wxT("Error Opening Soundfile\n%s"), sf_strerror(sndfile));
+		sf_close(sndfile);
 		return;
 	}
+	m_infoFrames=sfinfo.frames;
+	m_infoSampleRate=sfinfo.samplerate;
+	m_infoChannels=sfinfo.channels;
+
 	if (sfinfo.channels!=2 && sfinfo.channels!=1) {
+		wxLogError(wxT("Wrong number of channels!\n(Only mono and stereo allowed)"));
 		sf_close(sndfile);
 		return;
 	}
-/*	if (sfinfo.samplerate!=44100) {
+	if (sfinfo.frames==0) {
+		wxLogError(wxT("Soundfile has length Zero!"));
 		sf_close(sndfile);
 		return;
-	}*/
+	}
 	m_length = sfinfo.frames*2;
 	m_buffer=new float[m_length];
 
@@ -69,6 +77,7 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 	for(int i=0;i<=sfinfo.frames;i+=100000) {//i sind frames ?
 		if (updateListener)
 			if(updateListener->Update((i*factors)/sfinfo.frames)==false) {
+				sf_close(sndfile);
 				return;
 			}
 		int cnt;
@@ -78,15 +87,18 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 			cnt=100000;
 
 
-		std::cout << i << ", " << sfinfo.channels << ", " << sfinfo.frames <<", "<< cnt<<", "<<m_length<< std::endl;
+//		std::cout << i << ", " << sfinfo.channels << ", " << sfinfo.frames <<", "<< cnt<<", "<<m_length<< std::endl;
 		sf_readf_float(sndfile,m_buffer+i*sfinfo.channels,cnt);//segfault
+		if (SF_ERR_NO_ERROR!=sf_error(sndfile)) { /*TODO Error loggen !*/
+			wxLogError(wxT("Error Reading from Soundfile\n%s"), sf_strerror(sndfile));
+			sf_close(sndfile);
+			return;
+		}
+
 	}
 
-	
-//	sf_readf_float(sndfile,m_buffer,sfinfo.frames);
+	sf_close(sndfile);
 	int prog_offset=factors;
-
-	
 	if (sfinfo.channels==1) {/*Mono-Sample strecken.*/ /*dieser aufruf ist zeitkritisch*/
 		for (int i=sfinfo.frames-1;i>=0;i--) {
 			m_buffer[2*i+1]=m_buffer[i];
@@ -126,7 +138,8 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 				src_data.input_frames=buffer_length;
 			error=src_process(src_state, &src_data);
 			if(error!=0) {
-				std::cout << src_strerror(error) << std::endl;
+//				std::cout << src_strerror(error) << std::endl;
+				wxLogError(wxT("Error converting Samplerate\n%s"), src_strerror(error));
 			}
 			src_data.output_frames-=src_data.output_frames_gen;
 			frames_generated+=src_data.output_frames_gen;
@@ -143,20 +156,19 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 //		src_process(src_state, &src_data);
 
 		src_delete(src_state);
-
 		delete m_buffer;
 		m_buffer=out_buffer;//src_data.data_out;
 		m_length=frames_generated*2;//src_data.output_frames_gen*2;
 //		return;
 	}
 	
-	if (SF_ERR_NO_ERROR!=sf_error(sndfile))
+/*	if (SF_ERR_NO_ERROR!=sf_error(sndfile))
 	{
-		sf_close(sndfile);/*???*/
-		//std::cerr << sf_strerror(sndfile) << std::endl;
+		sf_close(sndfile);
+		wxLogError(wxT("2: %s"),sf_strerror(sndfile));
 		return;
 	}
-	sf_close(sndfile);
+	sf_close(sndfile);*/
 	m_valid=true;
 }
 void TLSample::UnRef()

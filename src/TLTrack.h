@@ -38,6 +38,7 @@ class TLTrack
 		void DeleteItem(TLItem *item);
 
 		int GetHeight();
+		long GetLength();
 
 		void SetPlaybackPosition(int Position);
 		unsigned int FillBuffer(float* outBuffer, unsigned int count);
@@ -56,6 +57,7 @@ class TLTrack
 		int m_pos;
 		bool m_mute;
 		double m_volume;
+		long m_length;
 		TLItemList::Node *m_currentNode;
 };
 

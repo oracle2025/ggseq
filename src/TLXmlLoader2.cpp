@@ -49,6 +49,10 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 		Error(filename);
 		return;
 	}
+	int snap=1;
+	if (element->Attribute("snap",&snap)) {
+		m_data->SetSnapValue(snap);
+	}
 	TiXmlNode *node = element->FirstChild("samples");
 	if (node==NULL) {
 		Error(filename);

@@ -40,7 +40,7 @@ class UpdateListener;
 class TLPanel : public wxPanel
 {
 	public:
-		TLPanel(wxWindow* parent,
+		TLPanel(wxWindow* parent, wxScrollBar *scrollbar,
 				wxWindowID id = -1,
 				const wxPoint& pos = wxDefaultPosition,
 				const wxSize& size = wxDefaultSize,

@@ -45,13 +45,14 @@ TLView::TLView(TLData *TlData)
 	m_TrackDrawDist=5;
 	m_selectionSet=new TLSelectionSet();
 	wxConfig config(wxT("ggseq"));
-	m_SnapPosition=config.Read(wxT("SnapPosition"), SNAP_POSITION);
+	m_TlData->SetSnapValue(config.Read(wxT("SnapPosition"), SNAP_POSITION));
+//	m_SnapPosition=config.Read(wxT("SnapPosition"), SNAP_POSITION);
 	
 }
 TLView::~TLView()
 {
 	wxConfig config(wxT("ggseq"));
-	config.Write(wxT("SnapPosition"),m_SnapPosition);
+	config.Write(wxT("SnapPosition"),m_TlData->GetSnapValue()/*m_SnapPosition*/);
 	delete m_selectionSet;
 	delete m_TlData;
 }
@@ -245,10 +246,10 @@ void TLView::SnapItem(TLItem *item)
 {
 	if (m_TlData->IsBlocked())
 		return;
-	long pos=item->GetPosition()%m_SnapPosition;
+	long pos=item->GetPosition()%m_TlData->GetSnapValue()/*m_SnapPosition*/;
 	if (pos) {
-		if (pos>m_SnapPosition/2)
-			m_TlData->SetItemPosition(item,item->GetPosition()-pos+m_SnapPosition);
+		if (pos>m_TlData->GetSnapValue()/*m_SnapPosition*//2)
+			m_TlData->SetItemPosition(item,item->GetPosition()-pos+m_TlData->GetSnapValue()/*m_SnapPosition*/);
 		else
 			m_TlData->SetItemPosition(item,item->GetPosition()-pos);
 	}
@@ -274,10 +275,10 @@ TLSample *TLView::GetSample(long position, long trackNr)
 long TLView::GetScreenSnapPosition(long position)
 {	
 	long pos1=FromScreenXtoTL(position);
-	long pos=pos1%m_SnapPosition;
+	long pos=pos1%m_TlData->GetSnapValue()/*m_SnapPosition*/;
 	if (pos) {
-		if (pos>m_SnapPosition/2)
-			pos1=pos1-pos+m_SnapPosition;
+		if (pos>m_TlData->GetSnapValue()/*m_SnapPosition*//2)
+			pos1=pos1-pos+m_TlData->GetSnapValue()/*m_SnapPosition*/;
 		else
 			pos1=pos1-pos;
 	}
@@ -382,10 +383,10 @@ void TLView::DrawSelection(wxDC *dc)
 void TLView::EndSelectionDrag(int x, int y, bool copy)
 {
 	long TL_x=FromScreenXtoTL(x);
-	long pos=TL_x%m_SnapPosition;
+	long pos=TL_x%m_TlData->GetSnapValue()/*m_SnapPosition*/;
 	if (pos) {
-		if (pos>m_SnapPosition/2)
-			TL_x=TL_x-pos+m_SnapPosition;
+		if (pos>m_TlData->GetSnapValue()/*m_SnapPosition*//2)
+			TL_x=TL_x-pos+m_TlData->GetSnapValue()/*m_SnapPosition*/;
 		else
 			TL_x=TL_x-pos;
 	}
@@ -397,3 +398,12 @@ void TLView::EndSelectionDrag(int x, int y, bool copy)
 		m_selectionSet->DeleteFrom(m_TlData);
 }
 
+
+void TLView::SetSnapValue(long snapValue)
+{
+	m_TlData->SetSnapValue(snapValue);
+}
+long TLView::GetSnapValue()
+{
+	return m_TlData->GetSnapValue();
+}

@@ -69,8 +69,10 @@ class TLView
 		void DrawSelection(wxDC *dc);
 		void EndSelectionDrag(int x, int y, bool copy);
 		/*wxPoint Snap(wxPoint)*/
-
-		int m_SnapPosition;
+		void SetSnapValue(long snapValue);
+		long GetSnapValue();
+		
+//		int m_SnapPosition;
 	private:
 		void SnapItem(TLItem *item);/*kommt evtl. nach TLData*/
 		long DrawTrack(wxDC& dc_screen, long yoffset, TLTrack* track);

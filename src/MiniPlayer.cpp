@@ -24,6 +24,7 @@
 #include "SoundManager.h"
 #include "MiniPlayer.h"
 #include "TLSample.h"
+#include "FileInfoPanel.h"
 
 #include "play_12.xpm"
 #include "stop_12.xpm"
@@ -31,6 +32,7 @@ enum
 {
 	ID_Play = 1,
 	ID_Stop,
+	ID_StaticBox,
 };
 
 BEGIN_EVENT_TABLE(MiniPlayer, wxPanel)
@@ -39,27 +41,27 @@ BEGIN_EVENT_TABLE(MiniPlayer, wxPanel)
 	EVT_TIMER(-1,MiniPlayer::OnTimer)
 END_EVENT_TABLE()
 
-MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListener *updateListener,
+MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListener *updateListener, FileInfoListener *fiListener,
 		wxWindowID id,
 		const wxPoint& pos,
 		const wxSize& size,
 		long style,
 		const wxString& name)
-		:wxPanel(parent, id, pos, size, style , name)
+		:wxPanel(parent, id, pos, size, style|wxNO_FULL_REPAINT_ON_RESIZE , name)
 {
 	MakeMiniPlayerWindow(this);
 	m_soundManager=soundManager;
 	m_timer = new wxTimer(this);
 	m_updateListener = updateListener;
+	m_fileInfoListener = fiListener;
 	m_sample=NULL;
 }
 void MiniPlayer::MakeMiniPlayerWindow(wxWindow *parent)
 {
 	wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
-	wxStaticBox *item2 = new wxStaticBox( parent, -1, wxT("") );
+	wxStaticBox *item2 = new wxStaticBox( parent, ID_StaticBox, wxT("") ,wxDefaultPosition, wxDefaultSize, wxNO_FULL_REPAINT_ON_RESIZE);
 	wxStaticBoxSizer *item1 = new wxStaticBoxSizer( item2, wxHORIZONTAL );
-
 	wxStaticText *item3 = new wxStaticText( parent, -1, wxT("Miniplayer"), wxDefaultPosition, wxDefaultSize, 0 );
 	item1->Add( item3, 0, wxALIGN_CENTRE|wxLEFT|wxRIGHT, 5 );
 
@@ -100,12 +102,17 @@ void MiniPlayer::Play()
 	m_playButton->Enable(false);
 	if (m_sample) {
 		wxLogStatus(wxT("Playing Sample: %s"),m_sample->GetFilename().c_str());
-		m_soundManager->Play(m_sample);
+		if (m_fileInfoListener) {m_fileInfoListener->SetInfo(m_sample->GetFilename(),m_sample->m_infoFrames,m_sample->m_infoChannels,m_sample->m_infoSampleRate);}
 		m_slider->SetRange(0,m_sample->GetLength());
+		m_soundManager->Play(m_sample);
 	} else {
 		wxLogStatus(wxT("Playing Sample: %s"),m_filename.c_str());
 		long length;
-		m_soundManager->Play(m_filename,length,m_updateListener);
+		long frames;
+		long channels;
+		long sampleRate;
+		m_soundManager->Play(m_filename,length,frames,channels,sampleRate,m_updateListener);
+		if (m_fileInfoListener) {m_fileInfoListener->SetInfo(m_filename,frames,channels,sampleRate);}
 		m_slider->SetRange(0,length);
 	}
 	m_slider->SetValue(0);

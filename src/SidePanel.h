@@ -1,4 +1,4 @@
-/* TLSample.h
+/* SidePanel.h
  *
  *  Copyright (C) 2003 Richard Spindler <oracle2025@gmx.de>
  *
@@ -17,41 +17,24 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _TLSAMPLE_H_
-#define _TLSAMPLE_H_
+#ifndef _SIDE_PANEL_H_
+#define _SIDE_PANEL_H_
 
-class wxString;
-class TLColourManager;
-class UpdateListener;
+class wxStaticLine;
 
-class TLSample
+class SidePanel : public wxPanel
 {
 	public:
-		TLSample(const wxString &filename, int id,TLColourManager *colourMan, UpdateListener* updateListener=NULL);
-		~TLSample();
-		float *GetBuffer();
-		int GetLength();
-		bool IsValid();
-		void Ref();
-		void UnRef();
-		int GetRefCount();
-		int GetId();
-		wxString GetFilename();
-		wxIcon GetIcon();
-		void Draw(wxDC& dc_screen);
-		wxColour GetColour();
-		long m_infoFrames;
-		long m_infoSampleRate;
-		long m_infoChannels;
+		SidePanel(wxWindow* parent,wxPanel* panel, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("panel"));
+		void OnButton(wxCommandEvent& event);
 	private:
-		int m_id; /*Für die Zuordnung im XML-File*/
-		int m_refCount;/*Ums zu löschen sobald es keine Referenzen mehr gibt.*/
-		int m_length;
-		float *m_buffer;
-		wxString m_filename;
-		bool m_valid;
-		TLColourManager *m_colourMan;
-		wxColour m_colour;
+		void Hide(bool hide=true);
+		wxPanel* m_contentPanel;
+		wxStaticLine *m_hLine;
+		wxStaticLine *m_vLine;
+		wxBoxSizer *m_hLineSizer;
+		bool m_hidden;
+		DECLARE_EVENT_TABLE()
 };
 
-#endif /*_TLSAMPLE_H_*/
+#endif /* _SIDE_PANEL_H_ */

@@ -46,7 +46,7 @@ class SoundManager// : public wxEvtHandler
 //		void OnDonePlayingSample(wxCommandEvent& event);
 //		int GetPlaybackPosition();
 		void Play();
-		void Play(wxString filename, long &length, UpdateListener *updateListener=NULL);
+		void Play(wxString filename, long &length,long &frames,long &channels, long &sampleRate, UpdateListener *updateListener=NULL);
 		void Play(TLSample *sample);
 		void Stop();
 		bool Done();

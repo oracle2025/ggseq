@@ -118,7 +118,7 @@ unsigned int SoundManager::FillBuffer_Sample(float* outBuffer, unsigned int coun
 	return i;
 }
 
-void SoundManager::Play(wxString filename, long &length, UpdateListener *updateListener)
+void SoundManager::Play(wxString filename, long &length,long &frames,long &channels, long &sampleRate, UpdateListener *updateListener)
 {
 	if (m_tlPlaying)
 		return;
@@ -138,6 +138,9 @@ void SoundManager::Play(wxString filename, long &length, UpdateListener *updateL
 	}
 	
 	length=sample->GetLength();
+	frames=sample->m_infoFrames;
+	channels=sample->m_infoChannels;
+	sampleRate=sample->m_infoSampleRate;
 	Play(sample);
 }
 void SoundManager::Play(TLSample *sample)

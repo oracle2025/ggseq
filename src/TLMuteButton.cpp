@@ -21,6 +21,7 @@
 #ifndef WX_PRECOMP
     #include "wx/wx.h"
 #endif
+#include <wx/tglbtn.h>
 
 #include "TLTrack.h"
 #include "TLMuteButton.h"
@@ -28,18 +29,26 @@
 #include "mute_on.xpm"
 
 BEGIN_EVENT_TABLE(TLMuteButton, wxBitmapButton)
+#ifdef __WXMSW__
+	EVT_TOGGLEBUTTON(-1,TLMuteButton::OnToggle)
+#else
 	EVT_BUTTON(-1,TLMuteButton::OnClick)
+#endif
 END_EVENT_TABLE()
 
-
+#ifdef __WXMSW__
+TLMuteButton::TLMuteButton(wxWindow* parent, wxWindowID id,TLTrack* track, const wxString& label, const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name)
+	: wxToggleButton(parent, id, label, pos ,size , style , validator , name)
+#else
 TLMuteButton::TLMuteButton(wxWindow* parent, wxWindowID id,TLTrack* track, const wxBitmap& bitmap, const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name)
 	: wxBitmapButton(parent, id, bitmap, pos ,size , style , validator , name)
+#endif
 {
 	m_track=track;
 	m_mute=FALSE;
 }
 
-
+#ifndef __WXMSW__
 void TLMuteButton::OnClick(wxCommandEvent &event)
 {
 	m_mute=!m_mute;
@@ -56,9 +65,15 @@ void TLMuteButton::OnClick(wxCommandEvent &event)
 		SetBitmapSelected(bmp);
 	}
 }
-
+#else
+void TLMuteButton::OnToggle(wxCommandEvent &event)
+{
+	m_track->SetMute(GetValue());
+}
+#endif
 void TLMuteButton::SetMute(bool mute)
 {
+#ifndef __WXMSW__
 	m_mute=mute;
 	m_track->SetMute(m_mute);
 	if(m_mute) {
@@ -72,5 +87,9 @@ void TLMuteButton::SetMute(bool mute)
 		SetBitmapFocus(bmp);
 		SetBitmapSelected(bmp);
 	}
+#else
+	SetValue(mute);
+	m_track->SetMute(mute);
+#endif
 
 }

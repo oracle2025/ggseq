@@ -20,11 +20,20 @@
 #ifndef _TL_MUTE_BUTTON_H_
 #define _TL_MUTE_BUTTON_H_
 
+#ifdef __WXMSW__
+class TLMuteButton : public wxToggleButton
+#else
 class TLMuteButton : public wxBitmapButton
+#endif
 {
 	public:
+#ifdef __WXMSW__
+		TLMuteButton(wxWindow* parent, wxWindowID id,TLTrack* track, const wxString& label, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxBU_AUTODRAW, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxT("button"));
+		void OnToggle(wxCommandEvent &event);
+#else
 		TLMuteButton(wxWindow* parent, wxWindowID id,TLTrack* track, const wxBitmap& bitmap, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxBU_AUTODRAW, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxT("button"));
 		void OnClick(wxCommandEvent &event);
+#endif
 		void SetMute(bool mute);
 	private:
 		TLTrack *m_track;

@@ -68,7 +68,10 @@ class TLData
 
 		void ClearSample(TLSample *sample);
 		void SetUpdateListener(UpdateListener *updateListener);
+		void SetSnapValue(long snapValue);
+		long GetSnapValue();
 	private:
+		long m_snapValue;
 		int mixChannels(float *A, float *B, float* out);
 		void printXML(wxString filename);
 		void loadXML(wxString filename);
