@@ -98,6 +98,8 @@ wxSizer *TimelineFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = 
 #define ID_TL_SIDEPANEL 10040
 wxSizer *SampleListFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
+wxSizer *TrimmerDialogFunc2( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
+
 // Declare menubar functions
 
 #define ID_MENU 10041
