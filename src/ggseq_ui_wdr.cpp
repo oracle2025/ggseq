@@ -683,6 +683,7 @@ wxMenuBar *MyMenuBarFunc()
     item0->Append( item3, wxT("&View") );
     
     wxMenu* item4 = new wxMenu;
+    item4->Append( ID_HELP, wxT("Contents ..."), wxT("") );
     item4->Append( ID_ABOUT, wxT("&About ..."), wxT("") );
     item0->Append( item4, wxT("&Help") );
     

@@ -225,18 +225,19 @@ long TLView::DrawTrack(wxDC& dc, long yoffset, TLTrack* track)
 }
 void TLView::Draw3dRect(wxDC *dc, wxCoord x, wxCoord y, wxCoord width, wxCoord height, wxColour colour)
 {
-	wxBrush b1=dc->GetBrush();
-	b1.SetColour(colour);
-	dc->SetBrush(b1);
+/*	wxBrush b1=dc->GetBrush();
+	b1.SetColour(colour);*/
+	dc->SetBrush(wxBrush(colour, wxSOLID));
+	dc->SetPen(*wxTRANSPARENT_PEN);
 	dc->DrawRectangle(x,y,width,height);
-	wxPen pen1=dc->GetPen();
-	pen1.SetColour(GetLightColour(colour));
-	dc->SetPen(pen1);
+/*	wxPen pen1=dc->GetPen();
+	pen1.SetColour(GetLightColour(colour));*/
+	dc->SetPen(wxPen(GetLightColour(colour), 1, wxSOLID ));
 	dc->DrawLine(x,y,x+width-1,y);
 	dc->DrawLine(x,y,x,y+height-1);
-	pen1=dc->GetPen();
-	pen1.SetColour(GetDarkColour(colour));
-	dc->SetPen(pen1);
+/*	pen1=dc->GetPen();
+	pen1.SetColour(GetDarkColour(colour));*/
+	dc->SetPen(wxPen(GetDarkColour(colour), 1, wxSOLID ));
 	dc->DrawLine(x,y+height-1,x+width-1,y+height-1);
 	dc->DrawLine(x+width-1,y,x+width-1,y+height);
 }

@@ -1,4 +1,12 @@
-2005-02-11  Richard Spindler <richard.spindler AT gmail.com>
+2005-03-14  Richard Spindler <richard.spindler AT gmail.com>
+
+ * Set a minimum Size for Trimming
+ * Fixed Timeline Rendering Artefact
+ * Fixed Ruler Reset Artefact
+ * Fixed Missing Filename in Window Title on "Load last File"
+ * Fixed Enable/Disable of Undo/Redo Buttons+Menu
+
+2005-03-11  Richard Spindler <richard.spindler AT gmail.com>
 
  * Made Ruler to snap to the Grid
  * Updated TinyXML to Version 2.3.3

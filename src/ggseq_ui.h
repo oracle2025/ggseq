@@ -45,7 +45,7 @@ class wxDragImage;
 // MyFrame
 //----------------------------------------------------------------------------
 
-class MyFrame: public wxFrame
+class MyFrame: public wxFrame, UndoRedoChangeListener
 {
 public:
     // constructors and destructors
@@ -59,6 +59,7 @@ public:
     void LoadFile(wxString& filename); 
     wxStatusBar* OnCreateStatusBar(int number,
     long style, wxWindowID id, const wxString& name);
+    void UndoRedoChanged();
 private:
     // WDR: method declarations for MyFrame
     wxSplitterWindow* GetTimelineSplitter()  { return (wxSplitterWindow*) FindWindow( ID_TIMELINE_SPLITTER ); }
@@ -73,16 +74,18 @@ private:
     void CreateAcceleratorTable();
     void RefreshWindowTitle();
     void Stop();
-
+    void SetUndoRedoButtons();
 private:
     // WDR: member variable declarations for MyFrame
     UpdateListener *m_updateListener;
     wxDragImage *m_dragImage;
     bool m_DraggingFile;
     wxTimer *m_timer;
+    wxHtmlHelpController     m_HtmlHelp;
 
 private:
     // WDR: handler declarations for MyFrame
+    void OnHelp( wxCommandEvent &event );
     void OnTimelineSplitterChanging( wxSplitterEvent &event );
     void OnExportPack( wxCommandEvent &event );
     void OnImportPack( wxCommandEvent &event );

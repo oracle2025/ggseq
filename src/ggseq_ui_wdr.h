@@ -121,16 +121,16 @@ wxSizer *TrimmerDialogFunc2( wxWindow *parent, bool call_fit = TRUE, bool set_si
 #define ID_ZOOM_50 10057
 #define ID_ZOOM_100 10058
 #define ID_ZOOM_150 10059
-#define ID_ABOUT 10060
+#define ID_HELP 10060
+#define ID_ABOUT 10061
 wxMenuBar *MyMenuBarFunc();
 
 // Declare toolbar functions
 
-#define ID_REWIND 10061
-#define ID_PLAY 10062
-#define ID_STOP 10063
-#define ID_CHOICE 10064
-#define ID_HELP 10065
+#define ID_REWIND 10062
+#define ID_PLAY 10063
+#define ID_STOP 10064
+#define ID_CHOICE 10065
 void MyToolBarFunc( wxToolBar *parent );
 
 // Declare bitmap functions

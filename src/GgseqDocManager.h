@@ -27,12 +27,14 @@ class TLSelectionSet;
 WX_DECLARE_LIST(GgseqCommand, GgseqCommandList);
 WX_DECLARE_LIST(GgseqUndoItem, GgseqUndoItemList);
 class TLPanel;
+class UndoRedoChangeListener;
 
 class GgseqDocManager
 {
 	public:
 		GgseqDocManager( TLData *data );
 		~GgseqDocManager();
+		void SetUndoRedoChangeListener(UndoRedoChangeListener *urChangeListener);
 		void SubmitCommand( GgseqCommand *command ); /*DocManager takes Ownership*/
 		void Undo();
 		void Redo();
@@ -45,6 +47,7 @@ class GgseqDocManager
 		GgseqCommandList m_commandList;
 		GgseqCommandList m_redoList;
 		long m_referenceCount;
+		UndoRedoChangeListener *m_urChangeListener;
 };
 
 class GgseqCommand

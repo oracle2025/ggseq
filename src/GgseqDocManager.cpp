@@ -32,6 +32,7 @@
 #include "TLSample.h"
 #include "TLSelectionSet.h"
 #include "GgseqDocManager.h"
+#include "Listeners.h"
 
 #define MAX_UNDO 50
 
@@ -71,8 +72,13 @@ WX_DEFINE_LIST(GgseqUndoItemList);
 GgseqDocManager::GgseqDocManager( TLData *data )
 {
 	m_document = data;
+	m_urChangeListener = 0;
 	m_referenceCount = 1;
 	g_ggseqProps.SetDocManager(this);
+}
+void GgseqDocManager::SetUndoRedoChangeListener(UndoRedoChangeListener *urChangeListener)
+{
+	m_urChangeListener = urChangeListener;
 }
 GgseqDocManager::~GgseqDocManager()
 {
@@ -108,6 +114,8 @@ void GgseqDocManager::SubmitCommand( GgseqCommand *command )
 		m_redoList.Clear();
 		m_redoList.DeleteContents(false);
 	}
+	if (m_urChangeListener)
+		m_urChangeListener->UndoRedoChanged();
 }
 void GgseqCommand::SetDocManager( GgseqDocManager *docManager )
 {

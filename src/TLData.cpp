@@ -82,7 +82,7 @@ void TLData::SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2)
 		return; //TODO, sollte auch im UI reflektiert werden.
 	m_loopPos1=pos1;/* Umrechnen nach abc, was auch immer(Wird im Ruler gemacht)*/
 	m_loopPos2=pos2;
-	m_loop_enabled=true;
+	m_loop_enabled=pos1 != pos2;
 	m_playbackPosition=m_loopPos1;
 /*	puts("abc-Test");*/
 }

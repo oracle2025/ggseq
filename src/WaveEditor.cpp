@@ -38,6 +38,8 @@
 #include "TLItem.h"
 #include "TLSample.h"
 #include "SoundManager.h"
+#define TRIMMER_MIN_WIDTH 20000
+
 // event table
 
 BEGIN_EVENT_TABLE(WaveEditor, wxPanel)
@@ -146,7 +148,7 @@ void WaveEditor::OnPaint( wxPaintEvent& event )
 	dc.SetPen( *wxBLACK_PEN );
 	int inc = m_len / ( width + 4 );
 	for ( int i=0; i < width; i ++ ) {
-		int h = ( get_average( &m_buffer[i * inc], inc * 4 ) * float( height  ) * 2 );
+		int h = ( get_average( &m_buffer[i * inc], inc * 4 ) * float( height  ) /* * 2 */ );
 		dc.DrawLine( i, ( height / 2 ) - h, i, ( height / 2 ) + h );
 	}
 	dc.DrawLine( 0, height / 2, width, height / 2 );
@@ -195,14 +197,26 @@ void WaveEditor::OnMouseMotion( wxMouseEvent& event )
 	fit_between( &m_dragMarker->x, - 5, GetClientSize().GetWidth() - 5 );
 	if ( m_dragMarker == &m_marker[0] ) {
 		m_leftTrim = MarkToTrim( m_dragMarker->x );
+		if ( m_leftTrim + TRIMMER_MIN_WIDTH > m_rightTrim && m_leftTrim + TRIMMER_MIN_WIDTH < m_len/2 ) {
+			m_rightTrim = m_leftTrim + TRIMMER_MIN_WIDTH;
+		} else if (m_leftTrim + TRIMMER_MIN_WIDTH > m_len/2) {
+			m_rightTrim = m_len/2;
+			m_leftTrim = m_len/2 - TRIMMER_MIN_WIDTH;
+		}
 	} else if ( m_dragMarker == &m_marker[1] ) {
 		m_rightTrim = MarkToTrim( m_dragMarker->x );
+		if ( m_leftTrim + TRIMMER_MIN_WIDTH > m_rightTrim && m_rightTrim - TRIMMER_MIN_WIDTH > 0 ) {
+			m_leftTrim = m_rightTrim - TRIMMER_MIN_WIDTH;
+		} else if (m_rightTrim - TRIMMER_MIN_WIDTH < 0) {
+			m_leftTrim = 0;
+			m_rightTrim = TRIMMER_MIN_WIDTH;
+		}
 	}
-	if ( m_leftTrim > m_rightTrim ) {
+/*	if ( m_leftTrim + 20000 > m_rightTrim ) {
 		gg_tl_dat t = m_leftTrim;
-		m_leftTrim = m_rightTrim;
+		m_leftTrim = m_rightTrim - 20000;
 		m_rightTrim = t;
-	}
+	}*/
 	Refresh();
 }
 

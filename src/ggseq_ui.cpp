@@ -36,8 +36,10 @@
 #include <wx/cmdline.h>
 #include <wx/dragimag.h>
 #include <wx/config.h>
+#include <wx/html/helpctrl.h>
 
 // Include private headers
+#include "Listeners.h"
 #include "ggseq_ui.h"
 #include "stuff.h"
 #include "TLMiniFiler2.h"
@@ -121,6 +123,7 @@ BEGIN_EVENT_TABLE(MyFrame,wxFrame)
     EVT_MENU( ID_SAVEAS_PACK, MyFrame::OnExportPack )
     EVT_SPLITTER_SASH_POS_CHANGING( ID_TIMELINE_SPLITTER, MyFrame::OnTimelineSplitterChanging )
     EVT_ACTIVATE(MyFrame::OnActivate)
+    EVT_MENU( ID_HELP, MyFrame::OnHelp )
 END_EVENT_TABLE()
 
 MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
@@ -151,6 +154,7 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     RefreshWindowTitle();
     SetDropTarget (new DropFiles (this));
     GetTlPanel()->SetUpdateListener(m_updateListener);
+    GetTlPanel()->SetUndoRedoChangeListener(this); //TODO sollte über globalProps laufen
     ((StatusProgressBar*)m_updateListener)->SetDisableListener(new DoubleDisabler(panel1,GetToolBar())); //TODO: Wer löscht die Dinger?, Menü kann nicht komplett disabled werden.
 //    GetTlPanel()->SetMiniPlayer(GetMiniplayer());
     m_timer = new wxTimer(this);
@@ -160,19 +164,23 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     // GUI - Hints
     GetMenuBar()->Enable( ID_MOVE_TRACK_UP, false );
     GetMenuBar()->Enable( ID_MOVE_TRACK_DOWN, false );
+    GetToolBar()->EnableTool( ID_UNDO, false );
+    GetToolBar()->EnableTool( ID_REDO, false );
+    GetMenuBar()->Enable( ID_UNDO, false );
+    GetMenuBar()->Enable( ID_REDO, false );
     SetSizeHints(470,500);
     GetMainSplitter()->SetSashPosition(200);
     GetTlPanel()->SetFocus();//Nötig, damit unter wxGTK die Cursor funktionieren.
 //    GetTimelineSplitter()->SetSashPosition(300);
-    
+    m_HtmlHelp.Initialize(wxT("../doc/ggseq.htb"));
     
 }
 void MyFrame::OnActivate( wxActivateEvent &event ) //Evil and Ugly Hack, but neccessary because wx is broken >:(
 {
-	static bool not_activated = true;
-	if (not_activated) {
-		GetTimelineSplitter()->SetSashPosition(290);
-	}
+    static bool not_activated = true;
+    if (not_activated) {
+        GetTimelineSplitter()->SetSashPosition(290);
+    }
 }
 MyFrame::~MyFrame()
 {
@@ -231,6 +239,7 @@ void MyFrame::RefreshWindowTitle()
 void MyFrame::LoadFile(wxString& filename)
 {
     GetTlPanel()->Load(filename);   
+    RefreshWindowTitle();
 }
 void MyFrame::Stop()
 {
@@ -241,6 +250,11 @@ void MyFrame::Stop()
 
 
 // WDR: handler implementations for MyFrame
+
+void MyFrame::OnHelp( wxCommandEvent &event )
+{
+    m_HtmlHelp.DisplayContents();
+}
 
 void MyFrame::OnTimelineSplitterChanging( wxSplitterEvent &event )
 {
@@ -383,15 +397,27 @@ void MyFrame::OnScroll2( wxScrollEvent &event )
 {
     GetTlPanel()->OnScroll2(event);
 }
-
+void MyFrame::UndoRedoChanged()
+{
+	SetUndoRedoButtons();
+}
+void MyFrame::SetUndoRedoButtons()
+{
+    GetToolBar()->EnableTool( ID_UNDO, GetTlPanel()->CanUndo() );
+    GetToolBar()->EnableTool( ID_REDO, GetTlPanel()->CanRedo() );
+    GetMenuBar()->Enable( ID_UNDO, GetTlPanel()->CanUndo() );
+    GetMenuBar()->Enable( ID_REDO, GetTlPanel()->CanRedo() );
+}
 void MyFrame::OnRedo( wxCommandEvent &event )
 {
     GetTlPanel()->Redo();
+    SetUndoRedoButtons();
 }
 
 void MyFrame::OnUndo( wxCommandEvent &event )
 {
     GetTlPanel()->Undo();
+    SetUndoRedoButtons();
 }
 
 void MyFrame::OnExportWav( wxCommandEvent &event )
@@ -473,7 +499,8 @@ bool GgseqApp::OnInit()
         wxT("SuperApp"), wxPoint(20,20), wxSize(600,340) );
     frame->SetIcon(wxICON(ggseq_32));
     frame->Show( TRUE );
-    
+    wxFileSystem::AddHandler(new wxZipFSHandler);
+
     SetTopWindow( frame );
     if (m_fnames.GetCount()>0) {
         frame->LoadFile(m_fnames[0]);

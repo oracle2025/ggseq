@@ -145,5 +145,10 @@ void Ruler::SetListener(LoopSetupListener *listener)
 {
 	m_listener=listener;
 }
-
+void Ruler::Reset()
+{
+	m_pos1 = 0;
+	m_pos2 = 0;
+	Refresh();
+}
 

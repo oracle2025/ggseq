@@ -235,6 +235,7 @@ void TLPanel::OnMouseUp( wxMouseEvent& event )
 		m_view->ClearSelection();
 		m_view->SelectTrack( event.m_y );
 		Refresh();
+		m_ruler->Reset();
 		m_view->SetPlaybackPosition( event.m_x );
 		wxClientDC dc( this );
 		DrawCaret( dc );
@@ -336,6 +337,7 @@ bool TLPanel::New()
 {
 	g_ggseqProps.GetSoundManager()->Stop();
 	m_loadSaveManager->New();
+	UpdateButtons();
 	Refresh();
 	ResetScrollBar();
 	return true;
@@ -394,6 +396,7 @@ bool TLPanel::SaveOnExit()
 }
 void TLPanel::Rewind()
 {
+	m_ruler->Reset();
 	m_data->SetPlaybackPosition( 0 );
 	wxClientDC dc( this );
 	DrawCaret( dc );
@@ -589,9 +592,13 @@ void TLPanel::UpdateRulerTicks()
 	m_ruler->SetPosition( m_view->GetPosition() );
 }
 void TLPanel::SetMasterVolume( float volume ) { m_data->SetMasterVolume( volume ); }
-
+void TLPanel::SetUndoRedoChangeListener(UndoRedoChangeListener *urChangeListener)
+{
+	m_view->m_docManager->SetUndoRedoChangeListener(urChangeListener);
+}
 void TLPanel::Undo()
 {
+	g_ggseqProps.GetSoundManager()->Stop();
 	m_view->Undo();
 	m_view->UpdateDialsAndButtons();
 	ResetScrollBar();
@@ -599,10 +606,19 @@ void TLPanel::Undo()
 }
 void TLPanel::Redo()
 {
+	g_ggseqProps.GetSoundManager()->Stop();
 	m_view->Redo();
 	m_view->UpdateDialsAndButtons();
 	ResetScrollBar();
 	Refresh();
+}
+bool TLPanel::CanUndo()
+{
+	return m_view->m_docManager->CanUndo();
+}
+bool TLPanel::CanRedo()
+{
+	return m_view->m_docManager->CanRedo();
 }
 void TLPanel::AddTrack()
 {

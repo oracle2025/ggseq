@@ -185,6 +185,8 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 void TLTrack::Clear()
 {
 	m_itemList->Clear();
+	m_mute = false;
+	m_volume = 1.0;
 }
 
 void TLTrack::SetMute(bool mute)

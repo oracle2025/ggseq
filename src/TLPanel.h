@@ -38,6 +38,8 @@ class UpdateListener;
 class BigScrollBar;
 class TLTrack;
 class MouseDragHandler;
+class wxScrollBar;
+class UndoRedoChangeListener;
 
 class TLPanel : public wxPanel
 {
@@ -75,10 +77,13 @@ class TLPanel : public wxPanel
 		void SetPrefs();
 		void SetZoom( float zoom );
 		void SetUpdateListener(UpdateListener *updateListener);
+		void SetUndoRedoChangeListener(UndoRedoChangeListener *urChangeListener);
 		wxString GetFilename();
 		void SetMasterVolume(float volume);
 		void Undo();
 		void Redo();
+		bool CanUndo();
+		bool CanRedo();
 		void AddTrack();
 		void DeleteTrack();
 
