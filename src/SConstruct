@@ -1,6 +1,11 @@
-env = Environment(CC = 'gcc')
+import os
 
-list = Split("""BigScrollBar.cpp
+env = Environment(CC = 'g++',
+	CCFLAGS='-D_WIN32_IE=0x400 -D__WXMSW__ -mthreads  -fno-pcc-struct-return -O2 -MMD -mthreads -Wall -ID:\\wxWindows-2.4.2\\lib\\wx\\include\\mswu-2.4 -ID:\\wxWindows-2.4.2\\include',
+	LINKFLAGS = '-Wl,--subsystem,windows -mwindows -mthreads',
+	ENV = {'PATH' : os.environ['PATH']}, tools=['mingw'])
+
+src_list = Split("""BigScrollBar.cpp
 	colour_helper.cpp
 	dial.cpp
 	DisableListener.cpp
@@ -49,8 +54,23 @@ list = Split("""BigScrollBar.cpp
 	ui_helper.cpp
 	UpdateListener.cpp
 	WaveEditor.cpp""")
-                       
-env.Program('ggseq', list, LIBS=['wx', 'libsndfile'], LIBPATH=['.'] )
+
+lib_list = Split("""wxmsw242u
+	rpcrt4
+	oleaut32
+	ole32
+	uuid
+	winspool
+	winmm
+	shell32
+	comctl32
+	ctl3d32
+	advapi32
+	wsock32""")
+
+env.Program('ggseq', src_list,
+	lib_list,
+	LIBPATH=['D:\\wxWindows-2.4.2\\lib'] )
 
 
 
