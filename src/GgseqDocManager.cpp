@@ -84,7 +84,7 @@ void GgseqDocManager::SubmitCommand( GgseqCommand *command )
 	if (command->GetError() ) {
 		delete command;
 	} else {
-		if (m_commandList.GetCount>MAX_UNDO) {
+		if (m_commandList.GetCount()>MAX_UNDO) {
 			m_commandList.DeleteContents(true);
 			m_commandList.DeleteNode(m_commandList.GetFirst());
 			m_commandList.DeleteContents(false);
