@@ -311,7 +311,7 @@ void MyFrame::OnAddTrack( wxCommandEvent &event )
 
 void MyFrame::OnPreferences( wxCommandEvent &event )
 {
-    GetTlPanel()->SetPrefs();
+    GetTlPanel()->SetPrefs( GetDirtree()->GetPath() );
     /*PreferencesDialog prefs(this, -1, wxT("Preferences"));
     prefs.Centre();
     prefs.ShowModal();*/

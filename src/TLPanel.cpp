@@ -539,12 +539,12 @@ wxString TLPanel::GetFilename()
 		return wxT("Unnamed");
 	return m_data->GetFilename();
 }
-void TLPanel::SetPrefs()
+void TLPanel::SetPrefs( const wxString &path )
 {
 	PreferencesDialog prefs(
 		this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),
 		-1, m_view->GetSnapValue() / 2,
-		m_data->GetColourManager(), wxT("Preferences")
+		m_data->GetColourManager(), path, wxT("Preferences")
 		);
 	prefs.Centre();
 	if ( prefs.ShowModal() == wxID_OK ) {

@@ -5,6 +5,7 @@
  * Fixed Ruler Reset Artefact
  * Fixed Missing Filename in Window Title on "Load last File"
  * Fixed Enable/Disable of Undo/Redo Buttons+Menu
+ * Fixed Propagate Tree-Path to Colour-Preferences
 
 2005-03-11  Richard Spindler <richard.spindler AT gmail.com>
 

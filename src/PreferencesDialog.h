@@ -42,6 +42,7 @@ public:
     // constructors and destructors
     PreferencesDialog( wxWindow *parent, wxWindowID id, int frameSnap,
         TLColourManager* cm,
+	const wxString &path,
         const wxString &title,
         const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize,

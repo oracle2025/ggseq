@@ -88,7 +88,7 @@ BEGIN_EVENT_TABLE(PreferencesDialog,wxDialog)
     EVT_GRID_SELECT_CELL( PreferencesDialog::OnColourGrid )
 END_EVENT_TABLE()
 
-PreferencesDialog::PreferencesDialog( wxWindow *parent, wxWindowID id, int frameSnap, TLColourManager* cm, const wxString &title,
+PreferencesDialog::PreferencesDialog( wxWindow *parent, wxWindowID id, int frameSnap, TLColourManager* cm, const wxString &path, const wxString &title,
     const wxPoint &position, const wxSize& size, long style ) :
     wxDialog( parent, id, title, position, size, style|wxRESIZE_BORDER  )
 {
@@ -136,6 +136,7 @@ PreferencesDialog::PreferencesDialog( wxWindow *parent, wxWindowID id, int frame
     bool loadLastProject = false;
     conf->Read( wxT("LoadLastProject"), &loadLastProject );
     GetLoadLastCheckbox()->SetValue(loadLastProject);
+    GetColourDirtree()->SetPath( path );
 }
 PreferencesDialog::~PreferencesDialog()
 {

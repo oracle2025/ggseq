@@ -74,7 +74,7 @@ class TLPanel : public wxPanel
 		void ImportPackage( wxString package, wxString contents );
 		void WavExport();
 		bool UpdateCaret();
-		void SetPrefs();
+		void SetPrefs( const wxString &path );
 		void SetZoom( float zoom );
 		void SetUpdateListener(UpdateListener *updateListener);
 		void SetUndoRedoChangeListener(UndoRedoChangeListener *urChangeListener);
