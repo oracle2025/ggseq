@@ -33,6 +33,8 @@ class TLView;
 class TLItem;
 class TLMuteButton;
 class TLTrackVolumeDial;
+class MiniPlayerInterface;
+class Ruler; 
 
 class TLPanel : public wxPanel
 {
@@ -66,13 +68,15 @@ class TLPanel : public wxPanel
 		void Rewind();
 		void Play();
 		void Stop();
-		void PlaySample(wxString filename);
+//		void PlaySample(wxString filename, long &length);
 		void StopAll();
 		void WavExport();
 		bool UpdateCaret();
 		void SetColours(wxString path);		
 		void SetSnap();
-
+		SoundManager *GetSoundManager();
+		void SetMiniPlayer(MiniPlayerInterface *mp);
+		
 		wxString GetFilename();
 	private:
 		void DrawCaret(wxDC& dc);
@@ -85,6 +89,7 @@ class TLPanel : public wxPanel
 		void EndSampleDrag(int x, int y, bool copyOnDrag);
 		void StartSelectionDrag(int x, int y, int width, int height);
 		void UpdateSelectionDrag(int x, int y);
+		void UpdateRulerTicks();
 		void EndSelectionDrag(int x, int y, bool copyOnDrag);
 		TLView *m_TlView;
 		wxScrollBar *m_scrollBar;
@@ -92,6 +97,7 @@ class TLPanel : public wxPanel
 		TLLoadSaveManager *m_loadSaveManager;
 		SoundManager *m_soundManager;
 		TLItem *m_DragItem;
+		MiniPlayerInterface *m_miniPlayer;
 #ifdef __WXMSW__ 
 		wxGenericDragImage *m_dragImage;
 #else
@@ -120,7 +126,7 @@ class TLPanel : public wxPanel
 		void ShowFrame(wxRect& rect, wxDC* dc);
 		void HideFrame(wxRect& rect, wxDC* dc);
 		void UpdateButtons();
-
+		Ruler *m_ruler;
 		int m_CaretPosition;
 		bool m_CaretVisible;
 		DECLARE_EVENT_TABLE()

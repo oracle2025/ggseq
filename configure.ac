@@ -150,9 +150,9 @@ else
 fi
 echo ""
 echo "at the moment it does not make a sense if anything of it is installed or not"
-echo "at later versions it shoud support different Sound Formats just for"
+echo "at later versions it should support different Sound Formats just for"
 echo "import and export"
 echo ""
 
-echo "now you can run make to build Gun Girl Sequenser"
+echo "now you can run make to build Gungirl Sequencer"
 echo "and make intall to install it" 

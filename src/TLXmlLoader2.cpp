@@ -86,7 +86,7 @@ void TLXMLLoader2::LoadFile(wxString filename)
 /*-*/
 
 
-		m_sampleManager->AddSample(tt,id);
+		m_sampleManager->AddSample(tt,id); /*TODO abbrechen einbauen*/
 		element=element->NextSiblingElement("sample");
 	}
 	element = doc.RootElement();

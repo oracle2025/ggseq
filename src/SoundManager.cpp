@@ -31,7 +31,7 @@
 #include "TLSample.h"
 #include "SoundManager.h"
 
-DEFINE_EVENT_TYPE(wxEVT_DONE_SAMPLE_COMMAND)
+//DEFINE_EVENT_TYPE(wxEVT_DONE_SAMPLE_COMMAND)
 
 static PortAudioStream* stream;
 
@@ -57,59 +57,52 @@ static int callback_sample(void *inputBuffer, void *outputBuffer, unsigned long 
 }
 
 
-BEGIN_EVENT_TABLE(SoundManager, wxEvtHandler)
+/*BEGIN_EVENT_TABLE(SoundManager, wxEvtHandler)
 	EVT_DONE_SAMPLE_COMMAND(-1,SoundManager::OnDonePlayingSample)
-END_EVENT_TABLE()
+END_EVENT_TABLE()*/
 
-SoundManager::SoundManager(TLData *TlData):wxEvtHandler()
+SoundManager::SoundManager(TLData *TlData)//:wxEvtHandler()
 {
 	m_data = TlData;
-	m_playing = false;
+	m_tlPlaying = false;
 	m_samplePlaying=false;
-//	m_evtHan=evtHan;
+	m_position = 0;
 }
 SoundManager::~SoundManager()
 {
 }
-void SoundManager::Play_TL()
+void SoundManager::Play()
 {
 	m_data->Block();
-	if (m_playing)
+	if (m_tlPlaying)
 		return;
 	if (m_samplePlaying)
-		Stop_Sample();
+		Stop();
 
 	m_data->SortAll();
 	m_position=m_data->GetPlaybackPosition();
-	m_positionBetweenEv=0;
-	m_playing = true;
+	m_tlPlaying = true;
 	StartStream((void*)callback);
 }
 unsigned int SoundManager::FillBuffer_TL(float* outBuffer, unsigned int count)
 {
-	int rv=m_data->FillBuffer(outBuffer,count);
-	m_position+=rv;
-	if (m_position >m_positionBetweenEv) {
-/*		wxCommandEvent eventCustom(wxEVT_UPDATE_CARET_COMMAND);
-		eventCustom.SetInt(m_position);
-		wxPostEvent(m_evtHan, eventCustom);*/
-		m_positionBetweenEv=m_position+11760;
-	}
-	return rv;
+	int written_samples=m_data->FillBuffer(outBuffer,count);
+	m_position+=written_samples;
+	return written_samples;
 }
 
-void SoundManager::Stop_TL()
+void SoundManager::Stop()
 {
-	if (!m_playing)
+	if (!m_tlPlaying && !m_samplePlaying)
 		return;
-	puts("fertisch");
-
-	m_playing = false;
-	m_data->UnBlock();
-//	std::cout << "written: " << m_position << std::endl;
 	StopStream();
+	if (m_samplePlaying)
+		delete m_sample;
+	if (m_tlPlaying)
+		m_data->UnBlock();
+	m_tlPlaying = false;
+	m_samplePlaying=false;
 }
-
 unsigned int SoundManager::FillBuffer_Sample(float* outBuffer, unsigned int count)
 {
 	float *buffer = m_sample->GetBuffer();
@@ -119,19 +112,15 @@ unsigned int SoundManager::FillBuffer_Sample(float* outBuffer, unsigned int coun
 		outBuffer[i]=buffer[m_position];
 		m_position++;
 	}
-	if (i<count) {
-		wxCommandEvent eventCustom(wxEVT_DONE_SAMPLE_COMMAND);
-		wxPostEvent(this, eventCustom);
-	}
 	return i;
 }
 
-void SoundManager::Play_Sample(wxString filename)
+void SoundManager::Play(wxString filename, long &length)
 {
-	if (m_playing)
+	if (m_tlPlaying)
 		return;
 	if (m_samplePlaying)
-		Stop_Sample();
+		Stop();
 	m_sample = new TLSample(filename,0,NULL);
 	if (!m_sample->IsValid()) {
 		wxLogError(wxT("Couldn't load Samplefile \"%s\""),filename.c_str());
@@ -140,20 +129,8 @@ void SoundManager::Play_Sample(wxString filename)
 	}
 	m_position=0;
 	m_samplePlaying=true;
+	length=m_sample->GetLength();
 	StartStream((void*)callback_sample);
-}
-void SoundManager::OnDonePlayingSample(wxCommandEvent& event)
-{
-	Stop_Sample();
-}
-void SoundManager::Stop_Sample()
-{
-	if (!m_samplePlaying)
-		return;
-	puts("OnDonePlayingSample");
-	StopStream();
-	m_samplePlaying=false;
-	delete m_sample;
 }
 void SoundManager::StartStream(void* callback)
 {
@@ -167,12 +144,9 @@ void SoundManager::StartStream(void* callback)
 	if( err != paNoError ) goto error;
 	return;
 	error:
-	wxLogError(wxT("Soundoutput failed"));
-	m_playing = false;
+	wxLogError(wxT("Soundoutput failed: \"%s\""),Pa_GetErrorText( err ));
+	m_tlPlaying = false;
 	m_samplePlaying = false;
-//	std::cerr << "An error occured while using the portaudio stream\n";
-//	std::cerr << "Error number: " << err << std::endl;
-//	std::cerr << "Error message: " << Pa_GetErrorText( err ) << std::endl;
 	return;
 }
 void SoundManager::StopStream()
@@ -185,21 +159,17 @@ void SoundManager::StopStream()
 	Pa_Terminate();
 	return;
 	error:
-	wxLogError(wxT("Portaudio Error!"));
-//	std::cerr << "An error occured while using the portaudio stream\n";
-//	std::cerr << "Error number: " << err << std::endl;
-//	std::cerr << "Error message: " << Pa_GetErrorText( err ) << std::endl;
+	wxLogError(wxT("Portaudio Error: \"%s\""),Pa_GetErrorText( err ));
 	return;
 }
 
-int SoundManager::GetPlaybackPosition()
+long SoundManager::GetPosition()
 {
-	return /*m_data->GetPlaybackPosition()+*/m_position;//(int)Pa_StreamTime(stream)*2;
-//	return Pa_StreamTime(stream);
+	return m_position;
 }
-bool SoundManager::Done_PlayingTL()
+bool SoundManager::Done()
 {
-	if (!m_playing)
+	if (!m_tlPlaying && !m_samplePlaying)
 		return true;
 	if (Pa_StreamActive(stream)<=0)
 		return true;

@@ -36,6 +36,7 @@ class TLView
 		void SetVisibleFrame(long width, long height, long x=0, long y=0);
 		void SetVisibleLength(long Length);
 		void SetPosition(long Position);
+		long GetPosition();
 		long GetScrollBarRange();
 		long GetScrollBarThumbSize();
 

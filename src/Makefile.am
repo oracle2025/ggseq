@@ -34,6 +34,10 @@ ggseq_SOURCES = MiniFilerTest.cpp\
 		dial.h\
 		TLTrackVolumeDial.h\
 		TLTrackVolumeDial.cpp\
+		MiniPlayer.h\
+		MiniPlayer.cpp\
+		Ruler.h\
+		Ruler.cpp\
                 SoundManager.h\
                 tinystr.h\
                 tinyxml.h\

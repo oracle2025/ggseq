@@ -46,8 +46,11 @@
 #include "dial.h"
 #include "TLTrackVolumeDial.h"
 #include "TLTrack.h"
+#include "MiniPlayer.h"
+#include "Ruler.h"
 
 #define LEFT_OFFSET_TRACKS 52
+#define TOP_OFFSET_TRACKS 22
 
 enum
 {
@@ -98,11 +101,13 @@ TLPanel::TLPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSi
 	int i=0;
 	for ( TLTrackList::Node *node = m_data->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
-		/*TLMuteButton *button =*/m_buttons[i] = new TLMuteButton( this, -1,current,mute_off_xpm, wxPoint(5,5+i*30),wxSize(25,25));
-		m_dials[i] = new TLTrackVolumeDial(this, -1, current,wxPoint(31,5+i*30),wxSize(25,25));
+		/*TLMuteButton *button =*/m_buttons[i] = new TLMuteButton( this, -1,current,mute_off_xpm, wxPoint(5,TOP_OFFSET_TRACKS+i*30),wxSize(25,25));
+		m_dials[i] = new TLTrackVolumeDial(this, -1, current,wxPoint(31,TOP_OFFSET_TRACKS+i*30),wxSize(25,25));
 		i++;
 	}
-
+	m_ruler = new Ruler(this,-1,wxPoint(LEFT_OFFSET_TRACKS,2),wxSize(GetSize().GetWidth()-5-LEFT_OFFSET_TRACKS,15),wxRAISED_BORDER);
+	m_ruler->SetSnap((m_TlView->m_SnapPosition*31)/117600);
+	
 	
 //	m_data->GetTrackCount
 
@@ -116,6 +121,7 @@ TLPanel::TLPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSi
 	m_selectionDrag=false;
 	m_frameVisible=false;
 	UpdateButtons();
+	m_miniPlayer=NULL;
 }
 TLPanel::~TLPanel()
 {
@@ -143,9 +149,11 @@ void TLPanel::OnSize(wxSizeEvent& event)
 	m_TlView->SetVisibleFrame(GetSize().GetWidth()-11-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-22,5+LEFT_OFFSET_TRACKS,5);
 	m_scrollBar->SetSize(0,GetSize().GetHeight()-22,GetSize().GetWidth()-6,16);
 #else
-	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-5,5+LEFT_OFFSET_TRACKS,5);
+	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
 	m_scrollBar->SetSize(0,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-2,GetSize().GetWidth()-4,20);
 #endif
+	m_ruler->SetSize(5+LEFT_OFFSET_TRACKS,2,GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,15);
+
 	ResetScrollBar();
 }
 void TLPanel::OnMouseMotion(wxMouseEvent& event)
@@ -229,8 +237,11 @@ void TLPanel::OnDoubleClick(wxMouseEvent& event)
 		return;
 	wxString tmp = m_TlView->GetSampleFilename(event.m_x, trackNr);
 	if (tmp!=wxT("")) {
-		wxLogStatus(wxT("Playing Sample: %s"),tmp.c_str());
-		PlaySample(tmp);
+//		wxLogStatus(wxT("Playing Sample: %s"),tmp.c_str());
+		if (m_miniPlayer) {
+			m_miniPlayer->SetFilename(tmp);
+			m_miniPlayer->Play();
+		}
 
 	/*	wxCommandEvent eventCustom(wxEVT_MF_ACTIVATE_COMMAND);
 		eventCustom.SetString(tmp);
@@ -306,7 +317,7 @@ void TLPanel::StartSampleDrag(int x, int y, int srcTrackNr, TLItem* srcItem)
 	m_DragItem = srcItem;
 
 	x_offset = m_DragX-m_TlView->FromTLtoScreenX(m_DragItem->GetPosition());
-	y_offset = m_DragY-m_SampleDragSrcTrackNr*30-5;
+	y_offset = m_DragY-m_SampleDragSrcTrackNr*30-/*5*/TOP_OFFSET_TRACKS;
 
 	m_SampleDragItemWidth = m_DragItem->GetSample()->GetLength()/3793;
 	wxBitmap bmp1(m_SampleDragItemWidth,25);
@@ -349,7 +360,7 @@ void TLPanel::UpdateSampleDrag(int x, int y)
 	region.Subtract(wxRect(new_x,new_y,m_SampleDragItemWidth,25));
 	dc.SetClippingRegion(region);
 	new_x=m_TlView->GetScreenSnapPosition(new_x);
-	new_y=trackNr*30+5;
+	new_y=trackNr*30+/*5*/TOP_OFFSET_TRACKS;
 	m_sampleFrame=wxRect(new_x,new_y,m_SampleDragItemWidth,25);
 	ShowFrame(m_sampleFrame,&dc);
 	dc.DestroyClippingRegion();
@@ -417,7 +428,7 @@ void TLPanel::StartSelectionDrag(int x, int y, int width, int height)
 	m_selectionFrame=wxRect(x_,y_,width,height);
 	int trackNr = m_TlView->GetTrackByY(y_);
 	if (trackNr>=0) {
-		m_selectionFrame.y=trackNr*30+5;
+		m_selectionFrame.y=trackNr*30+TOP_OFFSET_TRACKS;
 	} else {
 		return;
 	}
@@ -440,7 +451,7 @@ void TLPanel::UpdateSelectionDrag(int x, int y)
 		return;
 	}
 	m_dragImage->Show();
-	m_selectionFrame.y=trackNr*30+5;
+	m_selectionFrame.y=trackNr*30+TOP_OFFSET_TRACKS;
 	m_selectionFrame.x=m_TlView->GetScreenSnapPosition(x_);
 	m_dragImage->Move(wxPoint(m_selectionFrame.x,m_selectionFrame.y));
 //	ShowFrame(m_selectionFrame,&dc);
@@ -485,6 +496,7 @@ void TLPanel::OnScroll(wxScrollEvent& event)
 {
 	m_TlView->SetPosition(event.GetPosition());
 	m_CaretPosition = m_TlView->GetCaretPosition();
+	UpdateRulerTicks();
 #ifdef __WXMSW__
 	Refresh(true);
 #else
@@ -540,7 +552,7 @@ void TLPanel::ShowFrame(int x, int y, wxDC* dc)
 }*/
 bool TLPanel::New()
 {
-	m_soundManager->Stop_TL();
+	m_soundManager->Stop();
 	m_loadSaveManager->New();
 	Refresh();
 	ResetScrollBar();
@@ -548,7 +560,7 @@ bool TLPanel::New()
 }
 bool TLPanel::Load()
 {
-	m_soundManager->Stop_TL();
+	m_soundManager->Stop();
 	m_loadSaveManager->Load();
 	Refresh();
 	ResetScrollBar();
@@ -578,25 +590,32 @@ void TLPanel::Rewind()
 }
 void TLPanel::Play()
 {
-	m_soundManager->Play_TL();
+	m_soundManager->Play();
 }
 void TLPanel::Stop()
 {
-	m_soundManager->Stop_TL();
+	m_soundManager->Stop();
 	UpdateCaret();
 }
-void TLPanel::PlaySample(wxString filename)
+/*void TLPanel::PlaySample(wxString filename, long &length)
 {
-	m_soundManager->Play_Sample(filename);
+	m_soundManager->Play(filename,length);
+}*/
+SoundManager *TLPanel::GetSoundManager()
+{
+	return m_soundManager;
+}
+void TLPanel::SetMiniPlayer(MiniPlayerInterface *mp)
+{
+	m_miniPlayer=mp;
 }
 void TLPanel::StopAll()
 {
-	m_soundManager->Stop_TL();
-	m_soundManager->Stop_Sample();
+	m_soundManager->Stop();
 }
 void TLPanel::WavExport()
 {
-	m_soundManager->Stop_TL();
+	m_soundManager->Stop();
 	wxConfig config(wxT("ggseq"));
 	wxString lastFolder = config.Read(wxT("LastExportFolder"), wxT(""));
 	
@@ -616,8 +635,8 @@ void TLPanel::WavExport()
 bool TLPanel::UpdateCaret()
 {
 	wxClientDC dc(this);
-	if (m_soundManager->Done_PlayingTL()) {
-		m_soundManager->Stop_TL();
+	if (m_soundManager->Done()) {
+		m_soundManager->Stop();
 		DrawCaret(dc);
 		m_CaretPosition = m_TlView->GetCaretPosition();
 		DrawCaret(dc);
@@ -625,7 +644,7 @@ bool TLPanel::UpdateCaret()
 	}
 //	SetCaretPosition(m_soundManager->GetPlaybackPosition());
 	DrawCaret(dc);
-	int pos=m_soundManager->GetPlaybackPosition();
+	int pos=m_soundManager->GetPosition();
 	int pos2=(pos/117600)*31;
 	if (pos2<m_scrollBar->GetThumbPosition()) {
 		m_scrollBar->SetThumbPosition(pos2);
@@ -702,7 +721,8 @@ void TLPanel::SetSnap()
 	if (dlg.ShowModal()==wxID_OK) {
 		m_TlView->m_SnapPosition=dlg.m_SnapPosition;
 	}
-	
+	m_ruler->SetSnap((m_TlView->m_SnapPosition*31)/117600);
+	m_ruler->Refresh();
 }
 
 void TLPanel::DropFileAt(int x, int y, wxString filename)
@@ -735,4 +755,21 @@ void TLPanel::UpdateButtons()
 		i++;
 	}
 
+}
+
+void TLPanel::UpdateRulerTicks()
+{
+//	m_TlView->m_SnapPosition;
+/*	long ab=(m_TlView->m_SnapPosition*31)/117600;
+	long cd=m_TlView->GetPosition();
+	long index_c=cd/ab;
+	wxString out;
+	out << index_c;
+//	puts(out.mb_str());
+//	m_ruler
+	wxClientDC dc(m_ruler);
+	dc.DrawText(out,2,-2);*/
+//	m_ruler->SetSnap((m_TlView->m_SnapPosition*31)/117600);
+	m_ruler->SetPosition(m_TlView->GetPosition());
+//	m_ruler->Refresh();
 }

@@ -74,6 +74,11 @@ void TLView::SetPosition(long Position)
 {
 	m_PositionVisible=(Position*117600)/31;
 }
+long TLView::GetPosition()
+{
+	return (m_PositionVisible*31)/117600;
+}
+
 long TLView::GetScrollBarRange()
 {
 	return (m_TlData->GetLength()/117600)*31;//m_Length;

@@ -63,7 +63,7 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan)
 		}
 	/*Hier auf passende Samplerate strecken*/
 	if (sfinfo.samplerate!=44100) {
-		wxLogMessage(wxT("No 44100 Samplerate")); // TODO Fehler ausgeben.
+//		wxLogMessage(wxT("No 44100 Samplerate")); // TODO Fehler ausgeben.
 		SRC_DATA src_data;
 		src_data.src_ratio=44100.0/sfinfo.samplerate;
 			/*output_sample_rate / input_sample_rate*/
@@ -75,7 +75,7 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan)
 		
 		
 puts("---");
-		src_simple(&src_data,SRC_SINC_BEST_QUALITY,2);
+		src_simple(&src_data,SRC_SINC_MEDIUM_QUALITY,2);
 puts("---");
 		delete src_data.data_in;
 		m_buffer=src_data.data_out;

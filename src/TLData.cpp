@@ -358,7 +358,7 @@ unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 	return maxResultCount;
 }
 int TLData::mixChannels(float *A, float *B, float* out)/*Mix function for (-1)-(1) float audio*/
-{
+{/*TODO für andere Längen anpassen*/
 	int i;
 	for ( i=0; i < 512;i++){
 		if (A[i]<0 && B[i]<0) {

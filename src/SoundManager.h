@@ -19,8 +19,10 @@
 
 #ifndef _SOUNDMANAGER_H_
 #define _SOUNDMANAGER_H_
+class TLData;
+class TLSample;
 
-BEGIN_DECLARE_EVENT_TYPES()
+/*BEGIN_DECLARE_EVENT_TYPES()
     DECLARE_EVENT_TYPE(wxEVT_DONE_SAMPLE_COMMAND, 7778)
 END_DECLARE_EVENT_TYPES()
 
@@ -29,31 +31,36 @@ END_DECLARE_EVENT_TYPES()
         wxEVT_DONE_SAMPLE_COMMAND, id, -1, \
         (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&fn, \
         (wxObject *) NULL \
-    ),
-class SoundManager : public wxEvtHandler
+    ),*/
+class SoundManager// : public wxEvtHandler
 {
 	public:
 		SoundManager(TLData *TlData);
 		~SoundManager();
-		void Play_TL();
-		void Play_Sample(wxString filename);
+//		void Play_TL();
+//		void Play_Sample(wxString filename);
+//		void Stop_TL();
+//		void Stop_Sample();
+//		bool Done_PlayingTL();
+//		void OnDonePlayingSample(wxCommandEvent& event);
+//		int GetPlaybackPosition();
+		void Play();
+		void Play(wxString filename, long &length);
+		void Stop();
+		bool Done();
+		long GetPosition();
+		
 		unsigned int FillBuffer_TL(float* outBuffer, unsigned int count);
 		unsigned int FillBuffer_Sample(float* outBuffer, unsigned int count);
-		void Stop_TL();
-		void Stop_Sample();
-		bool Done_PlayingTL();
-		void OnDonePlayingSample(wxCommandEvent& event);
-		int GetPlaybackPosition();
 	private:
 		void StartStream(void* callback);
 		void StopStream();
 		TLData *m_data;
-		bool m_playing;
+		bool m_tlPlaying;
 		bool m_samplePlaying;
-		int m_position;
-		int m_positionBetweenEv;
+		long m_position;
 		TLSample *m_sample;
-		DECLARE_EVENT_TABLE()
+//		DECLARE_EVENT_TABLE()
 };
 
 #endif /*_SOUNDMANAGER_H_*/

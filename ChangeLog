@@ -1,3 +1,12 @@
+2003-11-22  Richard Spindler <oracle2025@gmx.de>
+
+ *  added Ruler.cpp .h
+
+2003-11-21  Richard Spindler <oracle2025@gmx.de>
+
+ *  added MiniPlayer.cpp .h
+ *  added play_12.xpm stop_12.xpm
+
 2003-11-20  Richard Spindler <oracle2025@gmx.de>
 
  *  fixed "random Mute" on Startup issue.

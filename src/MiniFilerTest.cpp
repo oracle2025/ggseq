@@ -31,6 +31,7 @@
 
 #include "TLPanel.h"
 #include "TLMiniFiler2.h"
+#include "MiniPlayer.h"
 
 #include "new1.xpm"
 #include "open.xpm"
@@ -87,6 +88,7 @@ class TestFrame1: public wxFrame
 		void OnA_Test(wxCommandEvent& event);
 		void OnFLStartDrag(wxListEvent& event);
 		void OnFLItemActivated(wxListEvent& event);
+		void OnFLItemSelected(wxListEvent& event);
 		void OnSelChanged(wxTreeEvent& event);
 		void OnMouseLeftUp(wxMouseEvent& event);
 		void OnMouseMotion(wxMouseEvent& event);
@@ -101,6 +103,7 @@ class TestFrame1: public wxFrame
 		TLPanel *m_tp;
 		wxToolBar *m_toolBar;
 		wxTimer *m_Timer;
+		MiniPlayerInterface *m_miniPlayer;
 		bool m_DraggingFile;
 		wxDragImage *m_dragImage;
 		DECLARE_EVENT_TABLE()
@@ -125,6 +128,7 @@ BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
 //	EVT_MF_ACTIVATE_COMMAND(-1, TestFrame1::OnActivate)
 	EVT_LIST_BEGIN_DRAG(ID_FileList,TestFrame1::OnFLStartDrag)
 	EVT_LIST_ITEM_ACTIVATED(ID_FileList,TestFrame1::OnFLItemActivated)	
+	EVT_LIST_ITEM_SELECTED(ID_FileList,TestFrame1::OnFLItemSelected)
 	EVT_TREE_SEL_CHANGED(-1,TestFrame1::OnSelChanged)
 	
 	EVT_MENU(ID_A_Test, TestFrame1::OnA_Test)
@@ -186,18 +190,32 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 	wxSplitterWindow* SplitView2 = new wxSplitterWindow(SplitView,-1,wxDefaultPosition,wxDefaultSize,wxSP_LIVE_UPDATE|wxSP_NOBORDER/*|wxSP_3DSASH| wxSP_FULLSASH*/);
 //	MakeTlPanel(SplitView2);
 	SplitView2->SetMinimumPaneSize(20);
-	m_tp = new TLPanel(SplitView2);
+	m_tp = new TLPanel(SplitView2);/*TODO Lautstärke regler einbauen*/
 
-	m_fileList = new FileList(SplitView2,ID_FileList);
+
+	wxPanel *miniplayerPanel = new wxPanel(SplitView2);
+	m_fileList = new FileList(miniplayerPanel,ID_FileList);
+	wxBoxSizer *miniPanSizer = new wxBoxSizer(wxVERTICAL);
+	miniPanSizer->Add(m_fileList,1,wxEXPAND);
+//--
+	MiniPlayer *mP = new MiniPlayer(miniplayerPanel,m_tp->GetSoundManager());
+	miniPanSizer->Add(mP,0,wxEXPAND|wxTOP,5);
+	m_miniPlayer = mP;
+	m_tp->SetMiniPlayer(m_miniPlayer);
+	
+	miniplayerPanel->SetSizer(miniPanSizer);
+	miniPanSizer->SetSizeHints(miniplayerPanel);
+	
+	
 	m_DirTree = NULL;
 	m_DirTree = new wxGenericDirCtrl(SplitView,ID_DirTree,wxDirDialogDefaultFolderStr,wxDefaultPosition,wxDefaultSize,wxDIRCTRL_DIR_ONLY|wxSUNKEN_BORDER);
 	wxConfig config(wxT("ggseq"));
 	m_DirTree->SetPath(config.Read(wxT("MiniFilerDirectory"), wxT("/")));
 
 	SplitView->SplitVertically(m_DirTree,SplitView2);
-	SplitView2->SplitHorizontally(m_tp,m_fileList);
+	SplitView2->SplitHorizontally(m_tp,miniplayerPanel);
 	SplitView->SetSashPosition(200);
-	SplitView2->SetSashPosition(270);
+	SplitView2->SetSashPosition(280);
 	
 }
 void TestFrame1::OnFLStartDrag(wxListEvent& event)
@@ -249,8 +267,14 @@ void TestFrame1::OnMouseMotion(wxMouseEvent& event)/*DragImage Move*/
 }
 void TestFrame1::OnFLItemActivated(wxListEvent& event)
 {
-	wxLogStatus(wxT("Playing Sample: %s"),m_fileList->GetSelection().c_str());
-	m_tp->PlaySample(m_fileList->GetSelection());
+//	wxLogStatus(wxT("Playing Sample: %s"),m_fileList->GetSelection().c_str());
+//	m_tp->PlaySample(m_fileList->GetSelection());
+	m_miniPlayer->SetFilename(m_fileList->GetSelection());
+	m_miniPlayer->Play();
+}
+void TestFrame1::OnFLItemSelected(wxListEvent& event)
+{
+	m_miniPlayer->SetFilename(m_fileList->GetSelection());
 }
 void TestFrame1::OnSelChanged(wxTreeEvent& event)
 {
@@ -421,7 +445,7 @@ bool Test::OnInit()
 
 {
 	SetAppName(wxT("ggseq"));
-	TestFrame1 *frame = new TestFrame1( wxT("Test"), wxPoint(50,50), wxSize(600,400));
+	TestFrame1 *frame = new TestFrame1( wxT("Test"), wxPoint(50,50), wxSize(600,450));
 	frame->SetIcon(wxICON(ggseq_32));
 	frame->Show( TRUE );
 	SetTopWindow( frame );
