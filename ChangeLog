@@ -1,3 +1,7 @@
+2004-10-05  Richard Spindler <oracle2025@gmx.de>
+
+ * Fixed Controls not being deleted while loading from File
+
 2004-06-05  Richard Spindler <oracle2025@gmx.de>
 
  * More the 8 Tracks implemented

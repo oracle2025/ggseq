@@ -135,7 +135,7 @@ class TLPanel : public wxPanel
 		Ruler *m_ruler;
 		int m_CaretPosition;
 		bool m_CaretVisible;
-		bool m_DeleteFromGUI;
+		//bool m_DeleteFromGUI;
 		DECLARE_EVENT_TABLE()
 };
 

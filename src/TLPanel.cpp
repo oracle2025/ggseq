@@ -120,7 +120,7 @@ TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar, Ruler *ruler, wxScro
 	m_miniPlayer=NULL;
 	SetSizeHints(100, 200);
 	m_ruler->SetListener(m_data);
-	m_DeleteFromGUI=0;
+	//m_DeleteFromGUI=0;
 }
 void TLPanel::AddControls(TLTrack *track)
 {
@@ -133,14 +133,18 @@ void TLPanel::AddControls(TLTrack *track)
 }
 void TLPanel::DeleteControls(TLTrack *track)
 {
-	if (m_DeleteFromGUI) {
+//	if (m_DeleteFromGUI) {
 		track->m_muteButton->Destroy();
 		track->m_volumeDial->Destroy();
 		m_TlView->UpdateDialsAndButtons();
-	}
+//	}
 }
 TLPanel::~TLPanel()
 {
+	while(m_data->GetTrackCount()>0) { // Muss hier gelöscht werden sonst segfault. Sollte TODO: Sollte aber "sauber" gelöst werden
+		m_data->DeleteTrack(0);
+	}
+
 	delete m_TlView;
 	delete m_soundManager;
 	delete m_loadSaveManager;
@@ -310,7 +314,7 @@ void TLPanel::StartSampleDrag(int x, int y, int srcTrackNr, TLItem* srcItem)
 	x_offset = m_DragX-m_TlView->FromTLtoScreenX(m_DragItem->GetPosition());
 	y_offset = m_DragY-m_SampleDragSrcTrackNr*30-/*5*/TOP_OFFSET_TRACKS + m_TlView->GetYScrollPosition();
 
-	m_SampleDragItemWidth = m_DragItem->GetSample()->GetLength()/3793;
+	m_SampleDragItemWidth = m_DragItem->/*GetSample()->*/GetLength()/3793;
 		//TODO: das soll keine Konstante sein.
 	wxBitmap bmp1(m_SampleDragItemWidth,25);
 	wxMemoryDC dc;
@@ -713,18 +717,18 @@ void TLPanel::SetMasterVolume(float volume) { m_data->SetMasterVolume(volume); }
 
 void TLPanel::Undo()
 {
-	m_DeleteFromGUI=1;
+	//m_DeleteFromGUI=1;
 	m_TlView->Undo();
-	m_DeleteFromGUI=0;
+	//m_DeleteFromGUI=0;
 	m_TlView->UpdateDialsAndButtons();
 	ResetScrollBar();
 	Refresh();
 }
 void TLPanel::Redo()
 {
-	m_DeleteFromGUI=1;
+	//m_DeleteFromGUI=1;
 	m_TlView->Redo();
-	m_DeleteFromGUI=0;
+	//m_DeleteFromGUI=0;
 	m_TlView->UpdateDialsAndButtons();
 	ResetScrollBar();
 	Refresh();
@@ -746,9 +750,9 @@ void TLPanel::DeleteTrack()
 	}
 	if (track==0)
 		return;
-	m_DeleteFromGUI=1;
+	//m_DeleteFromGUI=1;
 	m_TlView->m_docManager->SubmitCommand(new GgseqDeleteTrackCommand( m_data, track, this ) );
-	m_DeleteFromGUI=0;
+	//m_DeleteFromGUI=0;
 	ResetScrollBar();
 	Refresh();
 

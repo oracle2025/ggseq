@@ -51,5 +51,13 @@ class TLItem
 		//int m_trackNr;
 		GetItemTrackListener* m_trackListener;
 };
-
+/*
+class TLStoreItem : public TLItem
+{
+	public:
+		TLSample *GetSample();
+	private:
+		TLSample *m_sample;
+};
+*/
 #endif /*_TLITEM_H_*/
