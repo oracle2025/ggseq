@@ -130,7 +130,9 @@ void SoundManager::Play(wxString filename, long &length, UpdateListener *updateL
 	if (updateListener)
 		updateListener->EndUpdateProcess();
 	if (!sample->IsValid()) {
-		wxLogError(wxT("Couldn't load Samplefile \"%s\""),filename.c_str());
+		if (updateListener->Update(100)==true) {
+			wxLogError(wxT("Couldn't load Samplefile \"%s\""),filename.c_str());
+		}
 		delete sample;
 		return;
 	}
