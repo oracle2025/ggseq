@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Gungirl Sequenser
+Comment=PCM Audio Seqenser
+Exec=/usr/bin/ggseq
+Icon=/usr/share/icons/ggseq_32.xpm
+Terminal=0
+Type=Application
+Encoding=UTF-8
+Categories=Application;AudioVideo;
+StartupNotify=true

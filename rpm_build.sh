@@ -15,19 +15,36 @@
 # heissen
 
 SOFWARENAME=ggseq
-VERSION=0.1
+VERSION=0.2pre1
+
+echo 
+echo "****************************************"
+echo "*  Automaticly Building RPM-Files for  *"
+echo "*  $SOFWARENAME-$VERSION"
+echo "****************************************"
+echo
+# Abfragen ob als root
+echo -n "Testing if you are root........................"
+if [ ! `/usr/bin/id -u` = 0 ];then
+echo "You have to be root to build a rpm"
+exit 0;
+fi
+echo -n " OK"
+echo
 if 
 test "x`cd "${dir}" 2>/dev/null && pwd`" != "x`pwd`"
 then
     echo "This script must be executed directly from the source directory."
     exit 1
 fi
-cd ../
-if [ ! -r $(`ls -d` "$SOFWARENAME-$VERSION") ]; then
-    echo "The Directory has to have the same Name like the software."
-    exit 1
-fi
-cd ./$SOFWARENAME-$VERSION
+#cd ../
+#if [ ! -r $(`ls -d` "$SOFWARENAME-$VERSION") ]; then
+#    echo "The Directory has to have the same Name like the software."
+#    exit 1
+#fi
+#cd ./$SOFWARENAME-$VERSION
+#pwd
+#cd ./$SOFWARENAME
 RPMBUILD="rpmbuild"
 if [ !  -r /usr/bin/$RPMBUILD ];then
  	if [ ! -r /bin/$RPMBUILD ];then
@@ -37,7 +54,7 @@ if [ !  -r /usr/bin/$RPMBUILD ];then
    		if [ !  -r /usr/bin/rpm ];then
  			if [ ! -r /bin/rpm ];then
    			echo "rpm ..... no"
-   			echo "You havo to have rpm see http://www.rpm.org"
+   			echo "You have to have rpm see http://www.rpm.org"
    			exit 1
 			fi
 		fi
@@ -90,6 +107,9 @@ echo
 echo "No RPM-Build Path found"
 exit 2
 fi
+rm -f $RPMBUILDPATH/SPECS/$SOFWARENAME.spec
+rm -f $RPMBUILDPATH/SOURCES/$SOFWARENAME.tar.bz2
+rm -Rf $RPMBUILDPATH/BUILD/$SOFWARENAME*
 sleep 1
 # Quellcode nach $RPMBuild/SOURCE in gezippter form verschieben
 # Da nicht auf allen systemen bzip2 installiert sein muss nehmen wir gzip
@@ -99,8 +119,11 @@ sleep 1
 # =================================================
 # zur zeit bz2 (muss ich leider wegen der Quellenangabe im SPEC File so machen)
 echo -n "move and compress ............................. "
-cd ../
-tar -cjf $RPMBUILDPATH/SOURCES/$SOFWARENAME-$VERSION.tar.bz2  $SOFWARENAME-$VERSION 
+cd ..
+# Das rpm nicht aussteigt muss die Versionsnummer im Verzeichnissnamen sein
+echo "mv $SOFWARENAME $SOFWARENAME-$VERSION"
+mv $SOFWARENAME $SOFWARENAME-$VERSION
+tar -cjf $RPMBUILDPATH/SOURCES/$SOFWARENAME-$VERSION.tar.bz2  $SOFWARENAME-$VERSION
 cd ./$SOFWARENAME-$VERSION
 echo "done"
 sleep 1
@@ -113,7 +136,10 @@ cp -f $SOFWARENAME.spec $RPMBUILDPATH/SPECS/$SOFWARENAME.spec
 # ===========================================================================
 echo "done"
 sleep 1
+#clening Sourcedir
+cd ..
+mv $SOFWARENAME-$VERSION $SOFWARENAME
+
 #rpm(build) -ba $SPECFILE
 
 $RPMBUILD $RPMBUILDPATH/SPECS/$SOFWARENAME.spec
-

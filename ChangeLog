@@ -1,3 +1,19 @@
+2003-12-27  Richard Spindler <oracle2025@gmx.de>
+
+ *  Rubberframe only needs to touch the samples to select from now on
+ *  'Sanefied' Selection DnD Stuff ;)
+
+2003-12-23  Richard Spindler <oracle2025@gmx.de>
+
+ *  Added prefs_misc.xpm
+ *  Added ShortcutsDialog.cpp .h
+
+2003-12-21  Georg E Schneider <georg@georgs.org>
+  
+ *  Build first rpm-package
+ *  Corrections in rpm_build.sh and spec-file
+ *  added *.desktop file
+
 2003-12-16  Richard Spindler <oracle2025@gmx.de>
 
  *  Added 3d-Coloured Items
