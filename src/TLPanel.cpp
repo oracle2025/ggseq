@@ -32,8 +32,10 @@
 #include <wx/tglbtn.h>
 #include <wx/filename.h>
 #include <wx/dcbuffer.h>
+#include <wx/dir.h>
 //#include <iostream>
 
+#include "tinyxml.h"
 #include "stuff.h"
 #include "TLView.h"
 #include "TLPanel.h"
@@ -91,8 +93,8 @@ TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar, Ruler *ruler, wxScro
 	m_data->AddTrack( -1 );
 	m_data->AddTrack( -1 );
 
-	m_TlView->SetVisibleFrame(100,100);
-	m_TlView->SetVisibleLength(1420000);
+//	m_TlView->SetVisibleFrame(100,100);
+//	m_TlView->SetVisibleLength(1420000);
 	m_TlView->SetPosition(0);
 	m_TlView->UpdateDialsAndButtons();
 
@@ -103,13 +105,16 @@ TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar, Ruler *ruler, wxScro
 	m_scrollBar = scrollbar;
 	m_scrollBar2 = scrollbar2;
 	m_ruler = ruler;
-	m_ruler->SetSnap((m_TlView->GetSnapValue()/*m_SnapPosition*/ *31)/117600);
+	//m_ruler->SetSnap((m_TlView->GetSnapValue()/*m_SnapPosition*/ *31)/117600);
 		//TODO: Nicht Hardcoden
+	m_ruler->SetSnap((int)(m_TlView->GetSnapValue()/m_TlView->GetRealZoom()) );
 	
 	
 	ResetScrollBar();
 
-	m_TlView->SetVisibleFrame(GetSize().GetWidth(),GetSize().GetHeight());
+//	m_TlView->SetVisibleFrame(GetSize().GetWidth(),GetSize().GetHeight());
+	m_TlView->SetSize(GetSize().GetWidth(),GetSize().GetHeight());
+
 	m_CaretPosition=0;
 	m_CaretVisible=true;//false;
 	m_sampleDrag=false;
@@ -160,12 +165,13 @@ void TLPanel::OnPaint(wxPaintEvent& event)
 	m_TlView->Draw(dc);
 	DrawCaret(dc);
 }
-void TLPanel::OnEraseBackground(wxPaintEvent& event)
+void TLPanel::OnEraseBackground(wxEraseEvent& event)
 {
 }
 void TLPanel::OnSize(wxSizeEvent& event)
 {
-	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
+//	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
+	m_TlView->SetSize(GetSize().GetWidth(),GetSize().GetHeight());
 	ResetScrollBar();
 }
 void TLPanel::OnMouseMotion(wxMouseEvent& event)
@@ -314,12 +320,11 @@ void TLPanel::StartSampleDrag(int x, int y, int srcTrackNr, TLItem* srcItem)
 	x_offset = m_DragX-m_TlView->FromTLtoScreenX(m_DragItem->GetPosition());
 	y_offset = m_DragY-m_SampleDragSrcTrackNr*30-/*5*/TOP_OFFSET_TRACKS + m_TlView->GetYScrollPosition();
 
-	m_SampleDragItemWidth = m_DragItem->/*GetSample()->*/GetLength()/3793;
-		//TODO: das soll keine Konstante sein.
+	m_SampleDragItemWidth = (int)(m_DragItem->GetLength()/m_TlView->GetRealZoom());
 	wxBitmap bmp1(m_SampleDragItemWidth,25);
 	wxMemoryDC dc;
 	dc.SelectObject(bmp1);
-	m_DragItem->GetSample()->Draw(dc);
+	m_DragItem->GetSample()->Draw(dc,m_TlView->GetRealZoom());
 #ifdef __WXMSW__ 
 	m_dragImage = new wxGenericDragImage(bmp1);
 #else
@@ -524,7 +529,7 @@ bool TLPanel::Load()
 	ResetScrollBar();
 	UpdateCaret();
 	UpdateButtons();
-	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600); //TODO
+	m_ruler->SetSnap((long)(m_TlView->GetSnapValue()/m_TlView->GetRealZoom()) );
 	m_ruler->Refresh();
 	return true;
 }
@@ -550,7 +555,7 @@ bool TLPanel::Load(wxString& filename)
 	Refresh();
 	ResetScrollBar();
 	UpdateButtons();
-	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600); //TODO
+	m_ruler->SetSnap((long)(m_TlView->GetSnapValue()/m_TlView->GetRealZoom() ));
 	m_ruler->Refresh();
 	return true;
 
@@ -596,6 +601,53 @@ void TLPanel::SetMiniPlayer(MiniPlayerInterface *mp)
 void TLPanel::StopAll()
 {
 	m_soundManager->Stop();
+}
+void TLPanel::ImportPackage( wxString package, wxString contents )
+{
+	wxFileName fn(package);
+	wxString cont_path = contents + wxFileName::GetPathSeparator() + fn.GetName();
+	wxMkdir( cont_path );
+	wxSetWorkingDirectory( cont_path );
+	wxExecute( wxString(wxT("unzip ")) + package, wxEXEC_SYNC );
+	wxArrayString files;
+	wxDir::GetAllFiles( cont_path, &files, wxT("*.ggseq") );
+	wxString ggseq_file = files[0];
+	TiXmlDocument doc(ggseq_file.mb_str());
+	doc.LoadFile();
+	TiXmlElement *element = doc.RootElement();
+	TiXmlNode *node = element->FirstChild("samples");
+	node = node->FirstChild("sample");
+	element = node->ToElement();
+	for (;element;) {
+		node = element->FirstChild();
+		TiXmlText *text = node->ToText();
+		wxString txt( text->Value(), *wxConvCurrent );
+		txt = cont_path + wxFileName::GetPathSeparator() + txt;
+		text->SetValue(txt.mb_str());
+		element=element->NextSiblingElement("sample");
+	}
+	doc.SaveFile();
+	Load(ggseq_file);
+	//mkdir contents+filename
+	//cd -"-
+	//unzip
+	//xml_rewrite .ggseq /save it
+	//open xml
+}
+void TLPanel::ExportPackage()
+{
+wxString filename = wxFileSelector(wxT("Export Package as"),wxT(""),wxT(""),wxT("ggz"),wxT("Gungirl Package files (*.ggz)|*.ggz"),wxSAVE,this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent());
+	if ( !filename.empty() ) {
+		if (wxFileExists(filename)) {
+			wxMessageDialog msg_dlg(m_parent,wxT("File exists!\nOverride?"), wxT("Override File?"), wxYES_NO |wxICON_QUESTION );
+			if (msg_dlg.ShowModal()==wxID_NO)
+				return;
+		}
+		m_data->ExportPackage(filename);
+	}
+
+
+
 }
 void TLPanel::WavExport()
 {
@@ -671,7 +723,7 @@ void TLPanel::SetPrefs()
 		prefs.SaveColours(m_data->GetColourManager());
 		Refresh();
 	}
-	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600);
+	m_ruler->SetSnap((long)(m_TlView->GetSnapValue()/m_TlView->GetRealZoom()) );
 	m_ruler->Refresh();
 	m_scrollBar->Enable(); /*TODO: Evil Hack*/
 
@@ -758,4 +810,10 @@ void TLPanel::DeleteTrack()
 
 
 }
-
+void TLPanel::SetZoom( float zoom )
+{
+	m_TlView->SetZoom( zoom );
+	ResetScrollBar();
+	m_ruler->SetSnap((long)(m_TlView->GetSnapValue()/m_TlView->GetRealZoom()) );
+	m_TlView->SetPosition(m_scrollBar->GetBigThumbPosition());
+}

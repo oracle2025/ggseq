@@ -58,7 +58,7 @@ class wxDial : public wxControl
 			const wxString& name = wxT("dial"));
 		void SetValue(int value);
 		void OnPaint(wxPaintEvent& event);
-		void OnEraseBackground(wxPaintEvent& event);
+		void OnEraseBackground(wxEraseEvent& event);
 //		void OnMouseMotion(wxMouseEvent& event);
 		void OnMouseDown(wxMouseEvent& event);
 //		void OnMouseUp(wxMouseEvent& event);

@@ -248,8 +248,8 @@ wxWindow *item2 = new wxGenericDirCtrl( parent, ID_COLOUR_DIRTREE, wxDirDialogDe
 
     wxBoxSizer *item3 = new wxBoxSizer( wxVERTICAL );
 
-    wxString *strs4 = (wxString*) NULL;
-    wxListBox *item4 = new wxListBox( parent, ID_COLOUR_LISTBOX, wxDefaultPosition, wxSize(80,100), 0, strs4, wxLB_SINGLE );
+    wxGrid *item4 = new wxGrid( parent, ID_COLOUR_GRID, wxDefaultPosition, wxSize(200,160), wxWANTS_CHARS|wxSUNKEN_BORDER );
+    item4->CreateGrid( 0, 1, wxGrid::wxGridSelectRows );
     item3->Add( item4, 1, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
 
     wxBoxSizer *item5 = new wxBoxSizer( wxHORIZONTAL );
@@ -298,18 +298,22 @@ wxSizer *PreferencesFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     SetAccelsFunc( item5, FALSE );
     item2->AddPage( item5, wxT("Keyboard Shortcuts") );
 
+    wxPanel *item6 = new wxPanel( item2, -1 );
+    HelpProgsFunc( item6, FALSE );
+    item2->AddPage( item6, wxT("Helper Programs") );
+
     item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    wxBoxSizer *item6 = new wxBoxSizer( wxHORIZONTAL );
+    wxBoxSizer *item7 = new wxBoxSizer( wxHORIZONTAL );
 
-    wxButton *item7 = new wxButton( parent, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    item6->Add( item7, 0, wxALIGN_CENTER|wxRIGHT, 5 );
+    wxButton *item8 = new wxButton( parent, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    item7->Add( item8, 0, wxALIGN_CENTER|wxRIGHT, 5 );
 
-    wxButton *item8 = new wxButton( parent, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
-    item8->SetDefault();
-    item6->Add( item8, 0, wxALIGN_CENTER, 5 );
+    wxButton *item9 = new wxButton( parent, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
+    item9->SetDefault();
+    item7->Add( item9, 0, wxALIGN_CENTER, 5 );
 
-    item0->Add( item6, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxTOP|wxBOTTOM, 5 );
+    item0->Add( item7, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxTOP|wxBOTTOM, 5 );
 
     if (set_sizer)
     {
@@ -339,6 +343,83 @@ wxSizer *SetAccelsFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     return item0;
 }
 
+wxSizer *ImportPackDlgFunc( wxWindow *parent, bool call_fit, bool set_sizer )
+{
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    wxStaticText *item1 = new wxStaticText( parent, ID_TEXT, wxT("Import Package"), wxDefaultPosition, wxDefaultSize, 0 );
+    item1->SetFont( wxFont( 12, wxSWISS, wxNORMAL, wxBOLD ) );
+#if defined(__WXMSW__) && !(wxCHECK_VERSION(2,3,0))
+    item1->SetSize( item1->GetBestSize() );
+#endif
+    item0->Add( item1, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP, 5 );
+
+    wxStaticLine *item2 = new wxStaticLine( parent, ID_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL );
+    item0->Add( item2, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxFlexGridSizer *item3 = new wxFlexGridSizer( 3, 5, 5 );
+
+    wxStaticText *item4 = new wxStaticText( parent, ID_TEXT, wxT("Package"), wxDefaultPosition, wxDefaultSize, 0 );
+    item3->Add( item4, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    wxTextCtrl *item5 = new wxTextCtrl( parent, ID_PACKAGE_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(140,-1), wxTE_READONLY );
+    item3->Add( item5, 0, wxALIGN_CENTER, 5 );
+
+    wxBitmapButton *item6 = new wxBitmapButton( parent, ID_PACKAGE_BUTTON, GgseqBitmapsFunc( 8 ), wxDefaultPosition, wxDefaultSize );
+    item3->Add( item6, 0, wxALIGN_CENTER, 5 );
+
+    wxStaticText *item7 = new wxStaticText( parent, ID_TEXT, wxT("Save Contents At"), wxDefaultPosition, wxDefaultSize, 0 );
+    item3->Add( item7, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    wxTextCtrl *item8 = new wxTextCtrl( parent, ID_CONTENTS_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(140,-1), wxTE_READONLY );
+    item3->Add( item8, 0, wxALIGN_CENTER, 5 );
+
+    wxBitmapButton *item9 = new wxBitmapButton( parent, ID_CONTENTS_BUTTON, GgseqBitmapsFunc( 8 ), wxDefaultPosition, wxDefaultSize );
+    item3->Add( item9, 0, wxALIGN_CENTER, 5 );
+
+    item0->Add( item3, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxStaticLine *item10 = new wxStaticLine( parent, ID_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL );
+    item0->Add( item10, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxBoxSizer *item11 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxButton *item12 = new wxButton( parent, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    item11->Add( item12, 0, wxALIGN_CENTER|wxRIGHT, 5 );
+
+    wxButton *item13 = new wxButton( parent, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
+    item13->SetDefault();
+    item11->Add( item13, 0, wxALIGN_CENTER, 5 );
+
+    item0->Add( item11, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM, 5 );
+
+    if (set_sizer)
+    {
+        parent->SetSizer( item0 );
+        if (call_fit)
+            item0->SetSizeHints( parent );
+    }
+    
+    return item0;
+}
+
+wxSizer *HelpProgsFunc( wxWindow *parent, bool call_fit, bool set_sizer )
+{
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    wxTreeCtrl *item1 = new wxTreeCtrl( parent, ID_TREECTRL, wxDefaultPosition, wxSize(120,160), wxTR_HAS_BUTTONS|wxSUNKEN_BORDER );
+    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    if (set_sizer)
+    {
+        parent->SetSizer( item0 );
+        if (call_fit)
+            item0->SetSizeHints( parent );
+    }
+    
+    return item0;
+}
+
 // Implement menubar functions
 
 wxMenuBar *MyMenuBarFunc()
@@ -351,7 +432,10 @@ wxMenuBar *MyMenuBarFunc()
     item1->AppendSeparator();
     item1->Append( ID_SAVE, wxT("&Save"), wxT("") );
     item1->Append( ID_SAVEAS, wxT("Save &As..."), wxT("") );
+    item1->AppendSeparator();
     item1->Append( ID_WAV_EXPORT, wxT("Export WAV..."), wxT("") );
+    item1->Append( ID_SAVEAS_PACK, wxT("Export Package..."), wxT("") );
+    item1->Append( ID_IMPORT_PACK, wxT("Import Package..."), wxT("") );
     item1->AppendSeparator();
     item1->Append( ID_QUIT, wxT("&Quit"), wxT("") );
     item0->Append( item1, wxT("File") );
@@ -370,10 +454,14 @@ wxMenuBar *MyMenuBarFunc()
     
     wxMenu* item3 = new wxMenu;
     item3->Append( ID_SHOW_MIXER, wxT("Show &Mixer"), wxT("") );
+    item3->AppendSeparator();
+    item3->Append( ID_ZOOM_50, wxT("50%"), wxT("") );
+    item3->Append( ID_ZOOM_100, wxT("100%"), wxT("") );
+    item3->Append( ID_ZOOM_150, wxT("150%"), wxT("") );
     item0->Append( item3, wxT("&View") );
     
     wxMenu* item4 = new wxMenu;
-    item4->Append( ID_ABOUT, wxT("&About"), wxT("") );
+    item4->Append( ID_ABOUT, wxT("&About ..."), wxT("") );
     item0->Append( item4, wxT("&Help") );
     
     return item0;
@@ -394,6 +482,15 @@ void MyToolBarFunc( wxToolBar *parent )
     parent->AddTool( ID_REWIND, wxT(""), GgseqBitmapsFunc( 10 ), wxNullBitmap, wxITEM_NORMAL, wxT("Rewind") );
     parent->AddTool( ID_PLAY, wxT(""), GgseqBitmapsFunc( 2 ), wxNullBitmap, wxITEM_NORMAL, wxT("Play") );
     parent->AddTool( ID_STOP, wxT(""), GgseqBitmapsFunc( 14 ), wxNullBitmap, wxITEM_NORMAL, wxT("Stop") );
+    parent->AddSeparator();
+    wxString strs1[] = 
+    {
+        wxT("Snap to Grid"), 
+        wxT("Snap to Sample"), 
+        wxT("No Snap")
+    };
+    wxChoice *item1 = new wxChoice( parent, ID_CHOICE, wxDefaultPosition, wxSize(100,-1), 3, strs1, 0 );
+    parent->AddControl( item1 );
     parent->AddSeparator();
     parent->AddTool( ID_PREFERENCES, wxT(""), GgseqBitmapsFunc( 9 ), wxNullBitmap, wxITEM_NORMAL, wxT("Preferences") );
     parent->AddSeparator();

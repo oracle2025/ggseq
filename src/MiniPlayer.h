@@ -49,8 +49,8 @@ class MiniPlayer : public wxPanel, public MiniPlayerInterface
 		void SetSample(TLSample *sample);
 		void Play();
 		void Stop();
-		void OnPlay(wxCommandEvent *event);
-		void OnStop(wxCommandEvent *event);
+		void OnPlay(wxCommandEvent &event);
+		void OnStop(wxCommandEvent &event);
 		void OnTimer(wxTimerEvent &event);
 	private:
 		void SetPosition(gg_tl_dat position);

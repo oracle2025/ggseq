@@ -49,7 +49,8 @@ public:
     ~PreferencesDialog();
 
     // WDR: method declarations for PreferencesDialog
-    wxListBox* GetColourListbox()  { return (wxListBox*) FindWindow( ID_COLOUR_LISTBOX ); }
+    wxGrid* GetColourGrid()  { return (wxGrid*) FindWindow( ID_COLOUR_GRID ); }
+//    wxListBox* GetColourListbox()  { return (wxListBox*) FindWindow( ID_COLOUR_LISTBOX ); }
     wxButton* GetColourButton()  { return (wxButton*) FindWindow( ID_COLOUR_BUTTON ); }
     wxButton* GetColourRemoveButton()  { return (wxButton*) FindWindow( ID_COLOUR_REMOVE_BUTTON ); }
     wxGenericDirCtrl* GetColourDirtree()  { return (wxGenericDirCtrl*) FindWindow( ID_COLOUR_DIRTREE ); }
@@ -70,7 +71,7 @@ public:
     void SetSnapListData();
     void LoadColourDlgData( wxColourData &data );
     void SaveColourDlgData( wxColourData &data );
-    void SetColourButtons();
+    void SetColourButtons( int row = -1 );
     int GetFrameSnap() { return m_frameSnap; }
     void LoadColours( TLColourManager* cm );
     void SaveColours( TLColourManager* cm );
@@ -81,6 +82,8 @@ private:
     
 private:
     // WDR: handler declarations for PreferencesDialog
+    void OnColourGridClicked( wxGridEvent &event );
+    void OnColourGrid( wxGridEvent &event );
     void OnColourListbox( wxCommandEvent &event );
     void OnColourButton( wxCommandEvent &event );
     void OnColourRemoveButton( wxCommandEvent &event );
@@ -91,7 +94,7 @@ private:
     void OnPresetList( wxCommandEvent &event );
     void OnBpm( wxCommandEvent &event );
     void OnSeconds( wxCommandEvent &event );
-    void OnFrames( wxCommandEvent &event );
+    void OnFrames( wxSpinEvent &event );
 
 private:
     DECLARE_EVENT_TABLE()

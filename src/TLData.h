@@ -97,6 +97,7 @@ class TLData: public LoopSetupListener, GetTrackNrListener
 		void SetDocManager(GgseqDocManager *docManager);
 		void SetPanel( TLPanel *panel ) { m_panel = panel; }
 		//void GetTrackNrFromRef( long referenceId );
+		bool ExportPackage(wxString filename);
 	private:
 		gg_tl_dat m_loopPos1;
 		gg_tl_dat m_loopPos2;
@@ -104,7 +105,7 @@ class TLData: public LoopSetupListener, GetTrackNrListener
 		long m_snapValue;
 		long m_trackReferenceCounter;
 		unsigned int MixChannels(float *A, float *B, float* out, unsigned int count);
-		bool printXML(wxString filename);
+		bool printXML(wxString filename, bool relative=false, wxString tmp_path=wxT(""));
 		void loadXML(wxString filename);
 		void ResetOffsets();
 		TLTrackList *m_trackList;

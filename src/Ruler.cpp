@@ -50,6 +50,7 @@ Ruler::Ruler(wxWindow* parent,
 	m_pos1=0;
 	m_pos2=0;
 	m_listener=0;
+	m_zoom=( 117600.0 / 31.0 );
 }
 void Ruler::OnPaint(wxPaintEvent& event)
 {
@@ -100,7 +101,7 @@ void Ruler::OnLeftUp(wxMouseEvent& event)
 	if (m_pos2<LEFT_OFFSET)
 		m_pos2=LEFT_OFFSET;
 	if (m_listener)
-		m_listener->SetLoopSnaps(((m_pos1-LEFT_OFFSET)*117600)/31, ((m_pos2-LEFT_OFFSET)*117600)/31);//TODO: Zoomstufen berücksichtigen.
+		m_listener->SetLoopSnaps((long long)((m_pos1-LEFT_OFFSET)* m_zoom), (long long)((m_pos2-LEFT_OFFSET)* m_zoom)  );
 	Refresh();
 }
 void Ruler::OnMouseMotion(wxMouseEvent& event)

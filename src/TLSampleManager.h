@@ -35,7 +35,7 @@ class TLSampleManager
 		TLSample *GetSample(wxString filename, UpdateListener* updateListener=NULL);
 		TLSample *GetSample(int id); /*Fürs XML laden*/
 		TLSample *AddSample(wxString filename, int id, UpdateListener* updateListener=NULL);
-		void addXmlData(TiXmlElement *samples);
+		void addXmlData(TiXmlElement *samples, bool relative=false, wxString tmp_path=wxT(""));
 		void Clear(TLSample* tlSample);
 		void ClearAll();
 		TLColourManager *GetColourManager();

@@ -212,12 +212,12 @@ wxIcon TLSample::GetIcon()
 	icon1.CopyFromBitmap(b1);
 	return icon1;
 }
-void TLSample::Draw(wxDC& dc)
+void TLSample::Draw(wxDC& dc, float zoom)
 {
 	wxBrush b1=dc.GetBrush();
 /*	b1.SetColour(GetColour());
 	dc.SetBrush(b1);*/
-	int width=m_bufferLength/3793;
+	int width=m_bufferLength/ zoom;//3793;
 //	dc.DrawRectangle(0,0,width,25);
 
 	TLView::Draw3dRect(&dc,0,0,width,25,GetColour());

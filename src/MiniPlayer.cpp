@@ -154,12 +154,12 @@ void MiniPlayer::OnTimer(wxTimerEvent &event)
 	}
 }
 
-void MiniPlayer::OnPlay(wxCommandEvent *event)
+void MiniPlayer::OnPlay(wxCommandEvent &event)
 {
 	if (m_filename!=wxT(""))
 		Play();
 }
-void MiniPlayer::OnStop(wxCommandEvent *event)
+void MiniPlayer::OnStop(wxCommandEvent &event)
 {
 	Stop();
 }

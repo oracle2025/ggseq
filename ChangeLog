@@ -1,4 +1,20 @@
-2004-10-05  Richard Spindler <oracle2025@gmx.de>
+2004-07-11  Richard Spindler <oracle2025@gmx.de>
+
+ * Implemented Package loading and saving based on zip/unzip
+
+2004-07-03  Richard Spindler <oracle2025@gmx.de>
+
+ * Added Colours to the Colour-Preferences Listbox
+
+2004-07-02  Richard Spindler <oracle2025@gmx.de>
+
+ * Litte Fix, to prevent crash when setting loop-points, while playback
+
+2004-06-20  Richard Spindler <oracle2025@gmx.de>
+
+ * Added Zoom Funcionality
+
+2004-06-10  Richard Spindler <oracle2025@gmx.de>
 
  * Fixed Controls not being deleted while loading from File
 

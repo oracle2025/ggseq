@@ -99,20 +99,23 @@ wxString TLSampleManager::NormalizePath(wxString filename)
 	fn.Normalize();
 	return fn.GetFullPath();
 }
-void TLSampleManager::addXmlData(TiXmlElement *samples)
+void TLSampleManager::addXmlData(TiXmlElement *samples, bool relative, wxString tmp_path )
+/* wxCopyFile */
 {
-//	wxString count;
-//	count << m_sampleList.GetCount();
 	samples->SetAttribute("count",m_sampleList.GetCount());
 	for ( TLSampleList::Node *node = m_sampleList.GetFirst(); node; node = node->GetNext() )
 	{
 		TLSample *current = node->GetData();
-//		wxString tmp;
-//		tmp << current->GetId();
 		TiXmlElement *sample = new TiXmlElement("sample");
 		samples->LinkEndChild(sample);
-		sample->SetAttribute("id",current->GetId()/*(const char*)tmp.mb_str()*/);
-		sample->LinkEndChild(new TiXmlText(current->GetFilename().mb_str()));
+		sample->SetAttribute("id",current->GetId());
+		if ( relative ) {
+			wxFileName fn(current->GetFilename());
+			wxCopyFile(current->GetFilename(), tmp_path + wxFileName::GetPathSeparator() +fn.GetFullName());
+			sample->LinkEndChild(new TiXmlText(fn.GetFullName().mb_str()));
+		} else  {
+			sample->LinkEndChild(new TiXmlText(current->GetFilename().mb_str()));
+		}
 	}
 
 }

@@ -52,12 +52,13 @@ class NoSnapChangeHandler : public wxEvtHandler
     public:
         NoSnapChangeHandler() :wxEvtHandler(){}
         void OnEvent(wxCommandEvent &event){}
+        void OnSpinEvent(wxSpinEvent &event){}
     private:
         DECLARE_EVENT_TABLE()
 };
 BEGIN_EVENT_TABLE(NoSnapChangeHandler, wxEvtHandler)
     EVT_TEXT(ID_FRAMES_CTRL, NoSnapChangeHandler::OnEvent)
-    EVT_SPINCTRL(ID_FRAMES_CTRL, NoSnapChangeHandler::OnEvent)
+    EVT_SPINCTRL(ID_FRAMES_CTRL, NoSnapChangeHandler::OnSpinEvent)
     EVT_TEXT(ID_SECONDS_CTRL, NoSnapChangeHandler::OnEvent)
     EVT_TEXT(ID_BPM_CTRL, NoSnapChangeHandler::OnEvent)
 END_EVENT_TABLE()
@@ -82,7 +83,9 @@ BEGIN_EVENT_TABLE(PreferencesDialog,wxDialog)
     EVT_BUTTON( ID_COLOUR_ADD_BUTTON, PreferencesDialog::OnColourAddButton )
     EVT_BUTTON( ID_COLOUR_REMOVE_BUTTON, PreferencesDialog::OnColourRemoveButton )
     EVT_BUTTON( ID_COLOUR_BUTTON, PreferencesDialog::OnColourButton )
-    EVT_LISTBOX( ID_COLOUR_LISTBOX, PreferencesDialog::OnColourListbox )
+//    EVT_LISTBOX( ID_COLOUR_LISTBOX, PreferencesDialog::OnColourListbox )
+    EVT_GRID_CELL_LEFT_CLICK( PreferencesDialog::OnColourGridClicked )
+    EVT_GRID_SELECT_CELL( PreferencesDialog::OnColourGrid )
 END_EVENT_TABLE()
 
 PreferencesDialog::PreferencesDialog( wxWindow *parent, wxWindowID id, int frameSnap, TLColourManager* cm, const wxString &title,
@@ -117,20 +120,28 @@ PreferencesDialog::PreferencesDialog( wxWindow *parent, wxWindowID id, int frame
     
     LoadSnaps();
     // - Colours
-    SetColourButtons();
     LoadColours( cm );
+    wxGrid *colGrid = GetColourGrid();
+    //colGrid->SetCellValue(0,0,wxT("Test"));
+    colGrid->SetColLabelSize(0);
+    colGrid->SetRowLabelSize(0);
+    colGrid->EnableGridLines(false);
+    colGrid->DisableDragGridSize();
+    colGrid->EnableEditing(false);
+    colGrid->AutoSizeColumns();
+    SetColourButtons();
 }
 PreferencesDialog::~PreferencesDialog()
 {
-	SaveSnaps();
-	for (int i=0;i<GetPresetListbox()->GetCount();i++) {
-		int *t=(int*)GetPresetListbox()->GetClientData(i);
-		delete t;
-	}
-	for (int i=GetColourListbox()->GetCount()-1; i>=0;i--) {
-		wxColour *colour = (wxColour*)GetColourListbox()->GetClientData(i);
-		delete colour;	
-	}
+    SaveSnaps();
+    for (int i=0;i<GetPresetListbox()->GetCount();i++) {
+        int *t=(int*)GetPresetListbox()->GetClientData(i);
+        delete t;
+    }
+/*    for (int i=GetColourListbox()->GetCount()-1; i>=0;i--) {
+        wxColour *colour = (wxColour*)GetColourListbox()->GetClientData(i);
+        delete colour;  
+    }*/
 
 }
 void PreferencesDialog::LoadSnaps()
@@ -216,136 +227,190 @@ void PreferencesDialog::SetSnapListData()
 }
 long GetColourValue(const wxColour &colour)
 {
-	long var = colour.Blue();
-	var=var*256;
-	var +=colour.Green();
-	var=var*256;
-	var +=colour.Red();
-	return var;
+    long var = colour.Blue();
+    var=var*256;
+    var +=colour.Green();
+    var=var*256;
+    var +=colour.Red();
+    return var;
 }
 void PreferencesDialog::LoadColourDlgData( wxColourData &data )
 {
-	wxConfigBase *conf=wxConfigBase::Get();
-	conf->SetPath(wxT("/ColourDialog"));
-	data.SetCustomColour(0,wxColour(conf->Read(wxT("colour0"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(1,wxColour(conf->Read(wxT("colour1"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(2,wxColour(conf->Read(wxT("colour2"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(3,wxColour(conf->Read(wxT("colour3"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(4,wxColour(conf->Read(wxT("colour4"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(5,wxColour(conf->Read(wxT("colour5"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(6,wxColour(conf->Read(wxT("colour6"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(7,wxColour(conf->Read(wxT("colour7"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(8,wxColour(conf->Read(wxT("colour8"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(9,wxColour(conf->Read(wxT("colour9"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(10,wxColour(conf->Read(wxT("colour10"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(11,wxColour(conf->Read(wxT("colour11"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(12,wxColour(conf->Read(wxT("colour12"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(13,wxColour(conf->Read(wxT("colour13"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(14,wxColour(conf->Read(wxT("colour14"),GetColourValue(*wxWHITE))));
-	data.SetCustomColour(15,wxColour(conf->Read(wxT("colour15"),GetColourValue(*wxWHITE))));
+    wxConfigBase *conf=wxConfigBase::Get();
+    conf->SetPath(wxT("/ColourDialog"));
+    data.SetCustomColour(0,wxColour(conf->Read(wxT("colour0"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(1,wxColour(conf->Read(wxT("colour1"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(2,wxColour(conf->Read(wxT("colour2"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(3,wxColour(conf->Read(wxT("colour3"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(4,wxColour(conf->Read(wxT("colour4"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(5,wxColour(conf->Read(wxT("colour5"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(6,wxColour(conf->Read(wxT("colour6"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(7,wxColour(conf->Read(wxT("colour7"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(8,wxColour(conf->Read(wxT("colour8"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(9,wxColour(conf->Read(wxT("colour9"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(10,wxColour(conf->Read(wxT("colour10"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(11,wxColour(conf->Read(wxT("colour11"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(12,wxColour(conf->Read(wxT("colour12"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(13,wxColour(conf->Read(wxT("colour13"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(14,wxColour(conf->Read(wxT("colour14"),GetColourValue(*wxWHITE))));
+    data.SetCustomColour(15,wxColour(conf->Read(wxT("colour15"),GetColourValue(*wxWHITE))));
 }
 void PreferencesDialog::SaveColourDlgData( wxColourData &data )
 {
-	wxConfigBase *conf=wxConfigBase::Get();
-	conf->SetPath(wxT("/ColourDialog"));
-	conf->Write(wxT("colour0"),(long)GetColourValue(data.GetCustomColour(0)));
-	conf->Write(wxT("colour1"),(long)GetColourValue(data.GetCustomColour(1)));
-	conf->Write(wxT("colour2"),(long)GetColourValue(data.GetCustomColour(2)));
-	conf->Write(wxT("colour3"),(long)GetColourValue(data.GetCustomColour(3)));
-	conf->Write(wxT("colour4"),(long)GetColourValue(data.GetCustomColour(4)));
-	conf->Write(wxT("colour5"),(long)GetColourValue(data.GetCustomColour(5)));
-	conf->Write(wxT("colour6"),(long)GetColourValue(data.GetCustomColour(6)));
-	conf->Write(wxT("colour7"),(long)GetColourValue(data.GetCustomColour(7)));
-	conf->Write(wxT("colour8"),(long)GetColourValue(data.GetCustomColour(8)));
-	conf->Write(wxT("colour9"),(long)GetColourValue(data.GetCustomColour(9)));
-	conf->Write(wxT("colour10"),(long)GetColourValue(data.GetCustomColour(10)));
-	conf->Write(wxT("colour11"),(long)GetColourValue(data.GetCustomColour(11)));
-	conf->Write(wxT("colour12"),(long)GetColourValue(data.GetCustomColour(12)));
-	conf->Write(wxT("colour13"),(long)GetColourValue(data.GetCustomColour(13)));
-	conf->Write(wxT("colour14"),(long)GetColourValue(data.GetCustomColour(14)));
-	conf->Write(wxT("colour15"),(long)GetColourValue(data.GetCustomColour(15)));
+    wxConfigBase *conf=wxConfigBase::Get();
+    conf->SetPath(wxT("/ColourDialog"));
+    conf->Write(wxT("colour0"),(long)GetColourValue(data.GetCustomColour(0)));
+    conf->Write(wxT("colour1"),(long)GetColourValue(data.GetCustomColour(1)));
+    conf->Write(wxT("colour2"),(long)GetColourValue(data.GetCustomColour(2)));
+    conf->Write(wxT("colour3"),(long)GetColourValue(data.GetCustomColour(3)));
+    conf->Write(wxT("colour4"),(long)GetColourValue(data.GetCustomColour(4)));
+    conf->Write(wxT("colour5"),(long)GetColourValue(data.GetCustomColour(5)));
+    conf->Write(wxT("colour6"),(long)GetColourValue(data.GetCustomColour(6)));
+    conf->Write(wxT("colour7"),(long)GetColourValue(data.GetCustomColour(7)));
+    conf->Write(wxT("colour8"),(long)GetColourValue(data.GetCustomColour(8)));
+    conf->Write(wxT("colour9"),(long)GetColourValue(data.GetCustomColour(9)));
+    conf->Write(wxT("colour10"),(long)GetColourValue(data.GetCustomColour(10)));
+    conf->Write(wxT("colour11"),(long)GetColourValue(data.GetCustomColour(11)));
+    conf->Write(wxT("colour12"),(long)GetColourValue(data.GetCustomColour(12)));
+    conf->Write(wxT("colour13"),(long)GetColourValue(data.GetCustomColour(13)));
+    conf->Write(wxT("colour14"),(long)GetColourValue(data.GetCustomColour(14)));
+    conf->Write(wxT("colour15"),(long)GetColourValue(data.GetCustomColour(15)));
 }
-void PreferencesDialog::SetColourButtons()
+void PreferencesDialog::SetColourButtons( int row )
 {
-	wxListBox *lb = GetColourListbox();
-	if ( lb->GetSelection() < 0 ) {
+#if 0
+    wxListBox *lb = GetColourListbox();
+    if ( lb->GetSelection() < 0 ) {
+        GetColourButton()->Enable(false);
+        GetColourRemoveButton()->Enable(false);
+    } else {
+        GetColourButton()->Enable();
+        GetColourRemoveButton()->Enable();
+        GetColourButton()->SetBackgroundColour( *(wxColour*)lb->GetClientData( lb->GetSelection() ) );
+    }
+#endif
+	wxGrid *gr = GetColourGrid();
+	if ( row < 0 ) {
 		GetColourButton()->Enable(false);
 		GetColourRemoveButton()->Enable(false);
 	} else {
 		GetColourButton()->Enable();
 		GetColourRemoveButton()->Enable();
-		GetColourButton()->SetBackgroundColour( *(wxColour*)lb->GetClientData( lb->GetSelection() ) );
+		GetColourButton()->SetBackgroundColour( gr->GetCellBackgroundColour(row,0) );
 	}
+    
+
 }
 void PreferencesDialog::LoadColours( TLColourManager* cm )
 {
-	wxListBox *lb = GetColourListbox();
-	for ( TLDirColourList::Node *node = cm->GetColours(); node; node = node->GetNext() ) {
-		TLDirColour *current = node->GetData();
-		wxColour *colour = new wxColour(current->m_colour);
-		lb->Append(current->m_directory,(void*)colour);
-	}
+    //wxListBox *lb = GetColourListbox();
+    wxGrid *gr = GetColourGrid();
+    for ( TLDirColourList::Node *node = cm->GetColours(); node; node = node->GetNext() ) {
+        TLDirColour *current = node->GetData();
+        /*wxColour *colour = new wxColour(current->m_colour);
+        lb->Append(current->m_directory,(void*)colour);*/
+	gr->AppendRows();
+	gr->SetCellValue( current->m_directory, gr->GetRows()-1, 0 );
+	gr->SetCellBackgroundColour( gr->GetRows()-1, 0, current->m_colour );
+    }
 
 }
 void PreferencesDialog::SaveColours( TLColourManager* cm )
 {
-	wxListBox *lb = GetColourListbox();
-	cm->Clear();
-	for (int i=lb->GetCount()-1; i>=0;i--) {
-		cm->SetColour(lb->GetString(i),*(wxColour*)lb->GetClientData(i));
-	}
+    //wxListBox *lb = GetColourListbox();
+    wxGrid *gr = GetColourGrid();
+    cm->Clear();
+    for (int i=gr->GetRows()-1; i>=0;i--) {
+        cm->SetColour(gr->GetCellValue(i,0),gr->GetCellBackgroundColour(i,0));
+    }
 
 }
 // WDR: handler implementations for PreferencesDialog
 
+void PreferencesDialog::OnColourGridClicked( wxGridEvent &event )
+{
+	if ( !event.Selecting() ) {
+		SetColourButtons();
+	}
+	event.Skip();
+}
+void PreferencesDialog::OnColourGrid( wxGridEvent &event )
+{
+	if ( event.Selecting() ) {
+		SetColourButtons( event.GetRow() );
+	} else {
+		SetColourButtons();
+	}
+	event.Skip();
+}
+
 void PreferencesDialog::OnColourListbox( wxCommandEvent &event )
 {
-	SetColourButtons();
+    //SetColourButtons();
 }
 
 void PreferencesDialog::OnColourButton( wxCommandEvent &event )
 {
-	wxListBox *lb = GetColourListbox();
-	wxColourData colData;
-	if ( lb->GetSelection() < 0 )
-		return;
-	LoadColourDlgData( colData );
-	wxColourDialog dialog( this, &colData );
-	if (dialog.ShowModal() == wxID_OK) {
-		wxColour col = dialog.GetColourData().GetColour();
-		wxColour *col2 = (wxColour*) lb->GetClientData( lb->GetSelection() );
-		*col2 = col;
-		GetColourButton()->SetBackgroundColour(*col2);
-		colData = dialog.GetColourData();
-		SaveColourDlgData( colData );
-	}
+    wxGrid *gr = GetColourGrid();
+    if ( !gr->IsSelection() /*lb->GetSelection() < 0*/ )
+        return;
+    //wxListBox *lb = GetColourListbox();
+    wxColourData colData;
+    LoadColourDlgData( colData );
+    wxColourDialog dialog( this, &colData );
+    if (dialog.ShowModal() == wxID_OK) {
+        wxColour col = dialog.GetColourData().GetColour();
+        // wxColour *col2 = (wxColour*) lb->GetClientData( lb->GetSelection() );
+        // *col2 = col;
+        gr->SetCellBackgroundColour(gr->GetGridCursorRow(),0,col);
+        GetColourButton()->SetBackgroundColour(col);
+        
+        colData = dialog.GetColourData();
+        SaveColourDlgData( colData );
+    }
 }
 
 void PreferencesDialog::OnColourRemoveButton( wxCommandEvent &event )
 {
-	wxListBox *lb = GetColourListbox();
-	int sel = lb->GetSelection();
-	if ( sel >= 0 ) {
-		wxColour *colour = (wxColour*) lb->GetClientData( sel );
-		delete colour;
-		lb->Delete( sel );
-		SetColourButtons();
-	}
+    wxGrid *gr = GetColourGrid();
+    if ( !gr->IsSelection() )
+        return;
+    gr->DeleteRows( gr->GetGridCursorRow() );
+    SetColourButtons();
+
+#if 0
+    wxListBox *lb = GetColourListbox();
+    int sel = lb->GetSelection();
+    if ( sel >= 0 ) {
+        wxColour *colour = (wxColour*) lb->GetClientData( sel );
+        delete colour;
+        lb->Delete( sel );
+        SetColourButtons();
+    }
+#endif
 }
 
 void PreferencesDialog::OnColourAddButton( wxCommandEvent &event )
 {
-	wxListBox *lb = GetColourListbox();
-	wxGenericDirCtrl *dt = GetColourDirtree();
-	int len = lb->GetCount();
-	for ( int i = 0; i < len; i++ ) {
-		if ( dt->GetPath() == lb->GetString(i) )
-			return;
-	}
-	wxColour *colour = new wxColour( *wxRED );
-	lb->Append( dt->GetPath(), (void*) colour );
-	lb->SetSelection( lb->GetCount() - 1 );
-	SetColourButtons();
+    wxGrid *gr = GetColourGrid();
+    //wxListBox *lb = GetColourListbox();
+    wxGenericDirCtrl *dt = GetColourDirtree();
+    int len = gr->GetRows();
+    for ( int i = 0; i < len; i++ ) {
+        if ( dt->GetPath() == gr->GetCellValue(i,0) )
+            return;
+    }
+    /*wxColour *colour = new wxColour( *wxRED );
+    lb->Append( dt->GetPath(), (void*) colour );
+    lb->SetSelection( lb->GetCount() - 1 );*/
+
+    gr->AppendRows();
+    gr->SetCellValue( dt->GetPath(), gr->GetRows()-1, 0 );
+    gr->SetCellBackgroundColour( gr->GetRows()-1, 0, *wxRED );
+    gr->SelectRow( gr->GetRows()-1 );
+    gr->SetGridCursor( gr->GetRows()-1, 0 );
+    SetColourButtons(gr->GetRows()-1);
+
 }
 
 void PreferencesDialog::OnNewButton( wxCommandEvent &event )
@@ -424,7 +489,7 @@ void PreferencesDialog::OnSeconds( wxCommandEvent &event )
     SetSnapListData();
 }
 
-void PreferencesDialog::OnFrames( wxCommandEvent &event )
+void PreferencesDialog::OnFrames( wxSpinEvent &event )
 {
     m_frameSnap = event.GetInt();
     DISABLE_UPDATE

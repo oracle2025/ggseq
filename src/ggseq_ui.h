@@ -82,6 +82,11 @@ private:
 
 private:
     // WDR: handler declarations for MyFrame
+    void OnExportPack( wxCommandEvent &event );
+    void OnImportPack( wxCommandEvent &event );
+    void OnZoom150( wxCommandEvent &event );
+    void OnZoom100( wxCommandEvent &event );
+    void OnZoom50( wxCommandEvent &event );
     void OnDeleteTrack( wxCommandEvent &event );
     void OnAddTrack( wxCommandEvent &event );
     void OnPreferences( wxCommandEvent &event );

@@ -23,6 +23,7 @@
 #endif
 #include <sndfile.h>
 #include <wx/hashmap.h>
+#include <wx/filename.h>
 
 //#include <iostream>
 #include <fstream>
@@ -77,6 +78,8 @@ int TLData::GetTrackCount()
 }
 void TLData::SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2)
 {
+	if ( m_blocked )
+		return; //TODO, sollte auch im UI reflektiert werden.
 	m_loopPos1=pos1;/* Umrechnen nach abc, was auch immer(Wird im Ruler gemacht)*/
 	m_loopPos2=pos2;
 	m_loop_enabled=true;
@@ -257,7 +260,27 @@ void TLData::Clear() //TODO: auch wieder 8 Tracks herstellen.
 	m_changed=false;
 	m_filename=wxT("");
 }
-bool TLData::printXML(wxString filename)
+
+bool TLData::ExportPackage(wxString filename)//TODO: Konflikte bei gleichnamigen Dateien vermeiden.
+{
+//Liste vom SampleManager kriegen, addXmlData ein Flag hinzufügen, das die dateien nach /tmp kopiert, und relative Pathnames vergibt.
+	wxString tmp_dir = wxFileName::CreateTempFileName(wxT(""));
+	wxRemoveFile(tmp_dir);
+	wxMkdir(tmp_dir);
+	wxFileName fn(filename);
+	wxString xml_name = tmp_dir + wxFileName::GetPathSeparator() + fn.GetName() + wxT(".ggseq");
+	if ( !printXML(xml_name, true, tmp_dir) ) {
+		return false;
+	}
+	// Zip Up
+	wxSetWorkingDirectory(tmp_dir);
+	// system('zip ' + filename + ' -r .' )
+	wxExecute(wxString(wxT("zip ")) + filename + wxT(" -r ."), wxEXEC_SYNC);
+	wxExecute(wxString(wxT("rm -R ")) + tmp_dir, wxEXEC_SYNC);
+	return true;
+}
+
+bool TLData::printXML(wxString filename, bool relative, wxString tmp_path)
 {
 	TiXmlDocument doc(filename.mb_str());
 	
@@ -271,7 +294,7 @@ bool TLData::printXML(wxString filename)
 	TiXmlElement *samples = new TiXmlElement("samples");
 	el->LinkEndChild(samples);
 
-	m_sampleManager->addXmlData(samples);
+	m_sampleManager->addXmlData(samples, relative, tmp_path);
 
 	TiXmlElement *tracks = new TiXmlElement("tracks");
 	el->LinkEndChild(tracks);

@@ -58,7 +58,7 @@ wxSizer *TimelinePanelFunc2( wxWindow *parent, bool call_fit = TRUE, bool set_si
 wxSizer *SetSnapFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
 #define ID_COLOUR_DIRTREE 10018
-#define ID_COLOUR_LISTBOX 10019
+#define ID_COLOUR_GRID 10019
 #define ID_COLOUR_ADD_BUTTON 10020
 #define ID_COLOUR_REMOVE_BUTTON 10021
 #define ID_COLOUR_BUTTON 10022
@@ -70,32 +70,48 @@ wxSizer *PreferencesFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer
 #define ID_ACCELS_GRID 10024
 wxSizer *SetAccelsFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
+#define ID_LINE 10025
+#define ID_PACKAGE_TEXTCTRL 10026
+#define ID_PACKAGE_BUTTON 10027
+#define ID_CONTENTS_TEXTCTRL 10028
+#define ID_CONTENTS_BUTTON 10029
+wxSizer *ImportPackDlgFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
+
+#define ID_TREECTRL 10030
+wxSizer *HelpProgsFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
+
 // Declare menubar functions
 
-#define ID_MENU 10025
-#define ID_NEW 10026
-#define ID_OPEN 10027
-#define ID_SAVE 10028
-#define ID_SAVEAS 10029
-#define ID_WAV_EXPORT 10030
-#define ID_QUIT 10031
-#define ID_UNDO 10032
-#define ID_REDO 10033
-#define ID_ADD_TRACK 10034
-#define ID_DELETE_TRACK 10035
-#define ID_MOVE_TRACK_UP 10036
-#define ID_MOVE_TRACK_DOWN 10037
-#define ID_PREFERENCES 10038
-#define ID_SHOW_MIXER 10039
-#define ID_ABOUT 10040
+#define ID_MENU 10031
+#define ID_NEW 10032
+#define ID_OPEN 10033
+#define ID_SAVE 10034
+#define ID_SAVEAS 10035
+#define ID_WAV_EXPORT 10036
+#define ID_SAVEAS_PACK 10037
+#define ID_IMPORT_PACK 10038
+#define ID_QUIT 10039
+#define ID_UNDO 10040
+#define ID_REDO 10041
+#define ID_ADD_TRACK 10042
+#define ID_DELETE_TRACK 10043
+#define ID_MOVE_TRACK_UP 10044
+#define ID_MOVE_TRACK_DOWN 10045
+#define ID_PREFERENCES 10046
+#define ID_SHOW_MIXER 10047
+#define ID_ZOOM_50 10048
+#define ID_ZOOM_100 10049
+#define ID_ZOOM_150 10050
+#define ID_ABOUT 10051
 wxMenuBar *MyMenuBarFunc();
 
 // Declare toolbar functions
 
-#define ID_REWIND 10041
-#define ID_PLAY 10042
-#define ID_STOP 10043
-#define ID_TOOL 10044
+#define ID_REWIND 10052
+#define ID_PLAY 10053
+#define ID_STOP 10054
+#define ID_CHOICE 10055
+#define ID_TOOL 10056
 void MyToolBarFunc( wxToolBar *parent );
 
 // Declare bitmap functions

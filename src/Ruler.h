@@ -44,7 +44,9 @@ class Ruler: public wxPanel
 		void OnMouseMotion(wxMouseEvent& event);
 		void GetLoop(gg_tl_dat* pos1, gg_tl_dat* pos2);
 		void SetListener(LoopSetupListener *listener);
+		void SetZoom( float zoom ) { m_zoom = zoom; };
 	private:
+		float m_zoom;
 		long m_snap;
 		long m_zoomFactor;
 		gg_tl_dat m_position;

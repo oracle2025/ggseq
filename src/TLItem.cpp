@@ -54,7 +54,7 @@ unsigned int TLItem::FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int co
 	}
 	if (m_position>=pos)
 	{
-		for (unsigned int i=pos;i<m_position && written<count;i++)
+		for (unsigned int i=pos; i < m_position && written < count; i++)
 		{
 			outBuffer[i-pos]=0.0;
 			written++;

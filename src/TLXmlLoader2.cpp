@@ -126,6 +126,7 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 /*-*/
 		RecursiveUpdateListener s(updateListener, (i*100)/sampleNum, ((i+1)*100)/sampleNum);
 		m_sampleManager->AddSample(tt,id,&s); /*TODO abbrechen einbauen*/
+		/* TODO, hier auch relative Pfadnahmen berücksichtigen*/
 		element=element->NextSiblingElement("sample");
 	}
 	element = doc.RootElement();

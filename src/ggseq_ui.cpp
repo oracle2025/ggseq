@@ -47,6 +47,7 @@
 #include "StatusProgressBar.h"
 #include "DisableListener.h"
 #include "FileInfoPanel.h"
+#include "ImportPackDialog.h"
 //#include "PreferencesDialog.h"
 
 // Include Images
@@ -113,6 +114,11 @@ BEGIN_EVENT_TABLE(MyFrame,wxFrame)
     EVT_MENU( ID_PREFERENCES, MyFrame::OnPreferences )
     EVT_MENU( ID_ADD_TRACK, MyFrame::OnAddTrack )
     EVT_MENU( ID_DELETE_TRACK, MyFrame::OnDeleteTrack )
+    EVT_MENU( ID_ZOOM_50, MyFrame::OnZoom50 )
+    EVT_MENU( ID_ZOOM_100, MyFrame::OnZoom100 )
+    EVT_MENU( ID_ZOOM_150, MyFrame::OnZoom150 )
+    EVT_MENU( ID_IMPORT_PACK, MyFrame::OnImportPack )
+    EVT_MENU( ID_SAVEAS_PACK, MyFrame::OnExportPack )
 END_EVENT_TABLE()
 
 MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
@@ -164,6 +170,7 @@ MyFrame::~MyFrame()
     conf->Write(wxT("MiniFilerDirectory"), GetDirtree()->GetPath());
     conf->Write(wxT("Version"), wxT(GG_VERSION));
     conf->Write(wxT("LastProject"), GetTlPanel()->GetFilename());
+    conf->Flush();
     delete m_dragImage;
 }
 void MyFrame::CreateMyMenuBar()
@@ -222,19 +229,52 @@ void MyFrame::Stop()
 
 // WDR: handler implementations for MyFrame
 
+void MyFrame::OnExportPack( wxCommandEvent &event )
+{
+    GetTlPanel()->ExportPackage();
+}
+
+void MyFrame::OnImportPack( wxCommandEvent &event )
+{
+    ImportPackDialog dlg(this, -1, wxT("Import Package"));
+    if ( dlg.ShowModal()==wxID_OK ) {
+        //puts(dlg.GetContentsPath().mb_str());
+        //puts(dlg.GetPackageFile().mb_str());
+	GetTlPanel()->ImportPackage(dlg.GetPackageFile(), dlg.GetContentsPath());
+    }
+}
+
+void MyFrame::OnZoom150( wxCommandEvent &event )
+{
+    GetTlPanel()->SetZoom( 1.5 );
+    Refresh();
+}
+
+void MyFrame::OnZoom100( wxCommandEvent &event )
+{
+    GetTlPanel()->SetZoom( 1.0 );
+    Refresh();
+}
+
+void MyFrame::OnZoom50( wxCommandEvent &event )
+{
+    GetTlPanel()->SetZoom( 0.5 );
+    Refresh();
+}
+
 void MyFrame::OnDeleteTrack( wxCommandEvent &event )
 {
-	GetTlPanel()->DeleteTrack();
+    GetTlPanel()->DeleteTrack();
 }
 
 void MyFrame::OnAddTrack( wxCommandEvent &event )
 {
-	GetTlPanel()->AddTrack();
+    GetTlPanel()->AddTrack();
 }
 
 void MyFrame::OnPreferences( wxCommandEvent &event )
 {
-	GetTlPanel()->SetPrefs();
+    GetTlPanel()->SetPrefs();
     /*PreferencesDialog prefs(this, -1, wxT("Preferences"));
     prefs.Centre();
     prefs.ShowModal();*/
@@ -318,7 +358,7 @@ void MyFrame::OnScroll( wxScrollEvent &event )
 }
 void MyFrame::OnScroll2( wxScrollEvent &event )
 {
-	GetTlPanel()->OnScroll2(event);
+    GetTlPanel()->OnScroll2(event);
 }
 
 void MyFrame::OnRedo( wxCommandEvent &event )

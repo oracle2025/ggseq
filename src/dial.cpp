@@ -125,7 +125,7 @@ void wxDial::OnPaint(wxPaintEvent& event)
 	dc_screen.Blit(0,0,GetSize().GetWidth(),GetSize().GetHeight() , &dc, 0,0);
 }
 
-void wxDial::OnEraseBackground(wxPaintEvent& event)
+void wxDial::OnEraseBackground(wxEraseEvent& event)
 {
 }
 

@@ -38,7 +38,7 @@ class TLSample
 		int GetId();
 		wxString GetFilename();
 		wxIcon GetIcon();
-		void Draw(wxDC& dc_screen);
+		void Draw(wxDC& dc_screen, float zoom);
 		wxColour GetColour();
 		
 		gg_tl_dat m_infoFrames;

@@ -60,6 +60,8 @@ ggseq_SOURCES = PreferencesDialog.h\
 		BigScrollBar.h\
 		GgseqDocManager.cpp\
 		GgseqDocManager.h\
+		ImportPackDialog.cpp\
+		ImportPackDialog.h\
                 SoundManager.h\
                 tinystr.h\
                 tinyxml.h\

@@ -49,7 +49,7 @@ class TLPanel : public wxPanel
 		~TLPanel();
 
 		void OnPaint(wxPaintEvent& event);
-		void OnEraseBackground(wxPaintEvent& event);
+		void OnEraseBackground(wxEraseEvent& event);
 		void OnSize(wxSizeEvent& event);
 		void OnMouseUp(wxMouseEvent& event);
 		void OnMouseDown(wxMouseEvent& event);
@@ -70,9 +70,12 @@ class TLPanel : public wxPanel
 		void Play();
 		void Stop();
 		void StopAll();
+		void ExportPackage();
+		void ImportPackage( wxString package, wxString contents );
 		void WavExport();
 		bool UpdateCaret();
 		void SetPrefs();
+		void SetZoom( float zoom );
 		SoundManager *GetSoundManager();
 		void SetMiniPlayer(MiniPlayerInterface *mp);
 		void SetUpdateListener(UpdateListener *updateListener);

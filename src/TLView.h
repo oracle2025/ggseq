@@ -33,8 +33,13 @@ class TLView
 		TLView(TLData *TlData);
 		~TLView();
 
-		void SetVisibleFrame(long width, long height, long x=0, long y=0);
-		void SetVisibleLength(gg_tl_dat Length);
+		/* - Die zwei: - */
+		//void SetVisibleFrame(long width, long height, long x=0, long y=0);
+		//void SetVisibleLength(gg_tl_dat Length);
+		/* - werden durch das ersetzt: - */
+		void SetSize( long width, long height );
+		void SetZoom( float zoom );
+
 		void SetPosition(gg_tl_dat Position);
 		gg_tl_dat GetPosition();
 		gg_tl_dat GetScrollBarRange();
@@ -83,21 +88,26 @@ class TLView
 		long GetYScrollPosition() {return m_YscrollPosition;};
 		void UpdateDialsAndButtons();
 		GgseqDocManager *m_docManager;
+		float GetRealZoom();
 	private:
-		long m_YscrollPosition;
 		gg_tl_dat GetSnap(gg_tl_dat x);
 		long DrawTrack(wxDC& dc_screen, long yoffset, TLTrack* track);
-		bool m_SnapSuspended;
 		TLData *m_TlData;
 		TLSelectionSet *m_selectionSet;
 		gg_tl_dat m_LengthVisible;
-		gg_tl_dat m_PositionVisible;
-		float m_Faktor;
-		long m_FrameX;
-		long m_FrameY;
-		long m_FrameWidth;
-		long m_FrameHeight;
+		gg_tl_dat m_PositionVisible; // TODO: muss weg
+		long m_YscrollPosition;
+		bool m_SnapSuspended;
+		//float m_Faktor; // TODO: muss weg
+		//long m_FrameX; // TODO: muss weg
+		//long m_FrameY; // TODO: muss weg
+		//long m_FrameWidth; // TODO: muss weg
+		//long m_FrameHeight; // TODO: muss weg
 		long m_TrackDrawDist;
+
+		long m_width;
+		long m_height;
+		float m_zoom;
 		wxIcon *m_gungirl;
 };
 
