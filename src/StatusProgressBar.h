@@ -31,7 +31,7 @@ class StatusProgressBar: public wxStatusBar, public UpdateListener
 		void OnSize(wxSizeEvent &event);
 		void OnCancelButton(wxCommandEvent &event);
 		void SetDisableListener(DisableListener *disableListener);
-		void OnEraseBackground(wxPaintEvent &event);
+		void OnEraseBackground(wxEraseEvent &event);
 	private:
 		wxGauge *m_gauge;
 		wxButton *m_cancelButton;

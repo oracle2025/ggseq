@@ -32,6 +32,7 @@
 BEGIN_EVENT_TABLE(TLMuteButton, wxBitmapButton)
 #ifdef __WXMSW__
 	EVT_TOGGLEBUTTON(-1,TLMuteButton::OnToggle)
+	EVT_ERASE_BACKGROUND(TLMuteButton::OnEraseBackground)
 #else
 	EVT_BUTTON(-1,TLMuteButton::OnClick)
 #endif
@@ -39,7 +40,7 @@ END_EVENT_TABLE()
 
 #ifdef __WXMSW__
 TLMuteButton::TLMuteButton(wxWindow* parent, wxWindowID id,TLTrack* track, const wxString& label, const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name)
-	: wxToggleButton(parent, id, label, pos ,size , style , validator , name)
+	: wxToggleButton(parent, id, label, pos ,size , style|wxNO_FULL_REPAINT_ON_RESIZE , validator , name)
 #else
 TLMuteButton::TLMuteButton(wxWindow* parent, wxWindowID id,TLTrack* track, const wxBitmap& bitmap, const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name)
 	: wxBitmapButton(parent, id, bitmap, pos ,size , style , validator , name)

@@ -32,7 +32,9 @@ enum
 BEGIN_EVENT_TABLE(StatusProgressBar, wxStatusBar)
 	EVT_SIZE(StatusProgressBar::OnSize)
 	EVT_BUTTON(ID_CancelButton, StatusProgressBar::OnCancelButton)
-//	EVT_ERASE_BACKGROUND(StatusProgressBar::OnEraseBackground)
+#ifdef __WXMSW__
+	EVT_ERASE_BACKGROUND(StatusProgressBar::OnEraseBackground)
+#endif
 END_EVENT_TABLE()
 
 
@@ -51,8 +53,16 @@ StatusProgressBar::~StatusProgressBar()
 	if (m_disableListener)
 		delete m_disableListener;
 }
-void StatusProgressBar::OnEraseBackground(wxPaintEvent &event)
-{event.Skip();}
+void StatusProgressBar::OnEraseBackground(wxEraseEvent &event)
+{
+	wxDC *dc=event.GetDC(); /*Evil Hack to remove flicker from wxStatusBar*/
+	int width, height;
+	GetClientSize(&width, &height);
+	dc->SetBrush(wxBrush(GetBackgroundColour(),wxSOLID));
+	dc->SetPen(*wxTRANSPARENT_PEN);
+	dc->DrawRectangle(0,0,width,2);
+//	event.Skip();
+}
 bool StatusProgressBar::Update(int status)
 {
 	m_gauge->SetValue(status);

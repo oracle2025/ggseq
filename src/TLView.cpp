@@ -194,9 +194,10 @@ void TLView::Draw(wxDC& dc/*_screen*/)
 	wxBrush brush1=dc.GetBrush();
 	brush1.SetColour(wxColour(166,166,166));
 	dc.SetBrush(brush1);
-	wxPen pen1=dc.GetPen();
+/*	wxPen pen1=dc.GetPen();
 	pen1.SetColour(wxColour(100,100,100));
-	dc.SetPen(pen1);
+	dc.SetPen(pen1);*/
+	dc.SetPen(wxPen(wxColour(100,100,100),1,wxSOLID));
 	yoffset=m_FrameY;
 	for ( TLTrackList::Node *node = m_TlData->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *track = node->GetData();
@@ -205,7 +206,11 @@ void TLView::Draw(wxDC& dc/*_screen*/)
 	}
 
 //-.-
+#ifndef __WXMSW__
 	dc.DrawIcon(*m_gungirl,m_FrameWidth+m_FrameX-m_gungirl->GetWidth(),m_FrameHeight+m_FrameY-m_gungirl->GetHeight());
+#else
+	dc.DrawIcon(*m_gungirl,m_FrameWidth+m_FrameX-69,m_FrameHeight+m_FrameY-131);
+#endif
 
 	yoffset=m_FrameY;
 	for ( TLTrackList::Node *node = m_TlData->GetFirst(); node; node = node->GetNext() ) {

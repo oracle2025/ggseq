@@ -1,6 +1,15 @@
+2004-01-04  Richard Spindler <oracle2025@gmx.de>
+
+ *  Added ggEvtHandler.cpp .h
+
+2004-01-03  Richard Spindler <oracle2025@gmx.de>
+
+ *  Fixed a Bunch of stuff to improve redrawing on win32
+
 2004-01-02  Richard Spindler <oracle2025@gmx.de>
 
  *  Added a Master Volume Control
+ *  Custom Colours in the Colour Dialog are now saved
 
 2003-12-30  Richard Spindler <oracle2025@gmx.de>
 

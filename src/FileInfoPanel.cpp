@@ -23,6 +23,7 @@
 #endif
 
 #include "FileInfoPanel.h"
+#include "ggEvtHandler.h"
 
 enum
 {
@@ -32,10 +33,16 @@ enum
 
 FileInfoPanel::FileInfoPanel(wxWindow* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN)
 {
+//	m_noBgHandler=new NoBgEvtHandler();
 	InfoPanel(this);
+}
+FileInfoPanel::~FileInfoPanel()
+{
+//	delete m_noBgHandler;
 }
 void FileInfoPanel::SetInfo(const wxString &filename, long frames, long channels, long sampleRate)
 {
+
 	m_fileNameTC->SetValue(filename);
 	wxString ab;
 	ab << frames;
@@ -84,9 +91,12 @@ wxString FileInfoPanel::GenerateLengthString(long frames, long sampleRate)
 wxSizer *FileInfoPanel::InfoPanel( wxWindow *parent, bool call_fit, bool set_sizer)
 {
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
-
+#ifdef __WXMSW__
+    wxBoxSizer *item1 = new wxBoxSizer( wxHORIZONTAL );
+#else
     wxStaticBox *item2 = new wxStaticBox( parent, -1, wxT("") );
     wxStaticBoxSizer *item1 = new wxStaticBoxSizer( item2, wxVERTICAL );
+#endif
 
     wxFlexGridSizer *item3 = new wxFlexGridSizer( 2, 5, 5 );
     item3->AddGrowableCol( 1 );
@@ -124,7 +134,13 @@ wxSizer *FileInfoPanel::InfoPanel( wxWindow *parent, bool call_fit, bool set_siz
     item1->Add( item3, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
     item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxTOP, 5 );
-
+#ifdef __WXMSW__
+    item4->PushEventHandler(new NoBgEvtHandler());
+    item6->PushEventHandler(new NoBgEvtHandler());
+    item8->PushEventHandler(new NoBgEvtHandler());
+    item10->PushEventHandler(new NoBgEvtHandler());
+    item12->PushEventHandler(new NoBgEvtHandler());
+#endif
     if (set_sizer)
     {
         parent->SetAutoLayout( TRUE );

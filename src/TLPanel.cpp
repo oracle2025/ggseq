@@ -31,6 +31,7 @@
 #include <wx/config.h>
 #include <wx/tglbtn.h>
 #include <wx/filename.h>
+#include <wx/dcbuffer.h>
 #include <iostream>
 
 #include "stuff.h"
@@ -71,9 +72,9 @@ BEGIN_EVENT_TABLE(TLPanel, wxPanel)
 	EVT_MOTION(TLPanel::OnMouseMotion)
 	EVT_SIZE(TLPanel::OnSize)
 	EVT_COMMAND_SCROLL_THUMBTRACK(ID_ScrollBar,TLPanel::OnScroll)
-#ifndef __WXMSW__
+//#ifndef __WXMSW__
 	EVT_ERASE_BACKGROUND(TLPanel::OnEraseBackground)
-#endif
+//#endif
 END_EVENT_TABLE()
 
 TLPanel::TLPanel(wxWindow* parent, wxScrollBar *scrollbar, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
@@ -114,7 +115,7 @@ TLPanel::TLPanel(wxWindow* parent, wxScrollBar *scrollbar, wxWindowID id, const 
 		i++;
 	}
 	m_ruler = new Ruler(this,-1,wxPoint(LEFT_OFFSET_TRACKS,2),wxSize(GetSize().GetWidth()-5-LEFT_OFFSET_TRACKS,15),wxRAISED_BORDER);
-	m_ruler->SetSnap((m_TlView->GetSnapValue()/*m_SnapPosition*/*31)/117600);
+	m_ruler->SetSnap((m_TlView->GetSnapValue()/*m_SnapPosition*/ *31)/117600);
 	
 	
 //	m_data->GetTrackCount
@@ -143,14 +144,18 @@ TLPanel::~TLPanel()
 }
 void TLPanel::OnPaint(wxPaintEvent& event)
 {
-	wxPaintDC dc(this);
+//#ifdef __WXMSW__
+	int width, height;
+	GetClientSize(&width, &height);
+	wxBufferedPaintDC dc(this);
+	dc.SetBrush(wxBrush(GetBackgroundColour(),wxSOLID));
+	dc.SetPen(*wxTRANSPARENT_PEN);
+	dc.DrawRectangle(0,0,width,height);
+//#else
+//	wxPaintDC dc(this);
+//#endif
 	m_TlView->Draw(dc);
-//	m_CaretPosition = m_TlView->GetCaretPosition();
 	DrawCaret(dc);
-/*	if (m_DragFrameVisible) {
-		SetRubberframePen(&dc);
-		dc.DrawRectangle(m_DragFrameLastX,m_DragFrameLastY,m_SampleDragItemWidth,25);
-	}*/
 }
 void TLPanel::OnEraseBackground(wxPaintEvent& event)
 {
@@ -158,7 +163,7 @@ void TLPanel::OnEraseBackground(wxPaintEvent& event)
 void TLPanel::OnSize(wxSizeEvent& event)
 {
 #ifdef __WXMSW__
-	m_TlView->SetVisibleFrame(GetSize().GetWidth()-11-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-22-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
+	m_TlView->SetVisibleFrame(GetClientSize().GetWidth()-11-LEFT_OFFSET_TRACKS,GetClientSize().GetHeight()-22-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
 #else
 	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
 #endif

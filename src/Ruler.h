@@ -30,6 +30,7 @@ class Ruler: public wxPanel
 				long style = wxTAB_TRAVERSAL,
 				const wxString& name = wxT("panel"));
 		void OnPaint(wxPaintEvent& event);
+		void OnEraseBackground(wxEraseEvent& event);
 		void SetSnap(long snap);
 		void SetPosition(long position);
 	private:

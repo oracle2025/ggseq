@@ -42,7 +42,9 @@
 #include "DisableListener.h"
 #include "SidePanel.h"
 #include "FileInfoPanel.h"
-
+#ifdef __WXMSW__
+#include "ggEvtHandler.h"
+#endif
 #ifndef _DISABLE_CONFIG_SHORTCUTS_
 	#include "ShortcutsDialog.h"
 #endif
@@ -137,6 +139,7 @@ class TestFrame1: public wxFrame
 		bool m_DraggingFile;
 		wxDragImage *m_dragImage;
 		DECLARE_EVENT_TABLE()
+//		wxEvtHandler *m_noBgHandler;
 };
 
 class DropFiles: public wxFileDropTarget
@@ -184,9 +187,11 @@ BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
 	EVT_COMMAND_SCROLL_THUMBTRACK(ID_MasterVolume, TestFrame1::OnMasterVolume)
 END_EVENT_TABLE()
 
+
 TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& size)
 	:wxFrame((wxFrame *)NULL, -1, title, pos, size,wxDEFAULT_FRAME_STYLE|GG_WINDOW_FLAGS)
 {
+//	m_noBgHandler=new NoBgEvtHandler();
 	MakeToolBar();
 	wxPanel *panel1=new wxPanel(this,-1,wxDefaultPosition,wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN); /*Für richtige Hintergrundfarbe in osx und win32*/
 	wxBoxSizer *panelSizer = new wxBoxSizer( wxHORIZONTAL );
@@ -226,6 +231,7 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	SetSize(size);
 	SetDropTarget (new DropFiles (this));
 }
+
 void TestFrame1::MakeShortcuts()
 {
 	wxAcceleratorEntry entries[8];
@@ -245,11 +251,27 @@ TestFrame1::~TestFrame1()
 	wxConfig config(wxT("ggseq"));
 	config.Write(wxT("MiniFilerDirectory"),m_DirTree->GetPath());
 	delete m_dragImage;
+//	delete m_noBgHandler;
 }
 void TestFrame1::OnA_Test(wxCommandEvent& event)
 {
 	puts("A_Test");
 }
+#ifdef __WXMSW__
+class ttEvtHandler : public wxEvtHandler
+{
+	public:
+		ttEvtHandler() :wxEvtHandler(){}
+		void OnEraseBackground(wxEraseEvent& event){}
+		void OnScrollBarGetFocus(wxFocusEvent& event){}
+	private:
+		DECLARE_EVENT_TABLE()
+};
+BEGIN_EVENT_TABLE(ttEvtHandler, wxEvtHandler)
+	EVT_SET_FOCUS(ttEvtHandler::OnScrollBarGetFocus)
+	EVT_ERASE_BACKGROUND(ttEvtHandler::OnEraseBackground)
+END_EVENT_TABLE()
+#endif
 void TestFrame1::MakeMainWindow(wxWindow *parent)
 {
 	wxSplitterWindow* SplitView = new wxSplitterWindow(parent,-1,wxDefaultPosition,wxDefaultSize,wxSP_LIVE_UPDATE|wxSP_NOBORDER|wxNO_FULL_REPAINT_ON_RESIZE/*|wxSP_3DSASH| wxSP_FULLSASH*/);
@@ -272,6 +294,11 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 
 	wxBoxSizer * tlPanelSizer = new wxBoxSizer(wxVERTICAL);
 	wxScrollBar *sb = new wxScrollBar(panel1,ID_ScrollBar);
+#ifdef __WXMSW__
+	sb->SetSize(0,0,10,wxSystemSettings::GetMetric(wxSYS_HTHUMB_X));
+	sb->PushEventHandler(new NoBgEvtHandler());
+	sb->PushEventHandler(new ttEvtHandler());
+#endif
 	m_tp = new TLPanel(panel1,sb);
 	m_tp->Fit();
 	
@@ -326,7 +353,10 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 	
 	
 	m_DirTree = NULL;
-	m_DirTree = new wxGenericDirCtrl(SplitView,ID_DirTree,wxDirDialogDefaultFolderStr,wxDefaultPosition,wxDefaultSize,wxDIRCTRL_DIR_ONLY|wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
+	m_DirTree = new wxGenericDirCtrl(SplitView,ID_DirTree,wxDirDialogDefaultFolderStr,wxDefaultPosition,wxDefaultSize,wxDIRCTRL_DIR_ONLY|wxNO_FULL_REPAINT_ON_RESIZE|wxSUNKEN_BORDER/*|wxCLIP_CHILDREN*/);
+#ifdef __WXMSW__
+	m_DirTree->PushEventHandler(new NoBgEvtHandler());
+#endif
 	wxConfig config(wxT("ggseq"));
 	m_DirTree->SetPath(config.Read(wxT("MiniFilerDirectory"), wxT("/")));
 
@@ -587,7 +617,7 @@ bool DropFiles::OnDropFiles (wxCoord x, wxCoord y, const wxArrayString& filename
     for (size_t n = 0; n < filenames.Count(); n++) {
         if (wxFileName(filenames[n]).IsDir()) {
             wxMessageBox (_("It is currently not allowed to drop \n"
-                            "directories onto the editor!"),
+                            "directories onto Gungirl Sequencer!"),
                           _("Error"), wxOK | wxICON_EXCLAMATION);
             return FALSE;
         }

@@ -35,6 +35,7 @@ class TLMuteButton : public wxBitmapButton
 		void OnClick(wxCommandEvent &event);
 #endif
 		void SetMute(bool mute);
+		void OnEraseBackground(wxEraseEvent &event) {}
 	private:
 		TLTrack *m_track;
 		bool m_mute;

@@ -20,11 +20,15 @@
 #ifndef WX_PRECOMP
     #include "wx/wx.h"
 #endif
+#include <wx/dcbuffer.h>
 
 #include "Ruler.h"
 
 BEGIN_EVENT_TABLE(Ruler, wxPanel)
 	EVT_PAINT(Ruler::OnPaint)
+#ifdef __WXMSW__
+	EVT_ERASE_BACKGROUND(Ruler::OnEraseBackground)
+#endif
 END_EVENT_TABLE()
 
 Ruler::Ruler(wxWindow* parent,
@@ -33,14 +37,23 @@ Ruler::Ruler(wxWindow* parent,
 		const wxSize& size,
 		long style,
 		const wxString& name)
-	:wxPanel(parent, id, pos, size, style|wxSUNKEN_BORDER , name)
+	:wxPanel(parent, id, pos, size, style/*|wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE*/ , name)
 {
 	m_snap=1;
 	m_position=1;
 }
 void Ruler::OnPaint(wxPaintEvent& event)
 {
+#ifdef __WXMSW__
+	wxBufferedPaintDC dc(this);
+	dc.SetBrush(wxBrush(GetBackgroundColour(),wxSOLID));
+	dc.SetPen(*wxTRANSPARENT_PEN);
+	int width, height;
+	GetClientSize(&width, &height);
+	dc.DrawRectangle(0,0,width,height);
+#else
 	wxPaintDC dc(this);
+#endif
 	long index= m_position/m_snap;
 	long offs=m_position%m_snap;
 	wxString index_str;
@@ -58,7 +71,11 @@ void Ruler::SetSnap(long snap)
 void Ruler::SetPosition(long position)
 {
 	m_position=position;
+	Refresh();
 }
-
+void Ruler::OnEraseBackground(wxEraseEvent& event)
+{
+//	event.Skip();
+}
 
 

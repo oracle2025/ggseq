@@ -25,6 +25,9 @@
 #include "SoundManager.h"
 #include "MiniPlayer.h"
 #include "TLSample.h"
+#ifdef __WXMSW__
+#include "ggEvtHandler.h"
+#endif
 #include "FileInfoPanel.h"
 #include <iostream>
 
@@ -43,13 +46,13 @@ BEGIN_EVENT_TABLE(MiniPlayer, wxPanel)
 	EVT_TIMER(-1,MiniPlayer::OnTimer)
 END_EVENT_TABLE()
 
-MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListener *updateListener, FileInfoListener *fiListener,
+MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListener *updateListener, FileInfoListener *fiListener/*,
 		wxWindowID id,
 		const wxPoint& pos,
 		const wxSize& size,
 		long style,
-		const wxString& name)
-		:wxPanel(parent, id, pos, size, style|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN , name)
+		const wxString& name*/)
+		:wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN)
 {
 	MakeMiniPlayerWindow(this);
 	m_soundManager=soundManager;
@@ -58,35 +61,37 @@ MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListe
 	m_fileInfoListener = fiListener;
 	m_sample=NULL;
 	m_length=100;
+//	m_noBgHandler=new NoBgEvtHandler();
 }
-
-/*class tmpEventHandler : public wxEvtHandler
+MiniPlayer::~MiniPlayer()
 {
-	public:
-		tmpEventHandler() :wxEvtHandler(){}
-		void OnEraseBackground(wxPaintEvent& event){}
-	private:
-		DECLARE_EVENT_TABLE()
-};
-BEGIN_EVENT_TABLE(tmpEventHandler, wxEvtHandler)
-	EVT_ERASE_BACKGROUND(tmpEventHandler::OnEraseBackground)
-	EVT_CUSTOM(wxEVT_PAINT,ID_StaticBox,tmpEventHandler::OnEraseBackground)
-END_EVENT_TABLE()*/
+//	delete m_noBgHandler;
+}
+	
 void MiniPlayer::MakeMiniPlayerWindow(wxWindow *parent)
 {
 	wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
+#ifdef __WXMSW__
+	wxBoxSizer *item1 = new wxBoxSizer( wxHORIZONTAL );
+#else
 	wxStaticBox *item2 = new wxStaticBox( parent, ID_StaticBox, wxT("") ,wxDefaultPosition, wxDefaultSize, wxNO_FULL_REPAINT_ON_RESIZE);
-//	item2->PushEventHandler(new tmpEventHandler());
-	
 	wxStaticBoxSizer *item1 = new wxStaticBoxSizer( item2, wxHORIZONTAL );
+#endif
 	wxStaticText *item3 = new wxStaticText( parent, -1, wxT("Miniplayer"), wxDefaultPosition, wxDefaultSize, 0 );
+#ifdef __WXMSW__
+	item3->PushEventHandler(new NoBgEvtHandler());
+#endif
 	item1->Add( item3, 0, wxALIGN_CENTRE|wxLEFT|wxRIGHT, 5 );
 
 	m_playButton = new wxBitmapButton( parent,ID_Play , wxBitmap(play_12_xpm), wxDefaultPosition, wxSize(20,20) );
 	item1->Add( m_playButton, 0, wxALIGN_CENTRE|wxRIGHT, 5 );
 
 	m_stopButton = new wxBitmapButton( parent, ID_Stop, wxBitmap(stop_12_xpm), wxDefaultPosition, wxSize(20,20) );
+#ifdef __WXMSW__
+	m_playButton->PushEventHandler(new NoBgEvtHandler());
+	m_stopButton->PushEventHandler(new NoBgEvtHandler());
+#endif
 	item1->Add( m_stopButton, 0, wxALIGN_CENTRE|wxRIGHT, 5 );
 	m_stopButton->Enable(false);
 

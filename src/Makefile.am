@@ -49,6 +49,8 @@ ggseq_SOURCES = MiniFilerTest.cpp\
 		SidePanel.h\
 		FileInfoPanel.cpp\
 		FileInfoPanel.h\
+		ggEvtHandler.h\
+		ggEvtHandler.cpp\
                 SoundManager.h\
                 tinystr.h\
                 tinyxml.h\
