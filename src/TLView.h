@@ -92,7 +92,7 @@ class TLView
 		void DrawItem(wxDC& dc, TLItem* item, long left, long delta_left, long top, long width, long height);
 		TLData *m_TlData;
 		TLSelectionSet *m_selectionSet;
-		gg_tl_dat m_PositionVisible; // TODO: muss weg
+		gg_tl_dat m_PositionVisible; // TODO: muss weg ? warum? achso, darum (siehe eine Zeile weiter unten)
 		long m_YscrollPosition;
 		bool m_SnapSuspended;
 		long m_TrackDrawDist;
