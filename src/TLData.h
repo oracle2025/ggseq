@@ -52,6 +52,7 @@ class TLData
 		bool IsBlocked();
 
 		unsigned int FillBuffer(float* outBuffer, unsigned int count);
+		unsigned int FillLoopBuffer(float* outBuffer, unsigned int count);
 		void SetPlaybackPosition(gg_tl_dat Position);
 		gg_tl_dat GetPlaybackPosition();
 		gg_tl_dat GetLength();
@@ -71,7 +72,10 @@ class TLData
 		void SetSnapValue(long snapValue);
 		long GetSnapValue();
 		void SetMasterVolume(float volume);
+		gg_tl_dat m_position;/*Wird während des Abspielens inkrementiert*/
 	private:
+		gg_tl_dat m_loopPos1;
+		gg_tl_dat m_loopPos2;
 		long m_snapValue;
 		unsigned int MixChannels(float *A, float *B, float* out, unsigned int count);
 		bool printXML(wxString filename);
@@ -83,7 +87,6 @@ class TLData
 		bool m_changed;
 		bool m_blocked;
 		gg_tl_dat m_playbackPosition;
-		gg_tl_dat m_position;/*Wird während des Abspielens inkrementiert*/
 		gg_tl_dat m_length;
 		float m_masterVolume;
 		UpdateListener *m_updateListener;

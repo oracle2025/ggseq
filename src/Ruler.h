@@ -32,10 +32,16 @@ class Ruler: public wxPanel
 		void OnPaint(wxPaintEvent& event);
 		void OnEraseBackground(wxEraseEvent& event);
 		void SetSnap(long snap);
-		void SetPosition(long position);
+		void SetPosition(gg_tl_dat position);
+		void OnLeftDown(wxMouseEvent& event);
+		void OnLeftUp(wxMouseEvent& event);
+		void OnMouseMotion(wxMouseEvent& event);
+		void GetLoop(int* pos1, int* pos2);
 	private:
 		long m_snap;
-		long m_position;
+		gg_tl_dat m_position;
+		long m_pos1;
+		long m_pos2;
 		DECLARE_EVENT_TABLE()
 };
 #endif /* _RULER_H_ */

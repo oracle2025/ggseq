@@ -93,7 +93,7 @@ void SoundManager::Play()
 }
 unsigned int SoundManager::FillBuffer_TL(float* outBuffer, unsigned int count)
 {
-	int written_samples=m_data->FillBuffer(outBuffer,count);
+	int written_samples=m_data->FillLoopBuffer(outBuffer,count);
 	m_position+=written_samples;
 	return written_samples;
 }
@@ -192,7 +192,12 @@ void SoundManager::StopStream()
 	return;
 }
 
-gg_tl_dat SoundManager::GetPosition() { return m_position; }
+gg_tl_dat SoundManager::GetPosition()
+{
+	if (m_tlPlaying)
+		return m_data->m_position;
+	return m_position;
+} /*TODO beim TL-Data die Position aus data auslesen*/
 bool SoundManager::Done()
 {
 	if (!m_tlPlaying && !m_samplePlaying)

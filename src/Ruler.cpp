@@ -22,6 +22,7 @@
 #endif
 #include <wx/dcbuffer.h>
 
+#include "stuff.h"
 #include "Ruler.h"
 
 BEGIN_EVENT_TABLE(Ruler, wxPanel)
@@ -29,6 +30,9 @@ BEGIN_EVENT_TABLE(Ruler, wxPanel)
 #ifdef __WXMSW__
 	EVT_ERASE_BACKGROUND(Ruler::OnEraseBackground)
 #endif
+	EVT_LEFT_DOWN(Ruler::OnLeftDown)
+	EVT_LEFT_UP(Ruler::OnLeftUp)
+	EVT_MOTION(Ruler::OnMouseMotion)
 END_EVENT_TABLE()
 
 Ruler::Ruler(wxWindow* parent,
@@ -41,9 +45,13 @@ Ruler::Ruler(wxWindow* parent,
 {
 	m_snap=1;
 	m_position=1;
+	m_pos1=0;
+	m_pos2=0;
 }
 void Ruler::OnPaint(wxPaintEvent& event)
 {
+	int width, height;
+	GetClientSize(&width, &height);
 #ifdef __WXMSW__
 	wxBufferedPaintDC dc(this);
 	dc.SetBrush(wxBrush(GetBackgroundColour(),wxSOLID));
@@ -54,6 +62,11 @@ void Ruler::OnPaint(wxPaintEvent& event)
 #else
 	wxPaintDC dc(this);
 #endif
+	if(m_pos1<m_pos2) {
+		dc.SetBrush(*wxBLUE_BRUSH);
+		dc.SetPen(*wxTRANSPARENT_PEN);
+		dc.DrawRectangle(m_pos1-m_position, 0, m_pos2-m_pos1, height);
+	}
 	long index= m_position/m_snap;
 	long offs=m_position%m_snap;
 	wxString index_str;
@@ -65,11 +78,33 @@ void Ruler::OnPaint(wxPaintEvent& event)
 		index++;
 	}
 }
+void Ruler::OnLeftDown(wxMouseEvent& event)
+{
+	m_pos1=event.GetX()+m_position;
+}
+void Ruler::GetLoop(int* pos1, int* pos2)
+{
+	*pos1=m_pos1;
+	*pos2=m_pos2;
+}
+void Ruler::OnLeftUp(wxMouseEvent& event)
+{
+	m_pos2=event.GetX()+m_position;
+	Refresh();
+}
+void Ruler::OnMouseMotion(wxMouseEvent& event)
+{
+	if (!event.LeftIsDown())
+		return;
+	m_pos2=event.GetX()+m_position;
+	Refresh();
+	
+}
 void Ruler::SetSnap(long snap)
 {
 	m_snap=snap;
 }
-void Ruler::SetPosition(long position)
+void Ruler::SetPosition(gg_tl_dat position)
 {
 	m_position=position;
 	Refresh();

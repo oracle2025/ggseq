@@ -332,6 +332,16 @@ gg_tl_dat TLData::GetPlaybackPosition()
 {
 	return m_playbackPosition;
 }
+unsigned int TLData::FillLoopBuffer(float* outBuffer, unsigned int count)
+{
+	unsigned int result = FillBuffer(outBuffer, count);
+	if (result<count) {
+		m_position=m_playbackPosition;
+		ResetOffsets();
+		FillBuffer(outBuffer+result, count-result);
+	}
+	return count;
+}
 unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 {
 	float buffer1[count];
@@ -374,6 +384,7 @@ unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 		outBuffer[i]=outBuffer[i]*m_masterVolume;
 	}
 	m_position+=maxResultCount;
+	
 	return maxResultCount;
 }
 unsigned int TLData::MixChannels(float *A, float *B, float* out, unsigned int count)/*Mix function for (-1)-(1) float audio*/
