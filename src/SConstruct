@@ -1,0 +1,68 @@
+env = Environment(CC = 'gcc')
+
+list = Split("""BigScrollBar.cpp
+	colour_helper.cpp
+	dial.cpp
+	DisableListener.cpp
+	EnvelopeDragHandler.cpp
+	FileInfoPanel.cpp
+	ggEvtHandler.cpp
+	ggseq_ui.cpp
+	ggseq_ui_wdr.cpp
+	GgseqDocManager.cpp
+	GgseqGlobalProps.cpp
+	ImportPackDialog.cpp
+	MiniFilerTest.cpp
+	MiniPlayer.cpp
+	MouseDragHandler.cpp
+	PlayerInterface.cpp
+	PreferencesDialog.cpp
+	RubberDragHandler.cpp
+	Ruler.cpp
+	SampleEdit.cpp
+	SelectionDragHandler.cpp
+	ShortcutsDialog.cpp
+	SidePanel.cpp
+	SoundManager.cpp
+	StatusProgressBar.cpp
+	tinystr.cpp
+	tinyxml.cpp
+	tinyxmlerror.cpp
+	tinyxmlparser.cpp
+	TLColourManager.cpp
+	TLData.cpp
+	TLItem.cpp
+	TLLoadSaveManager.cpp
+	TLMiniFiler2.cpp
+	TLMuteButton.cpp
+	TLPanel.cpp
+	TLSample.cpp
+	TLSampleManager.cpp
+	TLSelectColourDialog.cpp
+	TLSelectionSet.cpp
+	TLSetSnapDialog.cpp
+	TLTrack.cpp
+	TLTrackVolumeDial.cpp
+	TLView.cpp
+	TLXmlLoader2.cpp
+	TrimmerDialog.cpp
+	ui_helper.cpp
+	UpdateListener.cpp
+	WaveEditor.cpp""")
+                       
+env.Program('ggseq', list, LIBS=['wx', 'libsndfile'], LIBPATH=['.'] )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
