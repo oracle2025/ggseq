@@ -61,7 +61,7 @@
 #include "dndfile.xpm"
 #include "snap.xpm"
 #include "ggseq_32.xpm"
-//#include "prefs_misc.xpm"
+#include "prefs_misc.xpm"
 
 
 enum
@@ -465,7 +465,8 @@ void TestFrame1::MakeToolBar()
 	m_toolBar->AddSeparator();
 	m_toolBar->AddTool(ID_SetColours,wxT("Setup Colours..."),wxBitmap(colours2_xpm),wxT("Setup Colours..."));
 	m_toolBar->AddTool(ID_SetSnap,wxT("Set Snap Width"),wxBitmap(snap_xpm),wxT("Set Snap Width"));
-//	m_toolBar->AddTool(ID_Preferences,wxT("Preferences"),wxBitmap(prefs_misc_xpm),wxT("Preferences"));
+	//m_toolBar->AddTool(ID_Preferences,wxT("Preferences"),wxBitmap(prefs_misc_xpm),wxT("Preferences"));
+	m_toolBar->AddTool(ID_Preferences,wxT("Load last Project on Startup"),wxBitmap(prefs_misc_xpm),wxT("Load last Project on Startup"),wxITEM_CHECK);
 	m_toolBar->Realize();
 	m_toolBar->EnableTool(ID_STOP,false);
 	this->SetToolBar(m_toolBar);

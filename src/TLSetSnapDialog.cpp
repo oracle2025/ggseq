@@ -313,7 +313,7 @@ wxSizer *MyDialogFunc( TLSetSnapDialog *parent, bool call_fit, bool set_sizer )
 */
     item2->Add( item10, 1, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    item0->Add( item2, 1, wxGROW|wxALIGN_CENTRE|wxLEFT|wxRIGHT, 5 );
+    item0->Add( item2, 1, wxGROW|wxALIGN_CENTRE|wxLEFT|wxRIGHT|wxBOTTOM, 5 );
 
     wxStaticLine *item15 = new wxStaticLine( parent, ID_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL );
     item0->Add( item15, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
@@ -325,11 +325,11 @@ wxSizer *MyDialogFunc( TLSetSnapDialog *parent, bool call_fit, bool set_sizer )
     wxButton *item18 = new wxButton( parent, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
     item18->SetDefault();
 #ifdef __WXMSW__ 
-    item16->Add( item18, 0, wxALIGN_RIGHT|wxRIGHT, 5 );
-    item16->Add( item17 );
+    item16->Add( item18, 0, wxALIGN_RIGHT|wxRIGHT|wxTOP, 5 );
+    item16->Add( item17, 0, wxTOP, 5 );
 #else
-    item16->Add( item17, 0, wxALIGN_RIGHT|wxRIGHT, 5 );
-    item16->Add( item18);
+    item16->Add( item17, 0, wxALIGN_RIGHT|wxRIGHT|wxTOP, 5 );
+    item16->Add( item18, 0, wxTOP, 5 );
 #endif
     item0->Add( item16, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5 );
 
