@@ -34,6 +34,10 @@
 
 #define PI 3.1415926535897931
 
+//DEFINE_EVENT_TYPE(wxEVT_MF_ACTIVATE_COMMAND)
+/*   wxCommandEvent eventCustom(wxEVT_MY_CUSTOM_COMMAND);
+
+    wxPostEvent(this, eventCustom);*/
 
 class wxDialTip : public wxPopupWindow
 {
@@ -90,6 +94,7 @@ bool wxDial::Create(wxWindow* parent,
 	m_leftStuck = false;
 	m_rightStuck = false;
 	m_dialTip=new wxDialTip(this);
+	SetValue(m_Value);
 	return RetVal;
 }
 
@@ -183,6 +188,10 @@ void wxDial::TipEventMotion(wxPoint point)
 	SetValueFromAngle(m_Angle);
 	DrawDialTip();
 	Refresh(0);
+	
+	wxScrollEvent scrEvent(wxEVT_SCROLL_THUMBTRACK,0,m_Value);
+	wxPostEvent(this,scrEvent);
+	
 }
 void wxDial::TipEventLeftUp(wxPoint point)
 {
@@ -196,6 +205,7 @@ void wxDial::OnMouseDown(wxMouseEvent& event)
 	m_dialTip->SetSize(pos.x,pos.y+GetSize().GetHeight(),40,15);
 	m_dialTip->Show();
 	m_dialTip->CaptureMouse();
+	DrawDialTip();
 }
 void wxDial::DrawDialTip() /*die events motion und left-up mussen verfolgt werden*/
 {

@@ -190,7 +190,9 @@ void TLData::loadXML(wxString filename)
 */
 	Clear();
 	TLXMLLoader2 loader(this,m_sampleManager);
+	m_filename=filename;
 	loader.LoadFile(filename);
+	m_changed=false;
 
 }
 void TLData::Clear()
@@ -210,6 +212,7 @@ void TLData::printXML(wxString filename)
 	doc.LinkEndChild(dec);
 	TiXmlElement *el = new TiXmlElement("song");
 	doc.LinkEndChild(el);
+	el->SetAttribute("version","0.1");
 
 	TiXmlElement *samples = new TiXmlElement("samples");
 	el->LinkEndChild(samples);
@@ -237,7 +240,7 @@ bool TLData::UnsavedChanges()
 }
 wxString TLData::GetFilename()
 {
-	puts("dd");
+//	puts("dd");
 	puts(m_filename.mb_str());
 	return m_filename;
 }
@@ -370,3 +373,29 @@ TLColourManager *TLData::GetColourManager()
 {
 	return m_sampleManager->GetColourManager();
 }
+void TLData::SetTrackMute(bool mute, int TrackNr)
+{
+	TLTrackList::Node *node =  m_trackList.Item(TrackNr);
+	if (!node)
+		return;
+	TLTrack *tlTrack = node->GetData();
+	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::AddItem!" );
+	if (!tlTrack)
+		return;
+	m_changed=true;
+	tlTrack->SetMute(mute);
+
+}
+void TLData::SetTrackVolume(double vol, int TrackNr)
+{
+	TLTrackList::Node *node =  m_trackList.Item(TrackNr);
+	if (!node)
+		return;
+	TLTrack *tlTrack = node->GetData();
+	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::AddItem!" );
+	if (!tlTrack)
+		return;
+	m_changed=true;
+	tlTrack->SetVolume(vol);
+}
+

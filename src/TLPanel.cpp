@@ -43,6 +43,8 @@
 #include "TLMuteButton.h"
 #include "mute_off.xpm"
 #include "dial.h"
+#include "TLTrackVolumeDial.h"
+#include "TLTrack.h"
 
 #define LEFT_OFFSET_TRACKS 52
 
@@ -95,10 +97,12 @@ TLPanel::TLPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSi
 	int i=0;
 	for ( TLTrackList::Node *node = m_data->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
-		/*TLMuteButton *button =*/ new TLMuteButton( this, -1,current,mute_off_xpm, wxPoint(5,5+i*30),wxSize(25,25));
+		/*TLMuteButton *button =*/m_buttons[i] = new TLMuteButton( this, -1,current,mute_off_xpm, wxPoint(5,5+i*30),wxSize(25,25));
+		m_dials[i] = new TLTrackVolumeDial(this, -1, current,wxPoint(31,5+i*30),wxSize(25,25));
 		i++;
 	}
-	new wxDial(this, -1, 0, 0, 100,wxPoint(31,5),wxSize(25,25));
+
+	
 //	m_data->GetTrackCount
 
 //	m_scrollBar->SetSize(0,GetSize().GetHeight()-20,GetSize().GetWidth(),20);
@@ -546,6 +550,7 @@ bool TLPanel::Load()
 	m_loadSaveManager->Load();
 	Refresh();
 	ResetScrollBar();
+	UpdateButtons();
 	return true;
 }
 bool TLPanel::SaveAs()
@@ -711,5 +716,17 @@ void TLPanel::DropFileAt(int x, int y, wxString filename)
 #else
 	Refresh(false);
 #endif
+
+}
+
+void TLPanel::UpdateButtons()
+{
+	int i=0;
+	for ( TLTrackList::Node *node = m_data->GetFirst(); node; node = node->GetNext() ) {
+		TLTrack *current = node->GetData();
+		m_buttons[i]->SetMute(current->IsMuted());
+		m_dials[i]->SetValue((int)(current->GetVolume()*100));
+		i++;
+	}
 
 }

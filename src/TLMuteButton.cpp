@@ -57,4 +57,20 @@ void TLMuteButton::OnClick(wxCommandEvent &event)
 	}
 }
 
+void TLMuteButton::SetMute(bool mute)
+{
+	m_mute=mute;
+	m_track->SetMute(m_mute);
+	if(m_mute) {
+		wxBitmap bmp(mute_on_xpm);
+		SetBitmapLabel(bmp);
+		SetBitmapFocus(bmp);
+		SetBitmapSelected(bmp);
+	} else {
+		wxBitmap bmp(mute_off_xpm);
+		SetBitmapLabel(bmp);
+		SetBitmapFocus(bmp);
+		SetBitmapSelected(bmp);
+	}
 
+}

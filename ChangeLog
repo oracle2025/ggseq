@@ -1,3 +1,9 @@
+2003-11-09  Richard Spindler <oracle2025@gmx.de>
+
+ *  added TLTrackVolumeDial.h .cpp
+ *  implemented Volume control for individual Tracks
+ *  implemented saving of Volume and Mute State
+
 2003-11-07  Richard Spindler  <oracle2025@gmx.de>
 
  *  added dial.cpp .h

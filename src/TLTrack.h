@@ -45,6 +45,8 @@ class TLTrack
 		void Clear();
 		void SortItems();
 		void SetMute(bool mute=TRUE);
+		void SetVolume(double vol);
+		double GetVolume();
 		bool IsMuted();
 		void addXmlData(TiXmlElement *tracks);
 	private:
@@ -53,6 +55,7 @@ class TLTrack
 		int m_trackNr;
 		int m_pos;
 		bool m_mute;
+		double m_volume;
 		TLItemList::Node *m_currentNode;
 };
 

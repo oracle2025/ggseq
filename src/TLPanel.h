@@ -31,6 +31,8 @@ class wxDragImage;
 #endif
 class TLView;
 class TLItem;
+class TLMuteButton;
+class TLTrackVolumeDial;
 
 class TLPanel : public wxPanel
 {
@@ -95,6 +97,8 @@ class TLPanel : public wxPanel
 #else
 		wxDragImage *m_dragImage;
 #endif
+		TLMuteButton *m_buttons[8];
+		TLTrackVolumeDial *m_dials[8];
 		bool m_sampleDrag;
 		bool m_rubberDrag;
 		bool m_selectionDrag;
@@ -115,6 +119,7 @@ class TLPanel : public wxPanel
 		bool m_frameVisible;
 		void ShowFrame(wxRect& rect, wxDC* dc);
 		void HideFrame(wxRect& rect, wxDC* dc);
+		void UpdateButtons();
 
 		int m_CaretPosition;
 		bool m_CaretVisible;

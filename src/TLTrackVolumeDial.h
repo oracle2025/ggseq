@@ -1,4 +1,4 @@
-/* TLMuteButton.h
+/* TLTrackVolumeDial.h
  *
  *  Copyright (C) 2003 Richard Spindler <oracle2025@gmx.de>
  *
@@ -16,21 +16,25 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
-#ifndef _TL_MUTE_BUTTON_H_
-#define _TL_MUTE_BUTTON_H_
 
-class TLMuteButton : public wxBitmapButton
+#ifndef _TL_TRACK_VOLUME_DIAL_H_
+#define _TL_TRACK_VOLUME_DIAL_H_
+class wxDial;
+
+class TLTrackVolumeDial : public wxDial
 {
 	public:
-		TLMuteButton(wxWindow* parent, wxWindowID id,TLTrack* track, const wxBitmap& bitmap, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxBU_AUTODRAW, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxT("button"));
-		void OnClick(wxCommandEvent &event);
-		void SetMute(bool mute);
+		TLTrackVolumeDial(wxWindow* parent,
+			wxWindowID id, TLTrack* track,
+			const wxPoint& pos = wxDefaultPosition,
+			const wxSize& size = wxDefaultSize,
+			long style = 0,
+			const wxString& name = wxT("dial"));
+		void OnScroll(wxScrollEvent &event);
 	private:
 		TLTrack *m_track;
-		bool m_mute;
 		DECLARE_EVENT_TABLE()
 };
 
+#endif /*_TL_TRACK_VOLUME_DIAL_H_*/
 
-#endif /*_TL_MUTE_BUTTON_H_*/

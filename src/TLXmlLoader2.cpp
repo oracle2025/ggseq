@@ -109,6 +109,17 @@ void TLXMLLoader2::LoadFile(wxString filename)
 	while (element) {
 		int id;
 		int pos;
+		int mute;
+		int volume;
+		/*Volume und Mute einlesen*/
+		if (element->Attribute("mute",&mute)!=NULL) {
+			m_data->SetTrackMute(mute,trackNr);
+		}
+		if (element->Attribute("volume",&volume)!=NULL) {
+			m_data->SetTrackVolume(((double)volume)/100.0,trackNr);
+		}
+
+		
 		node = element->FirstChild("item");
 		if (node!=NULL) {
 			TiXmlElement *element_item = node->ToElement();

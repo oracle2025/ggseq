@@ -41,6 +41,8 @@ class TLData
 		TLItem *ItemAtPos(int Position, int TrackNr);
 		void SetItemPosition(TLItem *item,int Position);
 		void DeleteItem(TLItem *item, int TrackNr);
+		void SetTrackMute(bool mute, int TrackNr);
+		void SetTrackVolume(double vol, int TrackNr);
 
 		void SortAll();
 		void Clear();

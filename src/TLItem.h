@@ -26,7 +26,7 @@ class TLItem
 	public:
 		TLItem(TLSample *sample, int trackNr,int position/* = 0*/);
 		~TLItem();
-		int FillBuffer(float* outBuffer, int pos, int count, bool mute);
+		int FillBuffer(float* outBuffer, int pos, int count, bool mute, double volume);
 		int GetLength();
 		const int GetPosition();
 		int GetTrack();

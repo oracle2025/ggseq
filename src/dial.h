@@ -19,6 +19,20 @@
  
 #ifndef _DIAL_H_
 #define _DIAL_H_
+
+/*BEGIN_DECLARE_EVENT_TYPES()
+    DECLARE_EVENT_TYPE(wxEVT_MF_ACTIVATE_COMMAND, 7781)
+END_DECLARE_EVENT_TYPES()
+
+#define EVT_MF_ACTIVATE_COMMAND(id, fn) \
+    DECLARE_EVENT_TABLE_ENTRY( \
+        wxEVT_MF_ACTIVATE_COMMAND, id, -1, \
+        (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&fn, \
+        (wxObject *) NULL \
+    ),
+*/
+
+
 class wxDialTip;
 
 class wxDial : public wxControl

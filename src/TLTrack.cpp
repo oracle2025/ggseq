@@ -38,6 +38,7 @@ TLTrack::TLTrack(int trackNr)
 	m_pos=0;
 	m_trackNr=trackNr;
 	m_itemList.DeleteContents(true);
+	m_volume=1.0;
 }
 TLTrack::~TLTrack()
 {
@@ -101,7 +102,7 @@ unsigned int TLTrack::FillBuffer(float* outBuffer, unsigned int count)
 	unsigned int emptyItems=0;
 	float* incBuffer=outBuffer;
 	while(written<count && m_currentNode) {
-		inc=m_currentNode->GetData()->FillBuffer(incBuffer,m_pos+written,count-written, m_mute);
+		inc=m_currentNode->GetData()->FillBuffer(incBuffer,m_pos+written,count-written, m_mute,m_volume);
 		written+=inc;
 		incBuffer+=inc;
 		if (written<count) {
@@ -123,6 +124,8 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 {
 	TiXmlElement *track = new TiXmlElement("track");
 	tracks->LinkEndChild(track);
+	track->SetAttribute("mute",m_mute);
+	track->SetAttribute("volume",(int)(m_volume*100));
 	for ( TLItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		TLItem *current = node->GetData();
 		wxString tmp;
@@ -156,3 +159,12 @@ bool TLTrack::IsMuted()
 {
 	return m_mute;
 }
+void TLTrack::SetVolume(double vol)
+{
+	m_volume=vol;
+}
+double TLTrack::GetVolume()
+{
+	return m_volume;
+}
+

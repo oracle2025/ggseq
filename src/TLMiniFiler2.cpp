@@ -34,7 +34,6 @@
 #include "TLMiniFiler2.h"
 
 //DEFINE_EVENT_TYPE(wxEVT_MF_ACTIVATE_COMMAND)
-
 FileList::FileList(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
 	:wxListCtrl(parent,id,pos,size,style|wxSUNKEN_BORDER)
 {}
