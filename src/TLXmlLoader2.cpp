@@ -176,19 +176,84 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 		if (node!=NULL) {
 			TiXmlElement *element_item = node->ToElement();
 			while (element_item) {
+				ItemEssentials e;
+/*				e.position       = pos;
+				e.toggleEnvelope = ;
+				e.referenceId    = 0;
+				e.nativeEnvData  = ;
+				e.timestretch    = ;
+				e.leftTrim       = ;
+				e.rightTrim      = ;
+				e.filename       = ;
+				e.trackId        = trackNr;*/
+				int tmp;
+				if ( element_item->Attribute("envelope",&tmp)==NULL ) {
+					Error(filename);
+					return;
+				}
+				e.toggleEnvelope = tmp;
+				strncpy(buffer,element_item->Attribute("leftTrim"),sizeof(buffer));
+				if (buffer==NULL) { //TODO: Da ist doch was im Argen
+					Error(filename);
+					return;
+				}
+				e.leftTrim = strtoll(buffer,NULL,10);
+				strncpy(buffer,element_item->Attribute("rightTrim"),sizeof(buffer));
+				if (buffer==NULL) { //TODO: Da ist doch was im Argen
+					Error(filename);
+					return;
+				}
+				e.rightTrim = strtoll(buffer,NULL,10);
+				double tmp2;
+				if ( element_item->Attribute( "leftFadeLevel", &tmp2 ) == NULL ) {
+					Error(filename);
+					return;
+				}
+				e.nativeEnvData.leftFadeLevel = tmp2;
+				if ( element_item->Attribute( "leftFadePos", &tmp2 ) == NULL ) {
+					Error(filename);
+					return;
+				}
+				e.nativeEnvData.leftFadePos = tmp2;
+				if ( element_item->Attribute( "middleLevel", &tmp2 ) == NULL ) {
+					Error(filename);
+					return;
+				}
+				e.nativeEnvData.middleLevel = tmp2;
+				if ( element_item->Attribute( "rightFadeLevel", &tmp2 ) == NULL ) {
+					Error(filename);
+					return;
+				}
+				e.nativeEnvData.rightFadeLevel = tmp2;
+				if ( element_item->Attribute( "rightFadePos", &tmp2 ) == NULL ) {
+					Error(filename);
+					return;
+				}
+				e.nativeEnvData.rightFadePos = tmp2;
+				if ( element_item->Attribute( "timestretch", &tmp2 ) == NULL ) {
+					Error(filename);
+					return;
+				}
+				e.timestretch = tmp2;
+				
+				
 				if (element_item->Attribute("sample",&id)==NULL) {
 					Error(filename);
 					return;
 				}
 				strncpy(buffer,element_item->Attribute("pos"),sizeof(buffer));
-				if (buffer==NULL) {
+				if (buffer==NULL) { //TODO: Da ist doch was im Argen
 					Error(filename);
 					return;
 				}
 				gg_tl_dat pos = strtoll(buffer,NULL,10);
 				TLSample *sample=m_sampleManager->GetSample(id);
+				e.position    = pos;
+				e.referenceId = 0;
+				e.trackId     = trackNr;
 				if (sample) {
-					m_data->AddItem(sample,pos,trackNr);
+//					m_data->AddItem(sample,pos,trackNr);
+					m_data->AddItem( e, sample );
 				}
 				element_item=element_item->NextSiblingElement("item");
 			}

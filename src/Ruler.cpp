@@ -24,6 +24,7 @@
 
 #include "stuff.h"
 #include "Ruler.h"
+#include "GgseqGlobalProps.h"
 
 #define LEFT_OFFSET 55
 
@@ -69,7 +70,8 @@ void Ruler::OnPaint(wxPaintEvent& event)
 	if(m_pos1<m_pos2) {
 		dc.SetBrush(*wxBLUE_BRUSH);
 		dc.SetPen(*wxTRANSPARENT_PEN);
-		dc.DrawRectangle(m_pos1-m_position, 0, m_pos2-m_pos1, height);
+		long p1 = g_ggseqProps.FromTLtoScreenX(m_pos1);
+		dc.DrawRectangle(p1-2, 0, g_ggseqProps.FromTLtoScreenX(m_pos2) - p1, height);
 	}
 	long index= m_position/m_snap;
 	long offs=m_position%m_snap;
@@ -82,9 +84,14 @@ void Ruler::OnPaint(wxPaintEvent& event)
 		index++;
 	}
 }
+/*long SnapOnScreen(long x)
+{
+	return g_ggseqProps.FromTLtoScreenX(g_ggseqProps.GetSnap(g_ggseqProps.FromScreenXtoTL(x)));
+}*/
 void Ruler::OnLeftDown(wxMouseEvent& event)
 {
-	m_pos1=event.GetX()+m_position;
+//	m_pos1=SnapOnScreen(event.GetX()+m_position);
+	m_pos1 = g_ggseqProps.GetSnap( g_ggseqProps.FromScreenXtoTL( event.GetX() ) );
 	CaptureMouse();
 }
 void Ruler::GetLoop(gg_tl_dat* pos1, gg_tl_dat* pos2)
@@ -95,20 +102,29 @@ void Ruler::GetLoop(gg_tl_dat* pos1, gg_tl_dat* pos2)
 void Ruler::OnLeftUp(wxMouseEvent& event)
 {
 	ReleaseMouse();
-	m_pos2=event.GetX()+m_position;
-	if (m_pos1<LEFT_OFFSET)
+	//m_pos2=event.GetX()+m_position;
+	m_pos2 = g_ggseqProps.GetSnap( g_ggseqProps.FromScreenXtoTL( event.GetX() ) );
+/*	if (m_pos1<LEFT_OFFSET)
 		m_pos1=LEFT_OFFSET;
 	if (m_pos2<LEFT_OFFSET)
-		m_pos2=LEFT_OFFSET;
-	if (m_listener)
-		m_listener->SetLoopSnaps((long long)((m_pos1-LEFT_OFFSET)* m_zoom), (long long)((m_pos2-LEFT_OFFSET)* m_zoom)  );
+		m_pos2=LEFT_OFFSET;*/
+	/*Snap m_pos'es*/
+	if (m_listener) {
+		m_listener->SetLoopSnaps(
+/*				(long long)((m_pos1-LEFT_OFFSET)* m_zoom),
+				(long long)((m_pos2-LEFT_OFFSET)* m_zoom)*/
+				m_pos1,
+				m_pos2
+				);
+	}
 	Refresh();
 }
 void Ruler::OnMouseMotion(wxMouseEvent& event)
 {
 	if (!event.LeftIsDown())
 		return;
-	m_pos2=event.GetX()+m_position;
+//	m_pos2=SnapOnScreen(event.GetX()+m_position);
+	m_pos2 = g_ggseqProps.GetSnap( g_ggseqProps.FromScreenXtoTL( event.GetX() ) );
 	Refresh();
 	
 }

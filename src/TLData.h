@@ -60,7 +60,7 @@ class TLData: public LoopSetupListener, GetTrackNrListener
 		                 int TrackNr, long referenceId = 0, const NativeEnvData* env = 0, bool toggleEnvelope = false );
 		TLItem *AddItem( wxString& filename, gg_tl_dat Position,
 		                 int TrackNr, long referenceId = 0 );
-		TLItem *AddItem( const ItemEssentials &e );
+		TLItem *AddItem( const ItemEssentials &e, TLSample *sample = 0 );
 		TLItem *ItemAtPos(gg_tl_dat Position, int TrackNr);
 		void SetItemPosition(TLItem *item, gg_tl_dat Position);
 		void DeleteItem(TLItem *item, int TrackNr );

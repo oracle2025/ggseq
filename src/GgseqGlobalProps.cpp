@@ -16,8 +16,8 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#include "GgseqGlobalProps.h"
 #include "stuff.h"
+#include "GgseqGlobalProps.h"
 class wxDC;
 class wxString;
 class wxCoord;
@@ -73,4 +73,16 @@ GgseqDocManager *GgseqGlobalProps::GetDocManager()
 void GgseqGlobalProps::SetView( TLView *view )
 {
 	m_view = view;
+}
+gg_tl_dat GgseqGlobalProps::GetSnap( gg_tl_dat x )
+{
+	return m_view->GetSnap( x );
+}
+gg_tl_dat GgseqGlobalProps::FromScreenXtoTL(long x)
+{
+	return m_view->FromScreenXtoTL( x );
+}
+long GgseqGlobalProps::FromTLtoScreenX(gg_tl_dat x)
+{
+	return m_view->FromTLtoScreenX( x );
 }

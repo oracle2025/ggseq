@@ -46,7 +46,9 @@ TiXmlString::TiXmlString (const char* instring)
         current_length = 0;
         return;
     }
-    newlen = strlen (instring) + 1;
+	//*ME:	warning C4267: convert 'size_t' to 'unsigned int'
+	//*ME:	Use Cast: (unsigned)
+    newlen = (unsigned)strlen (instring) + 1;
     newstring = new char [newlen];
     memcpy (newstring, instring, newlen);
     // strcpy (newstring, instring);
@@ -92,7 +94,7 @@ void TiXmlString ::operator = (const char * content)
         empty_it ();
         return;
     }
-    newlen = strlen (content) + 1;
+    newlen = (unsigned)strlen (content) + 1;
     newstring = new char [newlen];
     // strcpy (newstring, content);
     memcpy (newstring, content, newlen);
@@ -124,26 +126,22 @@ void TiXmlString ::operator = (const TiXmlString & copy)
 }
 
 
-//// Checks if a TiXmlString contains only whitespace (same rules as isspace)
-//bool TiXmlString::isblank () const
-//{
-//    char * lookup;
-//    for (lookup = cstring; * lookup; lookup++)
-//        if (! isspace (* lookup))
-//            return false;
-//    return true;
-//}
-
 // append a const char * to an existing TiXmlString
 void TiXmlString::append( const char* str, int len )
 {
     char * new_string;
     unsigned new_alloc, new_size, size_suffix;
+	
+	// don't use strlen - it can overrun the len passed in!
+	const char* p = str;
+	size_suffix = 0;
 
-    size_suffix = strlen (str);
-    if (len < (int) size_suffix)
-        size_suffix = len;
-    if (! size_suffix)
+	while ( *p && size_suffix < (unsigned)len )
+	{
+		++p;
+		++size_suffix;
+	}
+    if ( !size_suffix)
         return;
 
     new_size = length () + size_suffix + 1;
@@ -242,24 +240,29 @@ void TiXmlString::append( const char * suffix )
 //    return (! strcmp (c_str (), compare . c_str ()));
 //}
 
-unsigned TiXmlString::length () const
-{
-    if (allocated)
-        // return strlen (cstring);
-        return current_length;
-    return 0;
-}
+//unsigned TiXmlString::length () const
+//{
+//    if (allocated)
+//        // return strlen (cstring);
+//        return current_length;
+//    return 0;
+//}
 
 
 unsigned TiXmlString::find (char tofind, unsigned offset) const
 {
-    char * lookup;
+	//*ME:	warning C4244: convert '__w64 int' to 'unsigned'
+	//*ME:	Use Array-Arithmetic instead of Pointer
+	//  char * lookup;
 
     if (offset >= length ())
         return (unsigned) notfound;
-    for (lookup = cstring + offset; * lookup; lookup++)
-        if (* lookup == tofind)
-            return lookup - cstring;
+	//  for (lookup = cstring + offset; * lookup; lookup++)
+	//	if (* lookup == tofind)
+	//	    return lookup - cstring;
+    for( unsigned n=offset ; cstring[n] != '\0' ; n++ )
+	if( cstring[n] == tofind )
+	    return  n ;
     return (unsigned) notfound;
 }
 

@@ -85,9 +85,9 @@ class TLView
 		float GetRealZoom();
 		wxRect GetItemBoundaries(TLItem *item);
 		//Redraw Item => Zeichnet nur das Item.
+		gg_tl_dat GetSnap(gg_tl_dat x);
 	private:
 		gg_tl_dat VisibleLength();
-		gg_tl_dat GetSnap(gg_tl_dat x);
 		long DrawTrack(wxDC& dc_screen, long yoffset, TLTrack* track);
 		void DrawItem(wxDC& dc, TLItem* item, long left, long delta_left, long top, long width, long height);
 		TLData *m_TlData;

@@ -174,7 +174,7 @@ TLItem::~TLItem()
 {
 //	std::cout << "Deleting Item: " << (const char*)m_sample->GetFilename().mb_str() << std::endl;
 	if ( m_stretchedBuffer ) {
-		delete m_stretchedBuffer;
+		delete [] m_stretchedBuffer;
 		m_stretchedBuffer = 0;
 	}
 	m_sample->UnRef();
@@ -382,6 +382,13 @@ void TLItem::SetTrimNStretch( gg_tl_dat leftTrim,
 	m_leftTrim = leftTrim;
 	m_rightTrim = rightTrim;
 	m_timestretch = timestretch;
+	if ( m_stretchedBuffer ) {
+		delete [] m_stretchedBuffer;
+		m_stretchedBuffer = 0;
+	}
+	if ( leftTrim == 0 && rightTrim*2 == m_sample->GetLength() && m_timestretch == 1.0 ) {
+		return;
+	}
 	SampleEdit pSampleEdit( m_sample->GetBuffer(), m_sample->GetLength() );
 	pSampleEdit.SetTempo( timestretch );
 	pSampleEdit.SetTrims( leftTrim, rightTrim );

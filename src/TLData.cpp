@@ -166,14 +166,16 @@ TLItem *TLData::AddItem(wxString& filename, gg_tl_dat Position, int TrackNr, lon
 	}
 	return NULL;
 }
-TLItem *TLData::AddItem( const ItemEssentials &e )
+TLItem *TLData::AddItem( const ItemEssentials &e, TLSample *sample )
 {
 	TLTrack *tlTrack = m_trackList->Item(e.trackId)->GetData();
 	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::AddItem!" );
 	if (!tlTrack)
 		return NULL;
 	m_updateListener->StartUpdateProcess();
-	TLSample *sample = m_sampleManager->GetSample(e.filename, m_updateListener);
+	if ( !sample ) {
+		sample = m_sampleManager->GetSample(e.filename, m_updateListener);
+	}
 	m_updateListener->EndUpdateProcess();
 	if (sample) {
 		m_changed=true;

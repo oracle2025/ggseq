@@ -1,3 +1,9 @@
+2005-02-11  Richard Spindler <richard.spindler AT gmail.com>
+
+ * Made Ruler to snap to the Grid
+ * Updated TinyXML to Version 2.3.3
+ * Saving of Envelope, Trim and Stretch works now
+
 2005-03-06  Richard Spindler <richard.spindler AT gmail.com>
 
  * Changed lots of internal stuff, to fix the Trimmer, Envelope, etc..

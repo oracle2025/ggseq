@@ -165,12 +165,18 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 		item->SetAttribute("pos",tmp.mb_str());
 		current->GetEssentials(e);
 		item->SetAttribute("envelope", wxString::Format( wxT("%d"), e.toggleEnvelope ).mb_str() );
-		item->SetAttribute("leftFadeLevel", wxString::Format( wxT("%.30e"), e.nativeEnvData.leftFadeLevel ).mb_str() );
+		item->SetDoubleAttribute( "leftFadeLevel", e.nativeEnvData.leftFadeLevel );
+		item->SetDoubleAttribute( "leftFadePos", e.nativeEnvData.leftFadePos );
+		item->SetDoubleAttribute( "middleLevel", e.nativeEnvData.middleLevel );
+		item->SetDoubleAttribute( "rightFadeLevel", e.nativeEnvData.rightFadeLevel );
+		item->SetDoubleAttribute( "rightFadePos", e.nativeEnvData.rightFadePos );
+		item->SetDoubleAttribute( "timestretch", e.timestretch );
+/*		item->SetAttribute("leftFadeLevel", wxString::Format( wxT("%.30e"), e.nativeEnvData.leftFadeLevel ).mb_str() );
 		item->SetAttribute("leftFadePos", wxString::Format( wxT("%.30e"), e.nativeEnvData.leftFadePos ).mb_str() );
 		item->SetAttribute("middleLevel", wxString::Format( wxT("%.30e"), e.nativeEnvData.middleLevel ).mb_str() );
 		item->SetAttribute("rightFadeLevel", wxString::Format( wxT("%.30e"), e.nativeEnvData.rightFadeLevel ).mb_str() );
 		item->SetAttribute("rightFadePos", wxString::Format( wxT("%.30e"), e.nativeEnvData.rightFadePos ).mb_str() );
-		item->SetAttribute("timestretch", wxString::Format( wxT("%.30e"), e.timestretch ).mb_str() );
+		item->SetAttribute("timestretch", wxString::Format( wxT("%.30e"), e.timestretch ).mb_str() );*/
 		item->SetAttribute("leftTrim", wxString::Format( wxT("%lld"), e.leftTrim ).mb_str() );
 		item->SetAttribute("rightTrim", wxString::Format( wxT("%lld"), e.rightTrim ).mb_str() );
 	}

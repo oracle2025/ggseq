@@ -30,7 +30,6 @@
 
 #include "wx/popupwin.h"
 #include "dial.h"
-#include <iostream>
 
 #define PI 3.1415926535897931
 
@@ -86,6 +85,7 @@ bool wxDial::Create(wxWindow* parent,
 				const wxString& name)
 {
 	bool RetVal = wxControl::Create(parent, id, pos, size, style|wxNO_BORDER);
+	SetSizeHints(25,25);
 	m_Value = value;
 	m_MinValue = minValue;
 	m_MaxValue = maxValue;
@@ -94,6 +94,7 @@ bool wxDial::Create(wxWindow* parent,
 	m_leftStuck = false;
 	m_rightStuck = false;
 	m_dialTip=new wxDialTip(this);
+	m_dialTip->Hide();
 	SetValue(m_Value);
 	return RetVal;
 }

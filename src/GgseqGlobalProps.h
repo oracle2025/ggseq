@@ -40,6 +40,9 @@ class GgseqGlobalProps
 		void SetDocManager( GgseqDocManager *docManager );
 		void SetView( TLView *view );
 		GgseqDocManager *GetDocManager();
+		gg_tl_dat GetSnap( gg_tl_dat x );
+		gg_tl_dat FromScreenXtoTL(long x);
+		long FromTLtoScreenX(gg_tl_dat x);
 		/*UpdateListener *GetProgressBar();
 		void SetProgressBar( UpdateListener *pBar );*/
 		// GetTopLevelWindow();
