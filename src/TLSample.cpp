@@ -66,18 +66,23 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 		factors=50;
 	}
 	/*dieser aufruf ist zeitkritisch*/
-	for(int i=0;i<=sfinfo.frames;i+=100000) {
+	for(int i=0;i<=sfinfo.frames;i+=100000) {//i sind frames ?
 		if (updateListener)
 			if(updateListener->Update((i*factors)/sfinfo.frames)==false) {
 				return;
 			}
 		int cnt;
-		if (i>sfinfo.frames)
-			cnt=sfinfo.frames;
+		if (i+100000>sfinfo.frames)
+			cnt=sfinfo.frames-i;
 		else
 			cnt=100000;
-		sf_readf_float(sndfile,m_buffer+i*sfinfo.channels,cnt);
+
+
+		std::cout << i << ", " << sfinfo.channels << ", " << sfinfo.frames <<", "<< cnt<<", "<<m_length<< std::endl;
+		sf_readf_float(sndfile,m_buffer+i*sfinfo.channels,cnt);//segfault
 	}
+
+	
 //	sf_readf_float(sndfile,m_buffer,sfinfo.frames);
 	int prog_offset=factors;
 
