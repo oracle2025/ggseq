@@ -101,7 +101,7 @@ unsigned int TLTrack::FillBuffer(float* outBuffer, unsigned int count)
 	unsigned int emptyItems=0;
 	float* incBuffer=outBuffer;
 	while(written<count && m_currentNode) {
-		inc=m_currentNode->GetData()->FillBuffer(incBuffer,m_pos+written,count-written);
+		inc=m_currentNode->GetData()->FillBuffer(incBuffer,m_pos+written,count-written, m_mute);
 		written+=inc;
 		incBuffer+=inc;
 		if (written<count) {
@@ -115,7 +115,6 @@ unsigned int TLTrack::FillBuffer(float* outBuffer, unsigned int count)
 			incBuffer++;
 			emptyItems++;
 		}
-//		m_done=true;
 	}
 	m_pos+=written;
 	return written-emptyItems;
@@ -146,4 +145,14 @@ void TLTrack::Clear()
 void TLTrack::SetPlaybackPosition(int Position)
 {
 	m_pos=Position;
+}
+
+void TLTrack::SetMute(bool mute)
+{
+	m_mute=mute;
+//	puts("TLTrack::SetMute");
+}
+bool TLTrack::IsMuted()
+{
+	return m_mute;
 }

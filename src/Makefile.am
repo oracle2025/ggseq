@@ -29,6 +29,9 @@ ggseq_SOURCES = MiniFilerTest.cpp\
                 TLLoadSaveManager.cpp\
                 TLSelectColourDialog.cpp\
 		TLSetSnapDialog.cpp\
+		TLMuteButton.cpp\
+		dial.cpp\
+		dial.h\
                 SoundManager.h\
                 tinystr.h\
                 tinyxml.h\
@@ -45,7 +48,8 @@ ggseq_SOURCES = MiniFilerTest.cpp\
                 TLTrack.h\
                 TLView.h\
                 TLXmlLoader2.h\
-		TLSetSnapDialog.h
+		TLSetSnapDialog.h\
+		TLMuteButton.h
 
 ggseq_LDFLAGS = $(CLIBS) @SNDFILE_LIBS@  -lportaudio `wx-config --libs`
 

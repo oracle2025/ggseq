@@ -44,13 +44,15 @@ class TLTrack
 		void ResetOffsets(int Position);
 		void Clear();
 		void SortItems();
-
+		void SetMute(bool mute=TRUE);
+		bool IsMuted();
 		void addXmlData(TiXmlElement *tracks);
 	private:
 		TLItemList m_itemList;
 		int m_height;
 		int m_trackNr;
 		int m_pos;
+		bool m_mute;
 		TLItemList::Node *m_currentNode;
 };
 

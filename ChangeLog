@@ -1,3 +1,11 @@
+2003-11-07  Richard Spindler  <oracle2025@gmx.de>
+
+ *  added dial.cpp .h
+
+2003-11-01  Richard Spindler  <oracle2025@gmx.de>
+
+ *  added TLMuteButton.h .cpp and mute_off.xpm mute_on.xpm
+
 2003-10-26  Richard Spindler  <oracle2025@gmx.de>
 
  *  added a Dialog to configure the 'Snap Value'

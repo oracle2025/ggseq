@@ -1,4 +1,4 @@
-/* TLItem.h
+/* TLMuteButton.h
  *
  *  Copyright (C) 2003 Richard Spindler <oracle2025@gmx.de>
  *
@@ -16,33 +16,20 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+ 
+#ifndef _MY_BUTTON_H_
+#define _MY_BUTTON_H_
 
-#ifndef _TLITEM_H_
-#define _TLITEM_H_
-
-class TLSample;
-class TLItem
+class TLMuteButton : public wxBitmapButton
 {
 	public:
-		TLItem(TLSample *sample, int trackNr,int position/* = 0*/);
-		~TLItem();
-		int FillBuffer(float* outBuffer, int pos, int count, bool mute);
-		int GetLength();
-		const int GetPosition();
-		int GetTrack();
-		int GetEndPosition();
-		void SetPosition(int position);
-		void ResetOffset();
-		int m_position;
-		TLSample *GetSample();
-		void Select();
-		void UnSelect();
-		bool IsSelected();
+		TLMuteButton(wxWindow* parent, wxWindowID id,TLTrack* track, const wxBitmap& bitmap, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxBU_AUTODRAW, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxT("button"));
+		void OnClick(wxCommandEvent &event);
 	private:
-		int m_playingOffset;
-		TLSample *m_sample;
-		bool m_selected;
-		int m_trackNr;
+		TLTrack *m_track;
+		bool m_mute;
+		DECLARE_EVENT_TABLE()
 };
 
-#endif /*_TLITEM_H_*/
+
+#endif /*_MY_BUTTON_H_*/

@@ -67,7 +67,10 @@ TLData::~TLData()
 	m_trackList.Clear();
 	delete m_sampleManager;
 }
-
+int TLData::GetTrackCount()
+{
+	return m_trackList.GetCount();
+}
 TLTrackList::Node *TLData::GetFirst()
 {
 	return m_trackList.GetFirst();
@@ -318,11 +321,17 @@ unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 	unsigned int maxResultCount=0;
 	unsigned int rv;
 	TLTrackList::Node *node = m_trackList.GetFirst();
+/*	while(node->GetData()->IsMuted()) {
+		node = node->GetNext();
+	}*/
 	if (!node)
 		return 0;
 	rv=node->GetData()->FillBuffer(buffer1,count);/*first Track*/
 	maxResultCount=rv;
 	node = node->GetNext();
+/*	while(node->GetData()->IsMuted()) {
+		node = node->GetNext();
+	}*/
 	if (!node) { /*Only one Track*/
 		for (unsigned int i=0; i<count; i++)
 			outBuffer[i]=buffer1[i];
@@ -334,10 +343,12 @@ unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 	mixChannels(buffer1,buffer2,outBuffer);
 	node = node->GetNext();
 	while(node) {
-		rv=node->GetData()->FillBuffer(buffer1,count);
-		if (rv>maxResultCount)
-			maxResultCount=rv;
-		mixChannels(outBuffer,buffer1,outBuffer);
+	/*	if (!node->GetData()->IsMuted()){*/
+			rv=node->GetData()->FillBuffer(buffer1,count);
+			if (rv>maxResultCount)
+				maxResultCount=rv;
+			mixChannels(outBuffer,buffer1,outBuffer);
+		/*}*/
 		node = node->GetNext();
 	}
 	return maxResultCount;

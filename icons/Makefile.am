@@ -8,5 +8,5 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-EXTRA_DIST = colours2.xpm       new1.xpm  play.xpm    save.xpm dir.xpm        null.xpm  rewind.xpm  stop.xpm dndfile.xpm     open.xpm  saveas.xpm  wav_export.xpm ggseq_32.xpm snap.xpm
+EXTRA_DIST = colours2.xpm       new1.xpm  play.xpm    save.xpm dir.xpm        null.xpm  rewind.xpm  stop.xpm dndfile.xpm     open.xpm  saveas.xpm  wav_export.xpm ggseq_32.xpm snap.xpm  mute_off.xpm mute_on.xpm 
 SUBDIRS =

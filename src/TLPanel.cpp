@@ -40,6 +40,11 @@
 #include "TLData.h"
 #include "TLSelectColourDialog.h"
 #include "TLSetSnapDialog.h"
+#include "TLMuteButton.h"
+#include "mute_off.xpm"
+#include "dial.h"
+
+#define LEFT_OFFSET_TRACKS 52
 
 enum
 {
@@ -84,9 +89,17 @@ TLPanel::TLPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSi
 	m_loadSaveManager = new TLLoadSaveManager(this,m_data);
 	m_soundManager = new SoundManager(m_data);
 
+
 	m_scrollBar = new wxScrollBar(this,ID_ScrollBar,wxPoint(0,0),wxSize(GetSize().GetWidth(),0));	
 
-	//wxButton *button = new wxButton( this, -1,wxT("hehe"), wxPoint(5,5),wxSize(25,25));
+	int i=0;
+	for ( TLTrackList::Node *node = m_data->GetFirst(); node; node = node->GetNext() ) {
+		TLTrack *current = node->GetData();
+		/*TLMuteButton *button =*/ new TLMuteButton( this, -1,current,mute_off_xpm, wxPoint(5,5+i*30),wxSize(25,25));
+		i++;
+	}
+	new wxDial(this, -1, 0, 0, 100,wxPoint(31,5),wxSize(25,25));
+//	m_data->GetTrackCount
 
 //	m_scrollBar->SetSize(0,GetSize().GetHeight()-20,GetSize().GetWidth(),20);
 	m_scrollBar->SetScrollbar(0,m_TlView->GetScrollBarThumbSize() ,m_TlView->GetScrollBarRange() , m_TlView->GetScrollBarThumbSize());
@@ -124,7 +137,7 @@ void TLPanel::OnSize(wxSizeEvent& event)
 	m_TlView->SetVisibleFrame(GetSize().GetWidth()-11,GetSize().GetHeight()-22,5,5);
 	m_scrollBar->SetSize(0,GetSize().GetHeight()-22,GetSize().GetWidth()-6,16);
 #else
-	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10/*-25*/,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-5,5/*+25*/,5);
+	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-5,5+LEFT_OFFSET_TRACKS,5);
 	m_scrollBar->SetSize(0,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-2,GetSize().GetWidth()-4,20);
 #endif
 	ResetScrollBar();
@@ -474,7 +487,7 @@ void TLPanel::OnScroll(wxScrollEvent& event)
 }
 void TLPanel::DrawCaret(wxDC& dc)
 {
-	if (m_CaretPosition < 5/*30*/) //TODO: Das hier ist hardgecoded
+	if (m_CaretPosition < 5+LEFT_OFFSET_TRACKS) 
 		return;
 	dc.SetLogicalFunction(wxINVERT);
 	dc.SetPen(*wxTRANSPARENT_PEN);

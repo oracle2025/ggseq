@@ -41,7 +41,7 @@ TLItem::~TLItem()
 	std::cout << "TLItem gelöscht" << std::endl;
 	m_sample->UnRef();
 }
-int TLItem::FillBuffer(float* outBuffer, int pos, int count)
+int TLItem::FillBuffer(float* outBuffer, int pos, int count, bool mute)
 {
 	int written=0;
 	float *buffer = m_sample->GetBuffer();
@@ -61,7 +61,11 @@ int TLItem::FillBuffer(float* outBuffer, int pos, int count)
 		m_playingOffset = pos-m_position;
 	while(written<count && m_playingOffset<GetLength())
 	{
-		outBuffer[written]=buffer[m_playingOffset];
+		if (mute) {
+			outBuffer[written]=0.0;
+		} else {
+			outBuffer[written]=buffer[m_playingOffset];
+		}
 		written++;
 		m_playingOffset++;
 	}
