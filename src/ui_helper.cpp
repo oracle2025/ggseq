@@ -40,7 +40,7 @@ wxWindow *MakeTlPanel( wxWindow* parent, wxWindowID id )
 {
 	wxPanel *panel1 = new wxPanel(parent,-1,
 		wxDefaultPosition,
-		wxDefaultSize,
+		wxSize(100,200),
 		wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
 
 	wxBoxSizer * tlPanelSizer = new wxBoxSizer(wxVERTICAL);
@@ -49,7 +49,7 @@ wxWindow *MakeTlPanel( wxWindow* parent, wxWindowID id )
 	wxScrollBar *sb2 = new wxScrollBar(panel1, ID_SCROLLBAR2, wxDefaultPosition, wxDefaultSize, wxVERTICAL);
 	sb2->SetScrollbar(0,16,50,15);
 	TLPanel *tp = new TLPanel(panel1, sb,ruler,sb2, id);
-	tp->Fit();
+	//tp->Fit();
 	wxBoxSizer *sizer2 = new wxBoxSizer(wxHORIZONTAL);
 	sizer2->Add(tp,1,wxEXPAND);
 	sizer2->Add(sb2, 0, wxEXPAND);

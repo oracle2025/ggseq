@@ -707,15 +707,6 @@ void MyToolBarFunc( wxToolBar *parent )
     parent->AddTool( ID_STOP, wxT(""), GgseqBitmapsFunc( 14 ), wxNullBitmap, wxITEM_NORMAL, wxT("Stop") );
     parent->EnableTool( ID_STOP, FALSE );
     parent->AddSeparator();
-    wxString strs1[] = 
-    {
-        wxT("Snap to Grid"), 
-        wxT("Snap to Sample"), 
-        wxT("No Snap")
-    };
-    wxChoice *item1 = new wxChoice( parent, ID_CHOICE, wxDefaultPosition, wxSize(100,-1), 3, strs1, 0 );
-    parent->AddControl( item1 );
-    parent->AddSeparator();
     parent->AddTool( ID_PREFERENCES, wxT(""), GgseqBitmapsFunc( 9 ), wxNullBitmap, wxITEM_NORMAL, wxT("Preferences") );
     parent->AddSeparator();
     parent->AddTool( ID_UNDO, wxT(""), GgseqBitmapsFunc( 16 ), wxNullBitmap, wxITEM_NORMAL, wxT("Undo") );

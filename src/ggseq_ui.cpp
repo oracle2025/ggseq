@@ -269,8 +269,8 @@ void MyFrame::OnHelp( wxCommandEvent &event )
 
 void MyFrame::OnTimelineSplitterChanging( wxSplitterEvent &event )
 {
-    if ( event.GetSashPosition() < 200 ) {
-        event.SetSashPosition( 200 );
+    if ( event.GetSashPosition() < 234 ) {
+        event.SetSashPosition( 234 );
     } else {
         event.Skip();
     }

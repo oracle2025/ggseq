@@ -130,7 +130,6 @@ wxMenuBar *MyMenuBarFunc();
 #define ID_REWIND 10062
 #define ID_PLAY 10063
 #define ID_STOP 10064
-#define ID_CHOICE 10065
 void MyToolBarFunc( wxToolBar *parent );
 
 // Declare bitmap functions
