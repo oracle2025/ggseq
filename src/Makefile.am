@@ -51,6 +51,8 @@ ggseq_SOURCES = MiniFilerTest.cpp\
 		FileInfoPanel.h\
 		ggEvtHandler.h\
 		ggEvtHandler.cpp\
+		BigScrollBar.cpp\
+		BigScrollBar.h\
                 SoundManager.h\
                 tinystr.h\
                 tinyxml.h\

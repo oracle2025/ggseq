@@ -130,6 +130,9 @@ void MiniPlayer::Play()
 		m_length=m_sample->GetLength();
 		m_soundManager->Play(m_sample);
 	} else {
+		if (m_filename.IsEmpty()) {
+			return;
+		}
 		wxLogStatus(wxT("Playing Sample: %s"),m_filename.c_str());
 		long length;
 		long frames;

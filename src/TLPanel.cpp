@@ -52,6 +52,7 @@
 #include "TLTrack.h"
 #include "MiniPlayer.h"
 #include "Ruler.h"
+#include "BigScrollBar.h"
 
 #define LEFT_OFFSET_TRACKS 52
 #define TOP_OFFSET_TRACKS 22
@@ -77,7 +78,7 @@ BEGIN_EVENT_TABLE(TLPanel, wxPanel)
 //#endif
 END_EVENT_TABLE()
 
-TLPanel::TLPanel(wxWindow* parent, wxScrollBar *scrollbar, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 :wxPanel(parent, id, pos, size, style|wxCLIP_CHILDREN/*|wxSUNKEN_BORDER*/ , name)
 {
 
@@ -328,6 +329,7 @@ void TLPanel::StartSampleDrag(int x, int y, int srcTrackNr, TLItem* srcItem)
 	Refresh(true);
 #else
 	Refresh(false);
+	Update();
 #endif
 	m_SampleDragSrcTrackNr = srcTrackNr;
 	m_DragItem = srcItem;
@@ -410,31 +412,44 @@ void TLPanel::StartSelectionDrag(int x, int y, int width, int height)
 //	SetRubberframePen(&dc);
 	m_selectionDrag=true;
 	wxBitmap bitmap(width,height);
-	wxMemoryDC dc;
-	dc.SelectObject(bitmap);
+	wxMemoryDC *dc = new wxMemoryDC();
+	dc->SelectObject(bitmap);
 	wxPen pen(*wxBLACK_PEN);
 	pen.SetStyle(wxLONG_DASH);
-	dc.SetPen(pen);
-	dc.SetBrush(*wxGREEN_BRUSH);
-	dc.DrawRectangle(0,0,width,height);
+	dc->SetPen(pen);
+	dc->SetBrush(*wxGREEN_BRUSH);
+	dc->DrawRectangle(0,0,width,height);
 	wxBrush ab;
 	ab.SetStyle(wxTRANSPARENT);
-	dc.SetBrush(ab);
+	dc->SetBrush(ab);
 	pen.SetColour(*wxWHITE);
 	pen.SetWidth(3);
 	pen.SetStyle(wxSOLID);
-	dc.SetPen(pen);
-	m_TlView->DrawSelection(&dc);
+	dc->SetPen(pen);
+	m_TlView->DrawSelection(dc);
 	pen.SetWidth(1);
 	pen.SetColour(*wxBLACK);
 	pen.SetStyle(wxLONG_DASH);
-	dc.SetPen(pen);
-	m_TlView->DrawSelection(&dc);
+	dc->SetPen(pen);
+	m_TlView->DrawSelection(dc);
+	delete dc;
 
-#ifndef __WXMSW__
+/*#ifndef __WXMSW__*/
 	wxMask *mask = new wxMask(bitmap,*wxGREEN);
 	bitmap.SetMask(mask);
-#endif
+/*#else
+	wxBitmap maskBmp(width,height,1);
+	wxMemoryDC *maskDc = new wxMemoryDC();
+	maskDc->SelectObject(maskBmp);
+	maskDc->SetBrush(*wxWHITE_BRUSH);
+	maskDc->DrawRectangle(0,0,width,height);
+	maskDc->SetBrush(*wxBLACK_BRUSH);
+	maskDc->DrawRectangle(10,10,60,60);
+	delete maskDc;
+	wxMask *mask = new wxMask(maskBmp);
+//	wxMask *mask = new wxMask(bitmap,*wxGREEN);
+	bitmap.SetMask(mask);
+#endif*/
 
 #ifdef __WXMSW__ 
 	m_dragImage = new wxGenericDragImage(bitmap);
@@ -512,7 +527,7 @@ void TLPanel::HideFrame(wxRect& rect, wxDC* dc)
 }
 void TLPanel::OnScroll(wxScrollEvent& event)
 {
-	m_TlView->SetPosition(FromSBtoTL(event.GetPosition()));
+	m_TlView->SetPosition(/*FromSBtoTL(event.GetPosition())*/m_scrollBar->GetBigThumbPosition());
 	m_CaretPosition = m_TlView->GetCaretPosition();
 	UpdateRulerTicks();
 #ifdef __WXMSW__
@@ -537,7 +552,8 @@ void TLPanel::DrawCaret(wxDC& dc)
 void TLPanel::ResetScrollBar()
 {
 	int ts = FromTLtoSB(m_TlView->GetScrollBarThumbSize());
-	m_scrollBar->SetScrollbar(FromTLtoSB(m_TlView->GetPosition())/*m__scrollBar->GetThumbPosition()*/, ts,100000 , ts);
+//	m_scrollBar->SetScrollbar(FromTLtoSB(m_TlView->GetPosition())/*m__scrollBar->GetThumbPosition()*/, ts,100000 , ts);
+	m_scrollBar->SetBigScrollBar(m_TlView->GetPosition(),m_TlView->GetScrollBarThumbSize(),m_TlView->GetScrollBarRange());
 }
 
 /*void TLPanel::HideFrame(int x, int y, wxDC* dc)
@@ -708,22 +724,24 @@ bool TLPanel::UpdateCaret()
 //	SetCaretPosition(m_soundManager->GetPlaybackPosition());
 	DrawCaret(dc);
 	gg_tl_dat pos=m_soundManager->GetPosition();
-//	int pos2=(pos/117600)*31;
-	int sbPos=FromTLtoSB((pos/117600)*31);
-	if (sbPos<m_scrollBar->GetThumbPosition()) {
-		m_scrollBar->SetThumbPosition(sbPos);
-		m_TlView->SetPosition(FromSBtoTL(m_scrollBar->GetThumbPosition()));
+	gg_tl_dat pos2=(pos/117600)*31;
+//	int sbPos=FromTLtoSB((pos/117600)*31);
+	if (pos2<m_scrollBar->GetBigThumbPosition()) {
+		m_scrollBar->SetBigThumbPosition(pos2);
+		m_TlView->SetPosition(m_scrollBar->GetBigThumbPosition());
+		UpdateRulerTicks();
 #ifdef __WXMSW__
 		Refresh(true);
 #else
 		Refresh(false);
 #endif
-	} else if (sbPos>=m_scrollBar->GetThumbPosition()+m_scrollBar->GetThumbSize()) {
-		int newPos = m_scrollBar->GetThumbPosition()+m_scrollBar->GetThumbSize();
-		if (newPos>m_scrollBar->GetRange()-m_scrollBar->GetThumbSize())
-			newPos=m_scrollBar->GetRange()-m_scrollBar->GetThumbSize();
-		m_scrollBar->SetThumbPosition(newPos);
-		m_TlView->SetPosition(FromSBtoTL(m_scrollBar->GetThumbPosition()));
+	} else if (pos2>=m_scrollBar->GetBigThumbPosition()+m_scrollBar->GetBigThumbSize()) { //Hier wird gesprungen, sollte aber abhängig von der Fensterbreite passieren
+		gg_tl_dat newPos = m_scrollBar->GetBigThumbPosition()+m_scrollBar->GetBigThumbSize();
+		if (newPos>m_scrollBar->GetBigRange()-m_scrollBar->GetBigThumbSize())
+			newPos=m_scrollBar->GetBigRange()-m_scrollBar->GetBigThumbSize();
+		m_scrollBar->SetBigThumbPosition(newPos);
+		m_TlView->SetPosition(newPos/*m_scrollBar->GetBigThumbPosition()*/);
+		UpdateRulerTicks();
 #ifdef __WXMSW__
 		Refresh(true);
 #else

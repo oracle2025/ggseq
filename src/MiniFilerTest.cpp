@@ -48,6 +48,7 @@
 #ifndef _DISABLE_CONFIG_SHORTCUTS_
 	#include "ShortcutsDialog.h"
 #endif
+#include "BigScrollBar.h"
 
 #include "new1.xpm"
 #include "open.xpm"
@@ -61,7 +62,7 @@
 #include "dndfile.xpm"
 #include "snap.xpm"
 #include "ggseq_32.xpm"
-#include "prefs_misc.xpm"
+//#include "prefs_misc.xpm"
 
 
 enum
@@ -205,11 +206,12 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	panel1->SetFocus();
 //	panel1->Enable(false);
 
-	MakeMainWindow(panel1);
 
 	StatusProgressBar *cc = new StatusProgressBar(this,-1);
 	SetStatusBar(cc);
 	m_updateListener=cc;
+
+	MakeMainWindow(panel1);
 
 	cc->SetDisableListener(new DoubleDisabler(panel1,GetToolBar()));
 
@@ -293,7 +295,8 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 	wxPanel *panel1 = new wxPanel(SplitView2,-1,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
 
 	wxBoxSizer * tlPanelSizer = new wxBoxSizer(wxVERTICAL);
-	wxScrollBar *sb = new wxScrollBar(panel1,ID_ScrollBar);
+//	wxScrollBar *sb = new wxScrollBar(panel1,ID_ScrollBar);
+	BigScrollBar *sb =  new BigScrollBar(panel1,ID_ScrollBar);
 #ifdef __WXMSW__
 	sb->SetSize(0,0,10,wxSystemSettings::GetMetric(wxSYS_HTHUMB_X));
 	sb->PushEventHandler(new NoBgEvtHandler());
@@ -437,6 +440,8 @@ void TestFrame1::OnFLItemActivated(wxListEvent& event)
 //	wxLogStatus(wxT("Playing Sample: %s"),m_fileList->GetSelection().c_str());
 //	m_tp->PlaySample(m_fileList->GetSelection());
 	m_miniPlayer->SetFilename(m_fileList->GetSelection());
+//	puts("abc");
+//	puts(m_fileList->GetSelection().mb_str());
 	m_miniPlayer->Play();
 }
 void TestFrame1::OnFLItemSelected(wxListEvent& event)
@@ -466,7 +471,7 @@ void TestFrame1::MakeToolBar()
 	m_toolBar->AddTool(ID_SetColours,wxT("Setup Colours..."),wxBitmap(colours2_xpm),wxT("Setup Colours..."));
 	m_toolBar->AddTool(ID_SetSnap,wxT("Set Snap Width"),wxBitmap(snap_xpm),wxT("Set Snap Width"));
 	//m_toolBar->AddTool(ID_Preferences,wxT("Preferences"),wxBitmap(prefs_misc_xpm),wxT("Preferences"));
-	m_toolBar->AddTool(ID_Preferences,wxT("Load last Project on Startup"),wxBitmap(prefs_misc_xpm),wxT("Load last Project on Startup"),wxITEM_CHECK);
+//	m_toolBar->AddTool(ID_Preferences,wxT("Load last Project on Startup"),wxBitmap(prefs_misc_xpm),wxT("Load last Project on Startup"),wxITEM_CHECK);
 	m_toolBar->Realize();
 	m_toolBar->EnableTool(ID_STOP,false);
 	this->SetToolBar(m_toolBar);
@@ -509,6 +514,8 @@ void TestFrame1::OnStop(wxCommandEvent& event)
 }
 void TestFrame1::OnRewind(wxCommandEvent& event)
 {
+	Stop();
+	m_tp->Stop();
 	m_tp->Rewind();
 //	m_tp->HideCaret();
 }

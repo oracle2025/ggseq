@@ -1,3 +1,13 @@
+2004-01-13  Richard Spindler <oracle2025@gmx.de>
+
+ *  Added BigScrollBar.cpp .h
+
+2004-01-10  Richard Spindler <oracle2025@gmx.de>
+
+ *  Added some cool new icons for Wav Export and Snap Width Config
+ *  Fixed the screwed up SelectionDrag on win32
+ *  Fixed the Selection Border having the wrong colour
+
 2004-01-04  Richard Spindler <oracle2025@gmx.de>
 
  *  Added ggEvtHandler.cpp .h

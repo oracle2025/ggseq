@@ -36,11 +36,12 @@ class TLTrackVolumeDial;
 class MiniPlayerInterface;
 class Ruler; 
 class UpdateListener;
+class BigScrollBar;
 
 class TLPanel : public wxPanel
 {
 	public:
-		TLPanel(wxWindow* parent, wxScrollBar *scrollbar,
+		TLPanel(wxWindow* parent, BigScrollBar *scrollbar,
 				wxWindowID id = -1,
 				const wxPoint& pos = wxDefaultPosition,
 				const wxSize& size = wxDefaultSize,
@@ -95,7 +96,7 @@ class TLPanel : public wxPanel
 		void UpdateRulerTicks();
 		void EndSelectionDrag(int x, int y, bool copyOnDrag);
 		TLView *m_TlView;
-		wxScrollBar *m_scrollBar;
+		BigScrollBar *m_scrollBar;
 		TLData *m_data;
 		TLLoadSaveManager *m_loadSaveManager;
 		SoundManager *m_soundManager;

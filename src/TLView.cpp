@@ -206,11 +206,11 @@ void TLView::Draw(wxDC& dc/*_screen*/)
 	}
 
 //-.-
-#ifndef __WXMSW__
+//#ifndef __WXMSW__
 	dc.DrawIcon(*m_gungirl,m_FrameWidth+m_FrameX-m_gungirl->GetWidth(),m_FrameHeight+m_FrameY-m_gungirl->GetHeight());
-#else
-	dc.DrawIcon(*m_gungirl,m_FrameWidth+m_FrameX-69,m_FrameHeight+m_FrameY-131);
-#endif
+//#else
+//	dc.DrawIcon(*m_gungirl,m_FrameWidth+m_FrameX-69,m_FrameHeight+m_FrameY-131);
+//#endif
 
 	yoffset=m_FrameY;
 	for ( TLTrackList::Node *node = m_TlData->GetFirst(); node; node = node->GetNext() ) {
@@ -252,21 +252,34 @@ long TLView::DrawTrack(wxDC& dc, long yoffset, TLTrack* track)
 			wxBrush b1=dc.GetBrush();
 			b1.SetColour(current->GetSample()->GetColour());
 			dc.SetBrush(b1);
+		//	if (current->IsSelected()) {
+		//		pen1=dc.GetPen();
+		//		pen1.SetColour(*wxWHITE);
+		//		pen1.SetStyle(wxSHORT_DASH);
+		//		pen1.SetWidth(3);
+		//		dc.SetPen(pen1);
+		//	}
+//			dc.DrawRectangle((long)(start*m_Faktor)+m_FrameX,yoffset,(long)((end-start)*m_Faktor),track->GetHeight());
+			dc.SetPen(*wxBLACK_PEN);
+			dc.SetBrush(*wxBLACK_BRUSH);
+			Draw3dRect(&dc,(long)(start*m_Faktor)+m_FrameX,yoffset,(long)((end-start)*m_Faktor),track->GetHeight(),current->GetSample()->GetColour());
 			if (current->IsSelected()) {
 				pen1=dc.GetPen();
 				pen1.SetColour(*wxWHITE);
 				pen1.SetStyle(wxSHORT_DASH);
 				pen1.SetWidth(3);
 				dc.SetPen(pen1);
+				dc.SetBrush(*wxTRANSPARENT_BRUSH);
+				dc.DrawRectangle((long)(start*m_Faktor)+m_FrameX,yoffset,(long)((end-start)*m_Faktor),track->GetHeight());
 			}
-//			dc.DrawRectangle((long)(start*m_Faktor)+m_FrameX,yoffset,(long)((end-start)*m_Faktor),track->GetHeight());
-			Draw3dRect(&dc,(long)(start*m_Faktor)+m_FrameX,yoffset,(long)((end-start)*m_Faktor),track->GetHeight(),current->GetSample()->GetColour());
+
 			dc.SetPen(*wxBLACK_PEN);
 			dc.SetClippingRegion((long)(start*m_Faktor)+m_FrameX,yoffset,(long)((end-start)*m_Faktor),track->GetHeight());
 			dc.SetFont(*wxSMALL_FONT);
 			wxFileName fn(current->GetSample()->GetFilename());
 //#ifndef __WXMSW__ 
-			dc.DrawText(fn.GetName(),(long)(start*m_Faktor)+1+m_FrameX,yoffset+1);
+			if ( (long)(end*m_Faktor)+m_FrameX>(long)(start*m_Faktor)+1+m_FrameX ) //TODO Evil Hack ;)
+				dc.DrawText(fn.GetName(),(long)(start*m_Faktor)+1+m_FrameX,yoffset+1);
 //#endif
 			dc.DestroyClippingRegion();
 		}
