@@ -52,7 +52,7 @@ class TLView
 		static void Draw3dRect(wxDC *dc, wxCoord x,
 			wxCoord y, wxCoord width, wxCoord height, wxColour colour);
 
-		void DeleteItem(TLItem *item, long trackNr);
+		void DeleteItem(TLItem *item/*, long trackNr*/);
 		void AddItem(TLSample *sample, long position, long trackNr);
 		void AddItem(wxString filename, long position, long trackNr);
 
@@ -64,7 +64,7 @@ class TLView
 
 		TLItem *GetDragItem(long x, long y);
 		void DoDrop( long x, long y, TLItem *item,
-		long srcTrack, long x_offset, bool copy=false);
+		long x_offset, bool copy=false);
 
 		void SetPlaybackPosition(long Position);
 		long GetCaretPosition();

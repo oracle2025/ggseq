@@ -1,3 +1,12 @@
+2004-11-01  Richard Spindler <oracle2025@gmx.de>
+
+ * Modularized SampleDragging, Yeah, lets just modularize the other operations
+ and we can start adding features again :)
+
+2004-10-30  Richard Spindler <oracle2025@gmx.de>
+
+ * fixed a bug in rubberframe selection
+
 2004-10-24  Richard Spindler <oracle2025@gmx.de>
 
  * make distcheck was broken on my new system, fixed it

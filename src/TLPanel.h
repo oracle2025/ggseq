@@ -37,6 +37,7 @@ class Ruler;
 class UpdateListener;
 class BigScrollBar;
 class TLTrack;
+class MouseDragHandler;
 
 class TLPanel : public wxPanel
 {
@@ -87,9 +88,6 @@ class TLPanel : public wxPanel
 		void StartRubberFrame(int x, int y);
 		void UpdateRubberFrame(int x, int y);
 		void EndRubberFrame(int x, int y);
-		void StartSampleDrag(int x, int y, int srcTrackNr, TLItem* srcItem);
-		void UpdateSampleDrag(int x, int y);
-		void EndSampleDrag(int x, int y, bool copyOnDrag);
 		void StartSelectionDrag(int x, int y, int width, int height);
 		void UpdateSelectionDrag(int x, int y);
 		void UpdateRulerTicks();
@@ -109,15 +107,13 @@ class TLPanel : public wxPanel
 		bool m_rubberDrag;
 		bool m_selectionDrag;
 
-		int m_SampleDragSrcTrackNr;
 		int m_SampleDragItemWidth;
 
 		int m_DragX;
 		int m_DragY;
 		int x_offset;
 		int y_offset;
-		int m_oldXImgPos;
-		int m_oldYImgPos;
+		wxRect m_oldImgPos;
 
 		wxRect m_selectionFrame;
 		wxRect m_sampleFrame;
@@ -129,6 +125,7 @@ class TLPanel : public wxPanel
 		Ruler *m_ruler;
 		int m_CaretPosition;
 		bool m_CaretVisible;
+    MouseDragHandler *m_dragHandler;
 		DECLARE_EVENT_TABLE()
 };
 

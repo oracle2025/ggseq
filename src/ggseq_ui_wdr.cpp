@@ -18,6 +18,19 @@
 #include "ggseq_ui_wdr.h"
 
 
+// Euro sign hack of the year
+#if wxUSE_UNICODE
+    #define __WDR_EURO__ wxT("\u20ac")
+#else
+    #if defined(__WXMAC__)
+        #define __WDR_EURO__ wxT("\xdb")
+    #elif defined(__WXMSW__)
+        #define __WDR_EURO__ wxT("\x80")
+    #else
+        #define __WDR_EURO__ wxT("\xa4")
+    #endif
+#endif
+
 // Custom source
 #include <wx/dirctrl.h>
 #include "ui_helper.h"
@@ -353,9 +366,6 @@ wxSizer *ImportPackDlgFunc( wxWindow *parent, bool call_fit, bool set_sizer )
 
     wxStaticText *item1 = new wxStaticText( parent, ID_TEXT, wxT("Import Package"), wxDefaultPosition, wxDefaultSize, 0 );
     item1->SetFont( wxFont( 12, wxSWISS, wxNORMAL, wxBOLD ) );
-#if defined(__WXMSW__) && !(wxCHECK_VERSION(2,3,0))
-    item1->SetSize( item1->GetBestSize() );
-#endif
     item0->Add( item1, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP, 5 );
 
     wxStaticLine *item2 = new wxStaticLine( parent, ID_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL );
@@ -459,7 +469,7 @@ wxMenuBar *MyMenuBarFunc()
     item1->Append( ID_IMPORT_PACK, wxT("Import Package..."), wxT("") );
     item1->AppendSeparator();
     item1->Append( ID_QUIT, wxT("&Quit"), wxT("") );
-    item0->Append( item1, wxT("File") );
+    item0->Append( item1, wxT("&File") );
     
     wxMenu* item2 = new wxMenu;
     item2->Append( ID_UNDO, wxT("&Undo"), wxT("") );

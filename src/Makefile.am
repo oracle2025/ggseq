@@ -12,6 +12,8 @@ bin_PROGRAMS = ggseq
 ggseq_SOURCES = PreferencesDialog.h\
                 PreferencesDialog.cpp\
 		ggseq_ui.cpp\
+		MouseDragHandler.cpp\
+		MouseDragHandler.h\
                 ggseq_ui.h\
                 ggseq_ui_wdr.cpp\
 								colour_helper.h\

@@ -9,6 +9,7 @@
 #define GG_VERSION "0.2.0"
 #define ID_BIG_SCROLLBAR 20001
 #define ID_SCROLLBAR2 20002
+#define TOP_OFFSET_TRACKS 3
 
 typedef long long gg_tl_dat;
 

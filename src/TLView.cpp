@@ -263,7 +263,7 @@ void TLView::AddItem(wxString filename, long position, long trackNr)
 		);
 }
 
-void TLView::DeleteItem(TLItem *item, long trackNr)
+void TLView::DeleteItem(TLItem *item )
 {
 	if (m_TlData->IsBlocked())
 		return;
@@ -295,7 +295,12 @@ long TLView::GetTrackByY(long y)
 }
 wxRect TLView::GetItemBoundaries(TLItem *item)
 {
-
+  	static int x, y, width, height;
+	x      = FromTLtoScreenX( item->GetPosition() );
+  	y      = item->GetTrack() * 30 + TOP_OFFSET_TRACKS - GetYScrollPosition();
+	width  = (int)( item->GetLength() / GetRealZoom() );
+	height = 25;
+	return wxRect( x, y, width, height );
 }
 TLItem *TLView::GetDragItem( long x, long y )
 {
@@ -306,7 +311,7 @@ TLItem *TLView::GetDragItem( long x, long y )
 		return NULL;
 	return m_TlData->ItemAtPos( FromScreenXtoTL( x ), track );
 }
-void TLView::DoDrop( long x, long y, TLItem *item, long srcTrack, long x_offset, bool copy )
+void TLView::DoDrop( long x, long y, TLItem *item, long x_offset, bool copy )
 {
 	if ( m_TlData->IsBlocked() )
 		return;
@@ -315,7 +320,7 @@ void TLView::DoDrop( long x, long y, TLItem *item, long srcTrack, long x_offset,
 		track = -1;
 	/*Delete Item*/
 	if ( track < 0 && !copy ) {
-		DeleteItem( item, srcTrack );
+		DeleteItem( item );
 		return;
 	} else if ( track < 0 )
 		return;
@@ -386,8 +391,10 @@ void TLView::Select( long x, long y, long width, long height )
 	gg_tl_dat TL_X1 = FromScreenXtoTL( x );
 	gg_tl_dat TL_X2 = FromScreenXtoTL( x + width );
 	for ( TLTrackList::Node *trackNode = m_TlData->GetFirst(); trackNode; trackNode = trackNode->GetNext() ) {
-		if ( !( i >= firstTrackNr && i <= scndTrackNr ) )
+		if ( !( i >= firstTrackNr && i <= scndTrackNr ) ) {
+			i++;
 			continue;
+		}
 		TLTrack *track = trackNode->GetData();
 		for ( TLItemList::Node *node = track->GetFirst(); node; node = node->GetNext() ) {
 			TLItem *current = node->GetData();
