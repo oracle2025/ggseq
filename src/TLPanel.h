@@ -54,8 +54,8 @@ class TLPanel : public wxPanel
 		void OnDoubleClick(wxMouseEvent& event);
 		void OnScroll(wxScrollEvent& event);
 		void OnScroll2(wxScrollEvent& event);
-		void OnEdit(wxMenuEvent& event);
-		void OnToggleEnvelope(wxMenuEvent& event);
+		void OnEdit(wxCommandEvent& event);
+		void OnToggleEnvelope(wxCommandEvent& event);
 		void ResetScrollBar();
 		void DropFileAt(int x, int y, wxString filename);
 		bool New();

@@ -290,29 +290,21 @@ wxSizer *PreferencesFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     item2->AddPage( item4, wxT("Colours") );
 
     wxPanel *item5 = new wxPanel( item2, -1 );
-    SetAccelsFunc( item5, FALSE );
-    item2->AddPage( item5, wxT("Keyboard Shortcuts") );
-
-    wxPanel *item6 = new wxPanel( item2, -1 );
-    HelpProgsFunc( item6, FALSE );
-    item2->AddPage( item6, wxT("Helper Programs") );
-
-    wxPanel *item7 = new wxPanel( item2, -1 );
-    MiscOptsDlgFunc( item7, FALSE );
-    item2->AddPage( item7, wxT("Misc. Options") );
+    MiscOptsDlgFunc( item5, FALSE );
+    item2->AddPage( item5, wxT("Misc. Options") );
 
     item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    wxBoxSizer *item8 = new wxBoxSizer( wxHORIZONTAL );
+    wxBoxSizer *item6 = new wxBoxSizer( wxHORIZONTAL );
 
-    wxButton *item9 = new wxButton( parent, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    item8->Add( item9, 0, wxALIGN_CENTER|wxRIGHT|wxTOP|wxBOTTOM, 5 );
+    wxButton *item7 = new wxButton( parent, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    item6->Add( item7, 0, wxALIGN_CENTER|wxRIGHT|wxTOP|wxBOTTOM, 5 );
 
-    wxButton *item10 = new wxButton( parent, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
-    item10->SetDefault();
-    item8->Add( item10, 0, wxALIGN_CENTER|wxALL, 5 );
+    wxButton *item8 = new wxButton( parent, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
+    item8->SetDefault();
+    item6->Add( item8, 0, wxALIGN_CENTER|wxALL, 5 );
 
-    item0->Add( item8, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxTOP|wxBOTTOM, 5 );
+    item0->Add( item6, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxTOP|wxBOTTOM, 5 );
 
     if (set_sizer)
     {
@@ -685,8 +677,6 @@ wxMenuBar *MyMenuBarFunc()
     item0->Append( item2, wxT("&Edit") );
     
     wxMenu* item3 = new wxMenu;
-    item3->Append( ID_SHOW_MIXER, wxT("Show &Mixer"), wxT("") );
-    item3->AppendSeparator();
     item3->Append( ID_ZOOM_50, wxT("50%"), wxT("") );
     item3->Append( ID_ZOOM_100, wxT("100%"), wxT("") );
     item3->Append( ID_ZOOM_150, wxT("150%"), wxT("") );

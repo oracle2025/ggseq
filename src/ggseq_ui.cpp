@@ -160,7 +160,6 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     // GUI - Hints
     GetMenuBar()->Enable( ID_MOVE_TRACK_UP, false );
     GetMenuBar()->Enable( ID_MOVE_TRACK_DOWN, false );
-    GetMenuBar()->Enable( ID_SHOW_MIXER, false );
     SetSizeHints(470,500);
     GetMainSplitter()->SetSashPosition(200);
     GetTlPanel()->SetFocus();//Nötig, damit unter wxGTK die Cursor funktionieren.

@@ -40,25 +40,30 @@ WX_DEFINE_LIST(GgseqCommandList);
 class GgseqUndoItem
 {
 	public:
-		GgseqUndoItem(
+/*		GgseqUndoItem(
 			wxString filename,
 			int64_t position,
 			unsigned int trackId,
 			long referenceId = 0,
 			TLItem *itemReference = (TLItem*)0
-		)
-		{
+		)*/
+		GgseqUndoItem(
+			const ItemEssentials &e,
+			TLItem *itemReference = (TLItem*)0
+		)	{
 			m_itemReference = itemReference;
-			m_filename = filename;
+			m_essentials = e;
+/*			m_filename = filename;
 			m_position = position;
 			m_trackId = trackId;
-			m_referenceId = referenceId;
+			m_referenceId = referenceId;*/
 		}
 		TLItem *m_itemReference;/*ist nicht vermeidbar sein*/
-		long m_referenceId;
-		wxString m_filename;
-		int64_t m_position;
-		unsigned int m_trackId;
+		//long m_referenceId;
+		//wxString m_filename;
+		//int64_t m_position;
+		//unsigned int m_trackId;
+		ItemEssentials m_essentials;
 };
 WX_DEFINE_LIST(GgseqUndoItemList);
 
@@ -109,7 +114,7 @@ void GgseqCommand::SetDocManager( GgseqDocManager *docManager )
 	m_docManager = docManager;
 }
 bool GgseqCommand::GetError() { return m_error; }
-TLItem *GgseqCommand::GetItem()
+TLItem *GgseqModifyItemCommand::GetItem()
 {
 	if (!m_referenceId) {
 		m_referenceId = m_docManager->GetNewRefId();
@@ -160,27 +165,36 @@ GgseqAddItemCommand::GgseqAddItemCommand( TLData *doc, const wxString& filename,
 {
 	m_sample = sample;
 	m_document = doc;
-	m_filename = filename;
+	m_error = 0;
+	
+	m_essentials.position = position;
+	m_essentials.filename = filename;
+	m_essentials.trackId = trackId;
+	m_essentials.referenceId = 0;
+/*	m_filename = filename;
 	m_position = position;
 	m_trackId = trackId;
-	m_referenceId = 0;
-	m_error = 0;
+	m_referenceId = 0;*/
 }
 void GgseqAddItemCommand::Do()
 {
-	if (!m_referenceId)
-		m_referenceId = m_docManager->GetNewRefId();
+	if (!m_essentials.referenceId)
+		m_essentials.referenceId = m_docManager->GetNewRefId();
 	if (m_sample) {
-		m_document->AddItem( m_sample, m_position, m_trackId, m_referenceId );
+		m_document->AddItem( m_sample, m_essentials.position,
+				m_essentials.trackId, m_essentials.referenceId );
 	} else {
-		if (m_document->AddItem( m_filename, m_position, m_trackId, m_referenceId ) == 0)
+		if (m_document->AddItem( m_essentials.filename,
+					m_essentials.position,
+					m_essentials.trackId,
+					m_essentials.referenceId ) == 0)
 			m_error = 1;
 	}
 }
 void GgseqAddItemCommand::Undo()
 {
-	TLItem *item = m_document->GetItem(m_referenceId);
-	m_document->DeleteItem( item , m_trackId );
+	TLItem *item = m_document->GetItem(m_essentials.referenceId);
+	m_document->DeleteItem( item , m_essentials.trackId );
 	m_sample = (TLSample*) 0;
 }
 
@@ -189,27 +203,31 @@ GgseqDeleteItemCommand::GgseqDeleteItemCommand( TLData *doc, TLItem *item )
 {
 	m_document = doc;
 	m_item = item;
-	m_referenceId = item->GetReference();
+	m_error = 0;
+
+	item->GetEssentials( m_essentials );
+	
+/*	m_referenceId = item->GetReference();
 	m_filename = item->GetSample()->GetFilename();
 	m_position = item->GetPosition();
-	m_trackId = item->GetTrack();
-	m_error = 0;
+	m_trackId = item->GetTrack();*/
 }
 void GgseqDeleteItemCommand::Do()
 {
-	if (!m_referenceId)
-		m_referenceId = m_docManager->GetNewRefId();
+	if (!m_essentials.referenceId)
+		m_essentials.referenceId = m_docManager->GetNewRefId();
 	if (m_item) {
-		m_document->DeleteItem( m_item, m_trackId );
+		m_document->DeleteItem( m_item, m_essentials.trackId );
 		m_item = (TLItem*) 0;
 	} else {
-		TLItem *item = m_document->GetItem(m_referenceId); /* xxx (siehe oben)*/
-		m_document->DeleteItem( item, m_trackId );
+		TLItem *item = m_document->GetItem(m_essentials.referenceId); /* xxx (siehe oben)*/
+		m_document->DeleteItem( item, m_essentials.trackId );
 	}
 }
 void GgseqDeleteItemCommand::Undo()
 {
-	m_document->AddItem( m_filename, m_position, m_trackId, m_referenceId );
+//	m_document->AddItem( m_filename, m_position, m_trackId, m_referenceId );
+	m_document->AddItem( m_essentials );
 }
 
 /* -- GgseqMoveItemCommand -- */
@@ -217,56 +235,56 @@ GgseqMoveItemCommand::GgseqMoveItemCommand( TLData *doc, TLItem *srcItem,
                                             int64_t destPosition, unsigned int destTrackId )
 {
 	m_document = doc;
-	m_referenceId = srcItem->GetReference();
-	m_position = destPosition;
-	m_trackId = destTrackId;
-	m_item = srcItem;
 	m_error = 0;
+	
+//	m_referenceId = srcItem->GetReference();
+//	m_position = destPosition;
+//	m_trackId = destTrackId;
+	m_item = srcItem;
+	m_item->GetEssentials( m_essentials );
+	m_essentials.position = destPosition;
+	m_essentials.trackId = destTrackId;
 }
 void GgseqMoveItemCommand::Do()
 {
-	if (!m_referenceId)
-		m_referenceId = m_docManager->GetNewRefId();
+	if (!m_essentials.referenceId)
+		m_essentials.referenceId = m_docManager->GetNewRefId();
 	TLItem *item;
 	if (m_item) {
 		item = m_item;
 		m_item = (TLItem*) 0;
 	} else {
-		item = m_document->GetItem(m_referenceId);
+		item = m_document->GetItem(m_essentials.referenceId);
 	}
-	m_filename = item->GetSample()->GetFilename();
-	item->GetEnvelopeData(m_envelopeData);
-/*	for ( int i = 0; i < 4; i++ ) {
-		m_FadeInOut[i] = item->m_guiEnvData[i];
-	}*/
-	/*m_FadeInOut[0] = item->m_leftFadeIn;
-	m_FadeInOut[1] = item->m_rightFadeIn;
-	m_FadeInOut[2] = item->m_leftFadeOut;
-	m_FadeInOut[3] = item->m_rightFadeOut;*/
-	m_toggleEnvelope = item->m_toggleEnvelope;
+	//m_filename = item->GetSample()->GetFilename();
+	//item->GetEnvelopeData(m_envelopeData);
+	//m_toggleEnvelope = item->m_toggleEnvelope;
 	int64_t oldPositon = item->GetPosition();
 	unsigned int oldTrackId = item->GetTrack();
 	TLSample *sample = item->GetSample();
 	sample->Ref();
 	m_document->DeleteItem( item, oldTrackId );
-	m_document->AddItem( sample, m_position, m_trackId , m_referenceId, &m_envelopeData, m_toggleEnvelope );
 	
-	m_position = oldPositon;
-	m_trackId = oldTrackId;
+	//m_document->AddItem( sample, m_position, m_trackId , m_referenceId, &m_envelopeData, m_toggleEnvelope );
+	m_document->AddItem( m_essentials );
+	
+	m_essentials.position = oldPositon;
+	m_essentials.trackId = oldTrackId;
 	sample->UnRef();
 	
 }
 void GgseqMoveItemCommand::Undo()
 {
-	TLItem *item = m_document->GetItem(m_referenceId);
+	TLItem *item = m_document->GetItem(m_essentials.referenceId);
 	int64_t newPositon = item->GetPosition();
 	unsigned int newTrackId = item->GetTrack();
 	TLSample *sample = item->GetSample();
 	sample->Ref();
 	m_document->DeleteItem( item, newTrackId );
-	m_document->AddItem( sample, m_position, m_trackId, m_referenceId, &m_envelopeData );
-	m_position = newPositon;
-	m_trackId = newTrackId;
+	//m_document->AddItem( sample, m_position, m_trackId, m_referenceId, &m_envelopeData );
+	m_document->AddItem( m_essentials );
+	m_essentials.position = newPositon;
+	m_essentials.trackId = newTrackId;
 	sample->UnRef();
 }
 
@@ -283,12 +301,17 @@ GgseqAddItemsCommand::GgseqAddItemsCommand( TLData *doc, TLSelectionSet *selSet,
 	m_position = offsetPos;
 	m_trackId = trackId;
 	m_selSetPointer = newSet;
+	ItemEssentials e;
 	for ( TLSelItemList::Node *node = selSet->GetFirst(); node; node = node->GetNext() ) {
 		TLSelectionItem *current = node->GetData();
+		current->GetItem()->GetEssentials(e);
+		e.position = m_position + e.position - selSet->GetX1();
+		e.trackId = m_trackId + e.trackId - selSet->GetTrack1();
 		m_itemList.Append(
-			new GgseqUndoItem( current->GetSample()->GetFilename(),
+			new GgseqUndoItem( e )
+/*			new GgseqUndoItem( current->GetSample()->GetFilename(),
 				m_position + current->GetPosition() - selSet->GetX1(),
-				m_trackId + current->GetTrack() - selSet->GetTrack1() )
+				m_trackId + current->GetTrack() - selSet->GetTrack1() )*/
 		);
 	}
 	m_error = 0;
@@ -301,13 +324,14 @@ void GgseqAddItemsCommand::Do()
 	}
 	for ( GgseqUndoItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		GgseqUndoItem *current = node->GetData();
-		if (current->m_referenceId == 0)
-			current->m_referenceId = m_docManager->GetNewRefId();
+		if (current->m_essentials.referenceId == 0)
+			current->m_essentials.referenceId = m_docManager->GetNewRefId();
 		TLItem *item = m_document->AddItem(
-			current->m_filename,
-			current->m_position,
-			current->m_trackId,
-			current->m_referenceId
+			current->m_essentials
+//			current->m_filename,
+//			current->m_position,
+//			current->m_trackId,
+//			current->m_referenceId
 		);
 		if ( item && m_selSetPointer ) {
 			(*m_selSetPointer)->AddSample(item->GetSample(), item);
@@ -323,8 +347,8 @@ void GgseqAddItemsCommand::Undo()
 {
 	for ( GgseqUndoItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		GgseqUndoItem *current = node->GetData();
-		TLItem *item = m_document->GetItem(current->m_referenceId);
-		m_document->DeleteItem( item, current->m_trackId );
+		TLItem *item = m_document->GetItem(current->m_essentials.referenceId);
+		m_document->DeleteItem( item, current->m_essentials.trackId );
 	}
 }
 /* -- GgseqMoveItemsCommand -- */
@@ -336,13 +360,19 @@ GgseqMoveItemsCommand::GgseqMoveItemsCommand( TLData *doc,
 	m_position = offsetPos;
 	m_trackId = trackId;
 	m_selSetPointer = newSet;
+	ItemEssentials e;
 	for ( TLSelItemList::Node *node = selSet->GetFirst(); node; node = node->GetNext() ) {
 		TLSelectionItem *current = node->GetData();
+		current->GetItem()->GetEssentials(e);
+		e.position = m_position + e.position - selSet->GetX1();
+		e.trackId = m_trackId + e.trackId - selSet->GetTrack1();
 		m_itemList.Append(
-			new GgseqUndoItem( current->GetSample()->GetFilename(),
+			new GgseqUndoItem( e,
+				current->GetItem() )
+/*			new GgseqUndoItem( current->GetSample()->GetFilename(),
 				m_position + current->GetPosition() - selSet->GetX1(),
 				m_trackId + current->GetTrack() - selSet->GetTrack1(),
-				current->GetItem()->GetReference(), current->GetItem())
+				current->GetItem()->GetReference(), current->GetItem())*/
 		);
 	}
 	selSet->Clear(m_document);
@@ -360,24 +390,24 @@ void GgseqMoveItemsCommand::Do()
 		if (current->m_itemReference) {
 			item = current->m_itemReference;
 			current->m_itemReference = (TLItem*)0;
-			if (!current->m_referenceId)
-				current->m_referenceId = m_docManager->GetNewRefId();
+			if (!current->m_essentials.referenceId)
+				current->m_essentials.referenceId = m_docManager->GetNewRefId();
 		} else {
-			item = m_document->GetItem(current->m_referenceId);
+			item = m_document->GetItem(current->m_essentials.referenceId);
 		}
 		int64_t oldPosition = item->GetPosition();
 		unsigned int oldTrackId = item->GetTrack();
 		TLSample *sample = item->GetSample();
 		sample->Ref();
 		m_document->DeleteItem( item, oldTrackId );
-		item = m_document->AddItem(
-			sample,
+		item = m_document->AddItem( current->m_essentials
+/*			sample,
 			current->m_position,
 			current->m_trackId,
-			current->m_referenceId
+			current->m_referenceId*/
 		);
-		current->m_position = oldPosition;
-		current->m_trackId = oldTrackId;
+		current->m_essentials.position = oldPosition;
+		current->m_essentials.trackId = oldTrackId;
 		sample->UnRef();
 
 		if ( item && m_selSetPointer ) {
@@ -393,18 +423,19 @@ void GgseqMoveItemsCommand::Undo()
 {
 	for ( GgseqUndoItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		GgseqUndoItem *current = node->GetData();
-		TLItem *item = m_document->GetItem(current->m_referenceId);
+		TLItem *item = m_document->GetItem(current->m_essentials.referenceId);
 		int64_t newPosition = item->GetPosition();
 		unsigned int newTrackId = item->GetTrack();
 		TLSample *sample = item->GetSample();
 		sample->Ref();
 		m_document->DeleteItem( item, newTrackId );
-		m_document->AddItem( sample,
+		m_document->AddItem( current->m_essentials
+				/*sample,
 			current->m_position,
 			current->m_trackId,
-			current->m_referenceId );
-		current->m_position = newPosition;
-		current->m_trackId = newTrackId;
+			current->m_referenceId*/ );
+		current->m_essentials.position = newPosition;
+		current->m_essentials.trackId = newTrackId;
 		sample->UnRef();
 	}
 }
@@ -413,13 +444,16 @@ void GgseqMoveItemsCommand::Undo()
 GgseqDeleteItemsCommand::GgseqDeleteItemsCommand( TLData *doc, TLSelectionSet *selSet )
 {
 	m_document = doc;
+	ItemEssentials e;
 	for ( TLSelItemList::Node *node = selSet->GetFirst(); node; node = node->GetNext() ) {
 		TLSelectionItem *current = node->GetData();
+		current->GetItem()->GetEssentials(e);
 		m_itemList.Append(
-			new GgseqUndoItem( current->GetSample()->GetFilename(),
+			new GgseqUndoItem( e,
+				/*current->GetSample()->GetFilename(),
 				current->GetPosition(),
 				current->GetTrack(),
-				current->GetItem()->GetReference(), current->GetItem())
+				current->GetItem()->GetReference(),*/ current->GetItem())
 		);
 	}
 	selSet->Clear(m_document);
@@ -433,10 +467,10 @@ void GgseqDeleteItemsCommand::Do()
 		if (current->m_itemReference) {
 			item = current->m_itemReference;
 			current->m_itemReference = (TLItem*)0;
-			if (!current->m_referenceId)
-				current->m_referenceId = m_docManager->GetNewRefId();
+			if (!current->m_essentials.referenceId)
+				current->m_essentials.referenceId = m_docManager->GetNewRefId();
 		} else {
-			item = m_document->GetItem(current->m_referenceId);
+			item = m_document->GetItem(current->m_essentials.referenceId);
 		}
 		m_document->DeleteItem( item, item->GetTrack() );
 	}
@@ -446,10 +480,11 @@ void GgseqDeleteItemsCommand::Undo()
 {
 	for ( GgseqUndoItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		GgseqUndoItem *current = node->GetData();
-		m_document->AddItem( current->m_filename,
+		m_document->AddItem( current->m_essentials
+				/*current->m_filename,
 			current->m_position,
 			current->m_trackId,
-			current->m_referenceId );
+			current->m_referenceId*/ );
 	}
 
 }
@@ -466,13 +501,16 @@ GgseqDeleteTrackCommand::GgseqDeleteTrackCommand( TLData *doc, TLTrack *track, T
 	m_document = doc;
 	m_trackNr = track->GetTrackNr();
 	m_panel = panel;
+	ItemEssentials e;
 	for ( TLItemList::Node *node = track->GetFirst(); node; node = node->GetNext() ) {
 		TLItem *current = node->GetData();
+		current->GetEssentials(e);
 		m_itemList.Append(
-			new GgseqUndoItem( current->GetSample()->GetFilename(),
+			new GgseqUndoItem( e,
+				/*current->GetSample()->GetFilename(),
 				current->GetPosition(),
 				m_trackNr,
-				current->GetReference(), current)
+				current->GetReference(),*/ current)
 		);
 	}
 	m_error = 0;
@@ -486,10 +524,10 @@ void GgseqDeleteTrackCommand::Do()
 		if ( current->m_itemReference ) {
 			item = current->m_itemReference;
 			current->m_itemReference = (TLItem*)0;
-			if ( !current->m_referenceId )
-				current->m_referenceId = m_docManager->GetNewRefId();
+			if ( !current->m_essentials.referenceId )
+				current->m_essentials.referenceId = m_docManager->GetNewRefId();
 		} else {
-			item = m_document->GetItem( current->m_referenceId );
+			item = m_document->GetItem( current->m_essentials.referenceId );
 		}
 		m_document->DeleteItem( item, m_trackNr );
 	}
@@ -501,10 +539,11 @@ void GgseqDeleteTrackCommand::Undo()
 	m_document->AddTrack(m_trackNr);
 	for ( GgseqUndoItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		GgseqUndoItem *current = node->GetData();
-		m_document->AddItem( current->m_filename,
+		m_document->AddItem( current->m_essentials
+			/*current->m_filename,
 			current->m_position,
 			m_trackNr,
-			current->m_referenceId
+			current->m_referenceId*/
 			);
 	}
 
@@ -621,6 +660,7 @@ GgseqTrimNStretchItemCommand::GgseqTrimNStretchItemCommand(
 	m_rightTrim   = rightTrim;
 	m_timestretch = timestretch;
 	m_error       = 0;
+	m_referenceId = item->GetReference();
 	
 }
 GgseqTrimNStretchItemCommand::~GgseqTrimNStretchItemCommand()
@@ -655,6 +695,7 @@ void GgseqTrimNStretchItemCommand::Do()
 }
 void GgseqTrimNStretchItemCommand::Undo()
 {
+	std::cout << m_referenceId << std::endl;
 	TLItem *item = m_document->GetItem(m_referenceId);
 	wxASSERT(item);
 	gg_tl_dat tmp_leftTrim    = item->GetLeftTrim();

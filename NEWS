@@ -1,9 +1,18 @@
 ggseq -- History of visible changes.
 
-Copyright (C) 2003, Richard Spindler <oracle2025@gmx.de>
+Copyright (C) 2003, Richard Spindler <richard.spindler AT gmail.com>
 See the end for copying conditions.
 
-Please send ggseq bug reports to oracle2025@gmx.de.
+Please send ggseq bug reports to "richard.spindler AT gmail.com"
+
+Version 0.3.0
+
+* Unlimited Undo-Redo
+* Fade-In/Fade-Out
+* Sample Stretching and Trimming
+* Unlimited Number of Tracks
+* Export a Song to Zip-Package
+* Loop Playing
 
 Version 0.2.0
 
@@ -25,7 +34,7 @@ Version 0.1
 -------------------------------------------------------
 Copying information:
 
-Copyright (C) 2003, Richard Spindler <oracle2025@gmx.de>
+Copyright (C) 2003, Richard Spindler <richard.spindler AT gmail.com>
 
    Permission is granted to anyone to make or distribute verbatim copies
    of this document as received, in any medium, provided that the

@@ -42,17 +42,17 @@ void GetSampleEnvelope( EnvelopePoint *result, const NativeEnvData& e, gg_tl_dat
 class TLSample;
 class GetItemTrackListener;
 
-/*typedef struct { // Store everything important for UndoRedo of an Item.
-	position
-	toggleEnvelope
-	referenceId
-	nativeEnvData
-	timestretch
-	leftTrim
-	rightTrim
-	filename
-	trackId
-} ItemEssentials;*/
+typedef struct { // Store everything important for UndoRedo of an Item.
+	gg_tl_dat position; // empty in TLItem
+	bool toggleEnvelope;
+	long referenceId;
+	NativeEnvData nativeEnvData;
+	float timestretch;
+	gg_tl_dat leftTrim;
+	gg_tl_dat rightTrim;
+	wxString filename; // empty in TLItem
+	int trackId;       // empty in TLItem
+} ItemEssentials;
 
 
 class TLItem // Should not contain UI-relevant Data. ( Envelope Rects? )
@@ -64,6 +64,9 @@ class TLItem // Should not contain UI-relevant Data. ( Envelope Rects? )
 			long referenceId,
 			GetItemTrackListener* trackListener
 		);
+		TLItem( TLSample *sample,
+			const ItemEssentials& e,
+			GetItemTrackListener* trackListener );
 		~TLItem();
 	// method declarations
 		float    *GetBuffer();
@@ -105,6 +108,7 @@ class TLItem // Should not contain UI-relevant Data. ( Envelope Rects? )
 				bool mute, double volume);
 
 		TLSample *GetSample();
+		void GetEssentials( ItemEssentials &e );
 		
 		bool m_toggleEnvelope;
 		gg_tl_dat m_position;
@@ -113,6 +117,7 @@ class TLItem // Should not contain UI-relevant Data. ( Envelope Rects? )
 		float GetEnvelopValue( int position );
 		void GuiEnvToDataEnv();
 	// member variable declarations
+		ItemEssentials m_essentials;
 		long m_referenceId;
 		TLSample *m_sample;
 		bool m_selected;

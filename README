@@ -8,21 +8,19 @@ Gungirl Sequencer has support for WAV-Audiofiles.
 HOWTO Compile?
 
 Download and install the following libraries
-wxWindows http://www.wxwindows.org/
-Portaudio http://www.portaudio.com/
-libsndfile http://www.mega-nerd.com/libsndfile/
-libsamplerate http://www.mega-nerd.com/SRC/
+wxWindows http://www.wxwindows.org/               (2.4.2)
+Portaudio http://www.portaudio.com/               (V18.1)
+libsndfile http://www.mega-nerd.com/libsndfile/   (1.0.11)
+libsamplerate http://www.mega-nerd.com/SRC/       (0.1.2)
+SoundTouch http://www.iki.fi/oparviai/soundtouch  (1.3.0)
 
 And then:
 Thanks to Georg,
 The usual ./configure and make stuff.
 
-Hint: Drag and Drop with the right Mousebutten copies a sample
+Hint: Drag a simple with [Ctrl] pressed, to copy it.
 
-
-Richard Spindler
-csad2715@uibk.ac.at
-
+Richard Spindler <richard.spindler AT gmail.com>
 
 
 More Compilation hints:

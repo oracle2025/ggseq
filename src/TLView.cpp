@@ -29,9 +29,9 @@
 #include <iostream>
 
 #include "stuff.h"
+#include "TLItem.h"
 #include "TLTrack.h"
 #include "TLView.h"
-#include "TLItem.h"
 #include "TLData.h"
 #include "TLSample.h"
 #include "TLSelectionSet.h"

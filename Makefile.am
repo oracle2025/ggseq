@@ -10,3 +10,5 @@
 
 EXTRA_DIST = reconf configure rpm_build.sh ggseq.spec ggseq.desktop FAQ acinclude.m4
 SUBDIRS = src icons doc config
+
+#TODO Remove reconf from Dist

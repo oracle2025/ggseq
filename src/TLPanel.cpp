@@ -636,13 +636,13 @@ void TLPanel::SetZoom( float zoom )
 	m_ruler->SetSnap( (long)( m_view->GetSnapValue() / m_view->GetRealZoom() ) );
 	m_view->SetPosition( m_scrollBar->GetBigThumbPosition() );
 }
-void TLPanel::OnToggleEnvelope(wxMenuEvent& event)
+void TLPanel::OnToggleEnvelope(wxCommandEvent& event)
 {
 	m_view->m_docManager->SubmitCommand( new GgseqToggleEnvelopeItemCommand( m_data, m_EditItem ) );
 	m_EditItem = 0;
 	Refresh();
 }
-void TLPanel::OnEdit(wxMenuEvent& event)
+void TLPanel::OnEdit(wxCommandEvent& event)
 {
 	//Open super funky Sample-Editor Window
 	//m_EditItem;

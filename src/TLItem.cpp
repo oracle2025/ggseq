@@ -95,6 +95,27 @@ TLItem::TLItem(TLSample *sample , gg_tl_dat position, long reference, GetItemTra
 	GetSampleEnvelope( m_sampleEnvData, m_nativeEnvData, GetLen() );
 
 }
+TLItem::TLItem( TLSample *sample, const ItemEssentials& e, GetItemTrackListener* trackListener )
+{
+	m_sample=sample;
+	m_position=e.position;
+	m_sample->Ref();
+	m_selected=false;
+	m_toggleEnvelope = e.toggleEnvelope;
+	m_referenceId = e.referenceId;
+	m_trackListener = trackListener;
+	m_nativeEnvData  = e.nativeEnvData;
+	
+	m_stretchedBuffer = 0;
+	m_stretchedLen = 0;
+/*	m_timestretch = 1.0;
+	m_leftTrim = e.leftTrim;
+	m_rightTrim = e.rightTrim;*/
+	SetTrimNStretch( e.leftTrim, e.rightTrim, e.timestretch );
+		 
+	GetRectsFromEnv( m_nativeEnvData, GetLen(), m_guiEnvData );
+	GetSampleEnvelope( m_sampleEnvData, m_nativeEnvData, GetLen() );
+}
 void DrawWxRect( wxDC &dc, const wxRect &rect ) // TODO make Helper Functions File
 {
 	dc.DrawRectangle(rect.x, rect.y, rect.width, rect.height);
@@ -455,4 +476,16 @@ void TLItem::SetEnvelopeData( const NativeEnvData &env )
 	m_nativeEnvData = env;
 	GetRectsFromEnv( m_nativeEnvData, GetLen(), m_guiEnvData );
 	GetSampleEnvelope( m_sampleEnvData, m_nativeEnvData, GetLen() );
+}
+void TLItem::GetEssentials( ItemEssentials &e )
+{
+	e.position = m_position;
+	e.toggleEnvelope = m_toggleEnvelope;
+	e.referenceId = m_referenceId;
+	e.nativeEnvData = m_nativeEnvData;
+	e.timestretch = m_timestretch;
+	e.leftTrim = m_leftTrim;
+	e.rightTrim = m_rightTrim;
+	e.filename = m_sample->GetFilename();
+	e.trackId = GetTrack();
 }

@@ -56,23 +56,32 @@ class GgseqCommand
 		virtual ~GgseqCommand() {};
 		bool GetError();
 	protected:
-		TLItem *GetItem();
 		TLData *m_document;
-		long m_referenceId;
 		GgseqDocManager *m_docManager;
 		bool m_error;
+};
+class GgseqModifyItemCommand : public GgseqCommand
+{
+	public:
+		virtual void Do() = 0;
+		virtual void Undo() = 0;
+		virtual ~GgseqModifyItemCommand() {};
+	protected:
 		TLItem *m_item;
+		TLItem *GetItem();
+		long m_referenceId;
 };
 
 class GgseqSingleItemCommand : public GgseqCommand
 {
 	protected:
-		wxString m_filename;
-		int64_t m_position;
-		unsigned int m_trackId; /*Track ID*/
-		//wxRect m_FadeInOut[4]; //???
-		NativeEnvData m_envelopeData;
-		bool m_toggleEnvelope;
+//		wxString m_filename;
+//		int64_t m_position;
+//		unsigned int m_trackId; /*Track ID*/
+//		NativeEnvData m_envelopeData;
+//		bool m_toggleEnvelope;
+		ItemEssentials m_essentials;
+		TLItem *m_item;
 };
 
 class GgseqAddItemCommand : public GgseqSingleItemCommand
@@ -114,6 +123,8 @@ class GgseqBunchOfItemsCommand : public GgseqCommand
 	virtual ~GgseqBunchOfItemsCommand();
 	protected:
 		GgseqUndoItemList m_itemList;
+		int64_t m_position;
+		unsigned int m_trackId;
 };
 
 class GgseqAddItemsCommand : public GgseqBunchOfItemsCommand /*wird beim Kopieren mit der rechten Maustaste verwendet.*/
@@ -189,7 +200,7 @@ class GgseqMoveTrackCommand : public GgseqTrackCommand
 //TODO: Die ganzen Listen beim beenden löschen.
 
 
-class GgseqEnvelopeItemCommand : public GgseqCommand
+class GgseqEnvelopeItemCommand : public GgseqModifyItemCommand
 {
 	public:
 		GgseqEnvelopeItemCommand( TLData *doc,
@@ -203,7 +214,7 @@ class GgseqEnvelopeItemCommand : public GgseqCommand
 		NativeEnvData m_nativeEnvelope;
 //		TLItem *m_item;
 };
-class GgseqToggleEnvelopeItemCommand : public GgseqCommand
+class GgseqToggleEnvelopeItemCommand : public GgseqModifyItemCommand
 {
 	public:
 		GgseqToggleEnvelopeItemCommand( TLData *doc, TLItem *item );
@@ -213,7 +224,7 @@ class GgseqToggleEnvelopeItemCommand : public GgseqCommand
 	private:
 //		TLItem *m_item;
 };
-class GgseqTrimNStretchItemCommand : public GgseqCommand
+class GgseqTrimNStretchItemCommand : public GgseqModifyItemCommand
 {
 	public:
 		GgseqTrimNStretchItemCommand(

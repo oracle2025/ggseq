@@ -18,7 +18,7 @@
  */
 
 #ifdef __GNUG__
-    #pragma implementation "PreferencesDialog.cpp"
+    #pragma implementation "PreferencesDialog.h"
 #endif
 
 // For compilers that support precompilation, includes "wx/wx.h".
@@ -97,13 +97,13 @@ PreferencesDialog::PreferencesDialog( wxWindow *parent, wxWindowID id, int frame
 
     // Setting up GUI-Stuff
     // - Keyboard Shortcuts
-    wxGrid *acGrid = GetAccelsGrid();
+/*    wxGrid *acGrid = GetAccelsGrid();
     acGrid->SetCellValue(0,0,wxT("Test"));
     acGrid->SetColLabelSize(0);
     acGrid->SetRowLabelSize(0);
     acGrid->EnableGridLines(false);
     acGrid->DisableDragGridSize();
-    acGrid->EnableEditing(false);
+    acGrid->EnableEditing(false);*/
     
     // - Snap
     int *len=new int;

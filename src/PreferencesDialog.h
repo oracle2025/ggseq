@@ -21,7 +21,7 @@
 #define __PreferencesDialog_H__
 
 #ifdef __GNUG__
-    #pragma interface "PreferencesDialog.cpp"
+    #pragma interface "PreferencesDialog.h"
 #endif
 
 #ifndef WX_PRECOMP

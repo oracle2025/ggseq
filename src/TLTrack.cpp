@@ -23,8 +23,8 @@
 #endif
 
 #include "stuff.h"
-#include "TLTrack.h"
 #include "TLItem.h"
+#include "TLTrack.h"
 #include "TLSample.h"
 #include "TLData.h"
 #include "TLPanel.h"
@@ -85,7 +85,12 @@ TLItem *TLTrack::AddItem(TLSample *sample, gg_tl_dat position, long referenceId 
 	m_itemList->Append(referenceId, tmp);
 	return tmp;
 }
-
+TLItem *TLTrack::AddItem( TLSample *sample, const ItemEssentials &e )
+{
+	TLItem *tmp = new TLItem( sample, e, this );
+	m_itemList->Append( e.referenceId, tmp );
+	return tmp;
+}
 static int TlListCompare(const TLItem **arg1, const TLItem **arg2);
 
 void TLTrack::SortItems()
@@ -144,6 +149,7 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 	tracks->LinkEndChild(track);
 	track->SetAttribute("mute",m_mute);
 	track->SetAttribute("volume",(int)(m_volume*100));
+	ItemEssentials e;
 	for ( TLItemList::Node *node = m_itemList->GetFirst(); node; node = node->GetNext() ) {
 		TLItem *current = node->GetData();
 		wxString tmp;
@@ -157,16 +163,16 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 		track->LinkEndChild(item);
 		item->SetAttribute("sample",tmp2.mb_str());
 		item->SetAttribute("pos",tmp.mb_str());
-		
-/*		item->SetAttribute("envelope", wxString::Format( wxT("%d"), current->m_toggleEnvelope ).mb_str() );
-		item->SetAttribute("leftFadeLevel", wxString::Format( wxT("%.30e"), current->m_nativeEnvData.leftFadeLevel ).mb_str() );
-		item->SetAttribute("leftFadePos", wxString::Format( wxT("%.30e"), current->m_nativeEnvData.leftFadePos ).mb_str() );
-		item->SetAttribute("middleLevel", wxString::Format( wxT("%.30e"), current->m_nativeEnvData.middleLevel ).mb_str() );
-		item->SetAttribute("rightFadeLevel", wxString::Format( wxT("%.30e"), current->m_nativeEnvData.rightFadeLevel ).mb_str() );
-		item->SetAttribute("rightFadePos", wxString::Format( wxT("%.30e"), current->m_nativeEnvData.rightFadePos ).mb_str() );*/
-/*		item->SetAttribute("timestretch", wxString::Format( wxT("%d"), current-> ).mb_str() );
-		item->SetAttribute("leftTrim", wxString::Format( wxT("%d"), current-> ).mb_str() );
-		item->SetAttribute("rightTrim", wxString::Format( wxT("%d"), current-> ).mb_str() );*/
+		current->GetEssentials(e);
+		item->SetAttribute("envelope", wxString::Format( wxT("%d"), e.toggleEnvelope ).mb_str() );
+		item->SetAttribute("leftFadeLevel", wxString::Format( wxT("%.30e"), e.nativeEnvData.leftFadeLevel ).mb_str() );
+		item->SetAttribute("leftFadePos", wxString::Format( wxT("%.30e"), e.nativeEnvData.leftFadePos ).mb_str() );
+		item->SetAttribute("middleLevel", wxString::Format( wxT("%.30e"), e.nativeEnvData.middleLevel ).mb_str() );
+		item->SetAttribute("rightFadeLevel", wxString::Format( wxT("%.30e"), e.nativeEnvData.rightFadeLevel ).mb_str() );
+		item->SetAttribute("rightFadePos", wxString::Format( wxT("%.30e"), e.nativeEnvData.rightFadePos ).mb_str() );
+		item->SetAttribute("timestretch", wxString::Format( wxT("%.30e"), e.timestretch ).mb_str() );
+		item->SetAttribute("leftTrim", wxString::Format( wxT("%lld"), e.leftTrim ).mb_str() );
+		item->SetAttribute("rightTrim", wxString::Format( wxT("%lld"), e.rightTrim ).mb_str() );
 	}
 
 }

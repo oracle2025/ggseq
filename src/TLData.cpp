@@ -36,8 +36,8 @@
 #include "tinyxml.h"
 
 #include "Ruler.h"
-#include "TLTrack.h"
 #include "TLItem.h"
+#include "TLTrack.h"
 #include "TLData.h"
 #include "TLSample.h"
 #include "TLSampleManager.h"
@@ -165,6 +165,27 @@ TLItem *TLData::AddItem(wxString& filename, gg_tl_dat Position, int TrackNr, lon
 		return item;
 	}
 	return NULL;
+}
+TLItem *TLData::AddItem( const ItemEssentials &e )
+{
+	TLTrack *tlTrack = m_trackList->Item(e.trackId)->GetData();
+	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::AddItem!" );
+	if (!tlTrack)
+		return NULL;
+	m_updateListener->StartUpdateProcess();
+	TLSample *sample = m_sampleManager->GetSample(e.filename, m_updateListener);
+	m_updateListener->EndUpdateProcess();
+	if (sample) {
+		m_changed=true;
+		if (e.position+sample->GetLength()>m_length-LENGTH_ADD) {
+			m_length=e.position+sample->GetLength()+LENGTH_TO_ADD;
+		}
+		TLItem *item = tlTrack->AddItem(sample, e);
+		m_allItemsHash[e.referenceId]=item;
+		return item;
+	}
+	return NULL;
+
 }
 void TLData::SetItemReferenceId( TLItem *item, long referenceId )
 {

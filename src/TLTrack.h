@@ -19,7 +19,7 @@
 
 #ifndef _TLTRACK_H_
 #define _TLTRACK_H_
-
+#include "TLItem.h"
 class TLItem;
 class TLSample;
 class TiXmlElement;
@@ -47,6 +47,7 @@ class TLTrack : public GetItemTrackListener
 		TLItemList::Node *GetFirst();
 		TLItem *ItemAtPos(gg_tl_dat Position);
 		TLItem *AddItem(TLSample *sample, gg_tl_dat position, long referenceId );
+		TLItem *AddItem( TLSample *sample, const ItemEssentials &e );
 		int GetTrackNr();
 		void DeleteItem(TLItem *item/*, long referenceId*/);
 
