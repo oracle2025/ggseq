@@ -15,7 +15,7 @@
 # heissen
 
 SOFWARENAME=ggseq
-VERSION=0.2pre1
+VERSION=0.2.0
 
 echo 
 echo "****************************************"
@@ -80,6 +80,7 @@ sleep 1
 #Caldera = /usr/src/OpenLinux (rpm 3*)
 #Suse = /usr/src/packages (rpm 3*)
 #PLD = ?
+#Slackware = /usr/src/rpm
 RPMBUILDPATH=
 echo -n "Default RPM Build -Directory .................. "
 if [ -r /usr/src/RPM ];then
@@ -100,6 +101,10 @@ echo $RPMBUILDPATH
 fi
 if [ -r /usr/src/redhat ];then
 RPMBUILDPATH=/usr/src/redhat
+echo $RPMBUILDPATH
+fi
+if [ -r /usr/src/rpm ];then
+RPMBUILDPATH=/usr/src/rpm
 echo $RPMBUILDPATH
 fi
 if [ $RPMBUILDPATH = "" ];then
@@ -142,4 +147,4 @@ mv $SOFWARENAME-$VERSION $SOFWARENAME
 
 #rpm(build) -ba $SPECFILE
 
-$RPMBUILD $RPMBUILDPATH/SPECS/$SOFWARENAME.spec
+$RPMBUILD --nodeps $RPMBUILDPATH/SPECS/$SOFWARENAME.spec

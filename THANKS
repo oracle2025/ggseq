@@ -5,4 +5,11 @@ Many people have further contributed to Gungirl Sequencer by reporting problems,
 suggesting various improvements, or submitting actual code. Here is
 a list of these people. Help me keep it complete and exempt of errors.
 
-tinyxml http://sourceforge.net/projects/tinyxml
+tinyxml       http://sourceforge.net/projects/tinyxml/
+wxWindows     http://www.wxwindows.org/
+Portaudio     http://www.portaudio.com/
+libsndfile    http://www.mega-nerd.com/libsndfile/
+libsamplerate http://www.mega-nerd.com/SRC/
+
+Georg E Schneider <georg@georgs.org>
+Reinhard Amersberger

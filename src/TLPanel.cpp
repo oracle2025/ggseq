@@ -32,7 +32,7 @@
 #include <wx/tglbtn.h>
 #include <wx/filename.h>
 #include <wx/dcbuffer.h>
-#include <iostream>
+//#include <iostream>
 
 #include "stuff.h"
 #include "TLView.h"

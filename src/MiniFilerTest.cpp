@@ -129,6 +129,7 @@ class TestFrame1: public wxFrame
 		void OnMasterVolume(wxScrollEvent& event);
 		void OnQuit(wxCommandEvent& event);
 		void OnSize(wxSizeEvent &event); /*Nur für Windows*/
+		wxString argv0;
 	private:
 		void MakeToolBar();
 		void MakeTlPanel(wxWindow *parent);
@@ -245,10 +246,25 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 }
 void TestFrame1::OnHelp(wxCommandEvent& event)
 {
-	wxFileName filename = wxFileName(wxT("ggseq.htb"));
-	filename.Normalize();
-	//wxMessageDialog(this, wxGetCwd()).ShowModal();
-	m_help->Initialize(filename.GetFullPath());
+	wxString path;
+#ifdef __WXMSW__
+	wxString cwd=wxGetCwd();
+	if (wxIsAbsolutePath(argv0)) {
+		path = wxPathOnly(argv0);
+	} else {
+		path = cwd;
+	}
+	if (path.Last() != wxFILE_SEP_PATH)
+		path += wxFILE_SEP_PATH;
+
+
+	//wxFileName filename = wxFileName(wxT("ggseq.htb"));
+	//filename.Normalize();
+	//wxMessageDialog(this, path+wxT("ggseq.htb")).ShowModal();
+#else
+	path=wxT("/usr/share/doc/");
+#endif
+	m_help->Initialize(path+wxT("ggseq.htb"));
 	m_help->DisplayContents();
 }
 
@@ -706,9 +722,7 @@ bool Test::OnInit()
 	if (m_fnames.GetCount()>0) {
 		frame->LoadFile(m_fnames[0]);
 	}/* else LoadLastProject? */
-	
-//	wxMessageDialog dlg(frame, wxT("Abc"));
-//	dlg.ShowModal();
+	frame->argv0=argv[0];
 	return TRUE;
 }
 bool Test::ProcessCmdLine (wxChar** argv, int argc)

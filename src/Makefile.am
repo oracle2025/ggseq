@@ -72,6 +72,9 @@ ggseq_SOURCES = MiniFilerTest.cpp\
 		TLSetSnapDialog.h\
 		TLMuteButton.h
 
-ggseq_LDFLAGS = -ggdb $(CLIBS) @SNDFILE_LIBS@ @SAMPLERATE_LIBS@ -lportaudio `wx-config --libs`
-AM_CPPFLAGS = -ggdb @CPPFLAGS@ $(CPPFLAGS) @SNDFILE_CFLAGS@ @SAMPLERATE_CFLAGS@ -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons
+ggseq_LDFLAGS = $(CLIBS) @SNDFILE_LIBS@ @SAMPLERATE_LIBS@ -lportaudio `wx-config --libs`
+#ggseq_LDFLAGS = $(CLIBS)  `wx-config --libs`
+#ggseq_LDADD = /usr/lib/libsndfile.a /usr/lib/libsamplerate.a /usr/local/lib/libportaudio.a /tmp/wx_static/lib/libwx_gtk-2.4.a 
+
+AM_CPPFLAGS = @CPPFLAGS@ $(CPPFLAGS) @SNDFILE_CFLAGS@ @SAMPLERATE_CFLAGS@ -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons
 

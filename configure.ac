@@ -9,7 +9,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AC_INIT([ggseq],
-        [0.1.1],
+        [0.2.0],
         [Richard Spindler oracle2025@gmx.de],
         [ggseq])
 AC_CONFIG_AUX_DIR(config)
@@ -103,6 +103,8 @@ AC_CONFIG_FILES([
    Makefile
    src/Makefile
    icons/Makefile
+   doc/Makefile
+   doc/pics/Makefile
 ])
 
 AC_OUTPUT

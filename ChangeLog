@@ -1,3 +1,12 @@
+2004-02-19  Richard Spindler <oracle2025@gmx.de>
+
+ * Official 0.2.0 Release
+
+2004-02-16  Richard Spindler <oracle2025@gmx.de>
+
+ * Added doc/ggseq.htb
+ * Added html documentation
+
 2004-02-11  Richard Spindler <oracle2025@gmx.de>
 
  * Fixed Bug that coused loading an empty arrangement to throw an error-message
@@ -14,7 +23,7 @@
 2004-02-07  Richard Spindler <oracle2025@gmx.de>
 
  * Fixed some Redraw Errors on Windows XP, tried to reduce "Flicker" on win32
- * Programming in a the MS Windows Enviornment is Hell!
+ * Programming in the MS Windows Enviornment is Hell!
  * Fixed loading of Files saved with version 0.1
  * Added Version Information at various places
 

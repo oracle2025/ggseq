@@ -2,4 +2,4 @@ Authors of ggseq.
 See also the files THANKS and ChangeLog.
 
 Richard Spindler <oracle2025@gmx.de> designed and implemented ggseq.
-Georg E Schneider <georg@georgs.org> added autoconf stuff
+Georg E Schneider <georg@georgs.org> added autoconf stuff, the rpm_build.sh and spec file

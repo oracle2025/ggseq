@@ -5,9 +5,22 @@ See the end for copying conditions.
 
 Please send ggseq bug reports to oracle2025@gmx.de.
 
+Version 0.2.0
+
+* Ruler
+* Select Samples with rubber-frame
+* MiniPlayer for Pre-Listening
+* Customizable Snap-Value
+* Track Mute and Volume
+* Master Volume
+* Snapless Sample-Positing
+* Info-Box for Sample-Files
+* Progress-Bars for File loading
+* uncountable Bug-Fixes
+
 Version 0.1
 
-* List your features here
+* Initial Release
 
 -------------------------------------------------------
 Copying information:
