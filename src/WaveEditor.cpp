@@ -33,11 +33,11 @@
 #include <wx/dcbuffer.h>
 #include <math.h>
 
-#include "WaveEditor.h"
 #include "stuff.h"
+#include "WaveEditor.h"
 #include "TLItem.h"
 #include "TLSample.h"
-
+#include "SoundManager.h"
 // event table
 
 BEGIN_EVENT_TABLE(WaveEditor, wxPanel)
@@ -46,6 +46,7 @@ BEGIN_EVENT_TABLE(WaveEditor, wxPanel)
 	EVT_LEFT_DOWN(WaveEditor::OnMouseDown)
 	EVT_MOTION(WaveEditor::OnMouseMotion)
 	EVT_LEFT_UP(WaveEditor::OnMouseUp)
+	EVT_SIZE(WaveEditor::OnSize)
 END_EVENT_TABLE()
 
 
@@ -53,13 +54,57 @@ WaveEditor::WaveEditor( wxWindow* parent, TLItem *item, wxWindowID id )
 	:wxPanel(parent, id, wxDefaultPosition, wxDefaultSize, wxCLIP_CHILDREN)
 {
 	m_item = item;
-	m_marker[0] = wxRect( 0, 0, 10, 5 );
-	m_marker[1] = wxRect( 20, 0, 10, 5 );
+	m_marker[0] = wxRect( -5, 0, 10, 5 );
+	m_marker[1] = wxRect( GetClientSize().GetWidth() - 5, 0, 10, 5 );
+	m_leftTrim = 0;
+	m_rightTrim = m_item->GetLength() / 2;
 	m_dragOffset = 0;
 	m_dragMarker = 0;
+	m_caretVisible = false;
+	m_caretOldPosition = 0;
 }
 WaveEditor::~WaveEditor()
 {
+}
+void WaveEditor::ShowCaret()
+{
+	if (m_caretVisible)
+		return;
+	wxClientDC dc(this);
+	dc.SetLogicalFunction( wxINVERT );
+	dc.SetPen( *wxTRANSPARENT_PEN );
+	m_caretOldPosition = m_marker[0].x + 5;
+	dc.DrawRectangle( m_caretOldPosition, 0, 1, GetSize().GetHeight() );
+	m_caretVisible = true;
+}
+void WaveEditor::HideCaret()
+{
+	if (!m_caretVisible)
+		return;
+	wxClientDC dc(this);
+	dc.SetLogicalFunction( wxINVERT );
+	dc.SetPen( *wxTRANSPARENT_PEN );
+	dc.DrawRectangle( m_caretOldPosition, 0, 1, GetSize().GetHeight() );
+	m_caretVisible = false;
+}
+void WaveEditor::UpdateCaret()
+{
+	if (!m_caretVisible)
+		return;
+	wxClientDC dc(this);
+	dc.SetLogicalFunction( wxINVERT );
+	dc.SetPen( *wxTRANSPARENT_PEN );
+	dc.DrawRectangle( m_caretOldPosition, 0, 1, GetSize().GetHeight() );
+	m_caretOldPosition = m_marker[0].x + 5 + TrimToMark(g_ggseqProps.GetSoundManager()->GetPosition()/2);
+	dc.DrawRectangle( m_caretOldPosition, 0, 1, GetSize().GetHeight() );
+}
+gg_tl_dat WaveEditor::MarkToTrim( int x )
+{
+	return ( gg_tl_dat(x+5) * (m_item->GetLength() / 2) ) / GetClientSize().GetWidth();
+}
+int WaveEditor::TrimToMark( gg_tl_dat x )
+{
+	return ( ( x * GetClientSize().GetWidth() ) / (m_item->GetLength() / 2) ) - 5; 
 }
 float get_average( float* buffer, unsigned int len )
 {
@@ -69,6 +114,16 @@ float get_average( float* buffer, unsigned int len )
 	}
 	return sum / float(len / 2);
 }
+int resize( int oldX, int oldWidth, int newWidth )
+{
+	return ( ( (oldX + 5) * newWidth ) / oldWidth ) -5;
+}
+/*void WaveEditor::OnSize( wxSizeEvent& event )
+{
+	//m_marker[0].x = resize( m_marker[0].x, m_oldWidth, event.GetSize().GetWidth() );
+	//m_marker[1].x = resize( m_marker[1].x, m_oldWidth, event.GetSize().GetWidth() );
+	//m_oldWidth = event.GetSize().GetWidth();
+}*/
 void WaveEditor::OnPaint( wxPaintEvent& event )
 {
 	int width, height;
@@ -96,6 +151,8 @@ void WaveEditor::OnPaint( wxPaintEvent& event )
 	}
 	dc.DrawLine( 0, height / 2, width, height / 2 );
 	dc.SetPen( *wxRED_PEN );
+	m_marker[0].x = TrimToMark( m_leftTrim );
+	m_marker[1].x = TrimToMark( m_rightTrim );
 	dc.DrawLine( m_marker[0].x + 5, 0, m_marker[0].x + 5, height );
 	dc.DrawLine( m_marker[1].x + 5, 0, m_marker[1].x + 5, height );
 	dc.SetBrush( *wxBLACK_BRUSH );
@@ -110,6 +167,7 @@ void WaveEditor::OnEraseBackground( wxEraseEvent& event )
 
 void WaveEditor::OnMouseDown( wxMouseEvent& event )
 {
+	g_ggseqProps.GetSoundManager()->Stop();
 	for ( int i = 0; i < 2; i++ ) {
 		if ( m_marker[i].Inside( event.GetPosition() ) ) {
 			m_dragMarker = &m_marker[i];
@@ -135,6 +193,16 @@ void WaveEditor::OnMouseMotion( wxMouseEvent& event )
 		return;
 	m_dragMarker->x = event.m_x - m_dragOffset;
 	fit_between( &m_dragMarker->x, - 5, GetClientSize().GetWidth() - 5 );
+	if ( m_dragMarker == &m_marker[0] ) {
+		m_leftTrim = MarkToTrim( m_dragMarker->x );
+	} else if ( m_dragMarker == &m_marker[1] ) {
+		m_rightTrim = MarkToTrim( m_dragMarker->x );
+	}
+	if ( m_leftTrim > m_rightTrim ) {
+		gg_tl_dat t = m_leftTrim;
+		m_leftTrim = m_rightTrim;
+		m_rightTrim = t;
+	}
 	Refresh();
 }
 
@@ -144,6 +212,10 @@ void WaveEditor::OnMouseUp( wxMouseEvent& event )
 		ReleaseMouse();
 	}
 	m_dragMarker = 0;
+}
+void WaveEditor::GetTrims( gg_tl_dat &start, gg_tl_dat &end )
+{
+	
 }
 		
 

@@ -63,8 +63,7 @@ class TLItem
 		void DrawEnvelope( wxDC &dc, int xOffset, int yOffset );
 		wxRect *TouchingEnvelopeCtrl( int x, int y );
 		void GuiEnvToDataEnv();
-		void Stretch( float amount );
-//		void Trim( gg_tl_dat start, gg_tl_dat end );
+		void Stretch( float amount, gg_tl_dat trimStart = -1, gg_tl_dat trimEnd = -1 );
 		bool m_toggleEnvelope;
 		float *m_stretchedBuffer;
 		gg_tl_dat m_stretchedLen;

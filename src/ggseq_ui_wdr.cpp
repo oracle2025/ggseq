@@ -497,40 +497,48 @@ wxSizer *TrimmerDialogFunc( wxWindow *parent, bool call_fit, bool set_sizer )
 
     item8->Add( 20, 20, 1, wxALIGN_CENTER, 5 );
 
-    wxFlexGridSizer *item19 = new wxFlexGridSizer( 2, 5, 5 );
+    wxFlexGridSizer *item19 = new wxFlexGridSizer( 3, 5, 5 );
 
-    wxStaticText *item20 = new wxStaticText( parent, ID_TEXT, wxT("Timestrech"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText *item20 = new wxStaticText( parent, ID_TEXT, wxT("Timestretch"), wxDefaultPosition, wxDefaultSize, 0 );
     item19->Add( item20, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
-    wxTextCtrl *item21 = new wxTextCtrl( parent, ID_TIMESTRECH_TEXTCTRL, wxT("1,0"), wxDefaultPosition, wxSize(80,-1), 0 );
+    wxWindow *item21 = parent->FindWindow( ID_TIMESTRETCH_DIAL );
+    wxASSERT( item21 );
     item19->Add( item21, 0, wxALIGN_CENTER, 5 );
 
-    wxStaticText *item22 = new wxStaticText( parent, ID_TEXT, wxT("Volume"), wxDefaultPosition, wxDefaultSize, 0 );
-    item19->Add( item22, 0, wxALIGN_CENTER_VERTICAL, 5 );
+    wxTextCtrl *item22 = new wxTextCtrl( parent, ID_TIMESTRECH_TEXTCTRL, wxT("1,0"), wxDefaultPosition, wxSize(80,-1), wxTE_READONLY );
+    item19->Add( item22, 0, wxALIGN_CENTER, 5 );
 
-    wxTextCtrl *item23 = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), 0 );
-    item19->Add( item23, 0, wxALIGN_CENTER, 5 );
+    wxStaticText *item23 = new wxStaticText( parent, ID_TEXT, wxT("Volume"), wxDefaultPosition, wxDefaultSize, 0 );
+    item19->Add( item23, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    wxWindow *item24 = parent->FindWindow( ID_VOLUME_DIAL );
+    wxASSERT( item24 );
+    item19->Add( item24, 0, wxALIGN_CENTER, 5 );
+
+    wxTextCtrl *item25 = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), 0 );
+    item19->Add( item25, 0, wxALIGN_CENTER, 5 );
 
     item8->Add( item19, 0, wxALIGN_CENTER|wxLEFT, 5 );
 
     item0->Add( item8, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 5 );
 
-    wxStaticLine *item24 = new wxStaticLine( parent, ID_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL );
-    item0->Add( item24, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5 );
+    wxStaticLine *item26 = new wxStaticLine( parent, ID_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL );
+    item0->Add( item26, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5 );
 
-    wxBoxSizer *item25 = new wxBoxSizer( wxHORIZONTAL );
+    wxBoxSizer *item27 = new wxBoxSizer( wxHORIZONTAL );
 
-    wxButton *item26 = new wxButton( parent, ID_BUTTON, wxT("?"), wxDefaultPosition, wxSize(25,-1), 0 );
-    item25->Add( item26, 0, wxALIGN_CENTER|wxTOP|wxBOTTOM, 5 );
+    wxButton *item28 = new wxButton( parent, ID_BUTTON, wxT("?"), wxDefaultPosition, wxSize(25,-1), 0 );
+    item27->Add( item28, 0, wxALIGN_CENTER|wxTOP|wxBOTTOM, 5 );
 
-    wxButton *item27 = new wxButton( parent, ID_BUTTON, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    item25->Add( item27, 0, wxALIGN_CENTER|wxALL, 5 );
+    wxButton *item29 = new wxButton( parent, ID_BUTTON, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    item27->Add( item29, 0, wxALIGN_CENTER|wxALL, 5 );
 
-    wxButton *item28 = new wxButton( parent, ID_BUTTON, wxT("Apply and Close"), wxDefaultPosition, wxSize(130,-1), 0 );
-    item28->SetDefault();
-    item25->Add( item28, 0, wxALIGN_CENTER|wxALL, 5 );
+    wxButton *item30 = new wxButton( parent, ID_BUTTON, wxT("Apply and Close"), wxDefaultPosition, wxSize(130,-1), 0 );
+    item30->SetDefault();
+    item27->Add( item30, 0, wxALIGN_CENTER|wxALL, 5 );
 
-    item0->Add( item25, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+    item0->Add( item27, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
     if (set_sizer)
     {

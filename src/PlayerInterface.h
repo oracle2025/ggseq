@@ -82,7 +82,7 @@ class LoopPlayer : public PlayerInterface
 
 		// method declarations
 		int FillBuffer( float *buffer, unsigned long frames );
-		gg_tl_dat GetPosition(){ return 0; }
+		gg_tl_dat GetPosition(){ return m_loopPos; }
 	private:
 		// member variable declarations
 		float *m_loopSample;

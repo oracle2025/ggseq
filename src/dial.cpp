@@ -186,7 +186,7 @@ void wxDial::TipEventMotion(wxPoint point)
 	DrawDialTip();
 	Refresh(0);
 	
-	wxScrollEvent scrEvent(wxEVT_SCROLL_THUMBTRACK,0,m_Value);
+	wxScrollEvent scrEvent(wxEVT_SCROLL_THUMBTRACK,GetId(),m_Value);
 	wxPostEvent(this,scrEvent);
 	
 }
@@ -233,7 +233,7 @@ double wxDial::CalcAngle(int center_x, int center_y, int pos_x, int pos_y)
 }
 void wxDial::SetValueFromAngle(double angle)
 {
-	m_Value = (int)(((m_MaxValue-m_MinValue)*angle)/(PI/2+PI));
+	m_Value = m_MinValue+(int)(((m_MaxValue-m_MinValue)*angle)/(PI/2+PI));
 }
 void wxDial::DrawBgCircle(wxDC *dc)
 {

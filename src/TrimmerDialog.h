@@ -32,7 +32,7 @@
 
 // WDR: class declarations
 class TLItem;
-
+class WaveEditor;
 //----------------------------------------------------------------------------
 // TrimmerDialog
 //----------------------------------------------------------------------------
@@ -48,17 +48,21 @@ public:
     virtual ~TrimmerDialog();
     
     // WDR: method declarations for TrimmerDialog
+    WaveEditor* GetWaveEditor()  { return (WaveEditor*) FindWindow( ID_WAVE_EDITOR ); }
     wxTextCtrl* GetTimestrechTextctrl()  { return (wxTextCtrl*) FindWindow( ID_TIMESTRECH_TEXTCTRL ); }
     
 private:
     // WDR: member variable declarations for TrimmerDialog
     TLItem *m_item;
     bool m_playing;
+    wxTimer *m_timer;
     
 private:
     // WDR: handler declarations for TrimmerDialog
+    void OnVolume( wxScrollEvent &event );
+    void OnTimestretch( wxScrollEvent &event );
     void OnLoopButton( wxCommandEvent &event );
-
+    void OnTimer(wxTimerEvent &event);
 private:
     DECLARE_EVENT_TABLE()
 };

@@ -38,12 +38,21 @@ class WaveEditor : public wxPanel
 		WaveEditor( wxWindow* parent, TLItem *item, wxWindowID id = -1 );
 		virtual ~WaveEditor();
 		// method declarations
+		void GetTrims( gg_tl_dat &start, gg_tl_dat &end );
+		void ShowCaret();
+		void HideCaret();
+		void UpdateCaret();
+		// variables
+		gg_tl_dat  m_leftTrim;
+		gg_tl_dat  m_rightTrim;
 	private:
 		// member variable declarations
-		TLItem *m_item;
-		wxRect  m_marker[2];
-		int     m_dragOffset;
-		wxRect *m_dragMarker;
+		TLItem    *m_item;
+		wxRect     m_marker[2];
+		int        m_dragOffset;
+		wxRect    *m_dragMarker;
+		bool       m_caretVisible;
+		int        m_caretOldPosition;
 	private:
 		// handler declarations
 		void OnPaint( wxPaintEvent& event );
@@ -51,7 +60,10 @@ class WaveEditor : public wxPanel
 		void OnMouseDown( wxMouseEvent& event );
 		void OnMouseMotion( wxMouseEvent& event );
 		void OnMouseUp( wxMouseEvent& event );
+//		void OnSize( wxSizeEvent& event );
 	private:
+		gg_tl_dat MarkToTrim( int x );
+		int TrimToMark( gg_tl_dat x );
 		DECLARE_EVENT_TABLE()
 };
 

@@ -304,31 +304,12 @@ bool TLItem::IsSelected()
 	return m_selected;
 }
 long TLItem::GetReference() { return m_referenceId; }
-void TLItem::Stretch(float amount)
+void TLItem::Stretch( float amount, gg_tl_dat trimStart, gg_tl_dat trimEnd )
 {
-/*	if ( m_stretchedBuffer ) {
-		delete m_stretchedBuffer;
-		m_stretchedBuffer = 0;
-	}
-	int new_len = m_sample->GetLength() * amount + 50;
-	wxString s;
-	s.Printf( wxT("hello: %d, %e\n"), new_len, amount );
-	wxLogError( s );
-	float *new_buffer = new float[new_len];
-
-	m_SoundTouch.clear();
-	m_SoundTouch.setSampleRate( 44100 );
-	m_SoundTouch.setChannels( 2 );
-	m_SoundTouch.setTempo( amount ); // +/- 1.0
-	m_SoundTouch.putSamples( m_sample->GetBuffer(), m_sample->GetLength()/2 );
-	m_stretchedLen = m_SoundTouch.receiveSamples( new_buffer, new_len/2 )*2;
-	m_stretchedBuffer = new_buffer;*/
 	SampleEdit pSampleEdit( m_sample->GetBuffer(), m_sample->GetLength() );
 	pSampleEdit.SetTempo( amount );
+	pSampleEdit.SetTrims( trimStart, trimEnd );
 	int len;
 	m_stretchedBuffer = pSampleEdit.Convert( len );
 	m_stretchedLen = len;
-/*	wxString s;
-	s.Printf( wxT("hello: %d\n"), m_stretchedLen );
-	wxLogError( s );*/
 }
