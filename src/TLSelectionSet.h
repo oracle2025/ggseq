@@ -47,7 +47,7 @@ class TLSelectionSet
 		void AddSample(TLSample *sample, TLItem *item/*, int position, int trackNr*/);
 		void Clear(TLData* data);
 		void DeleteFrom(TLData* data);
-		void AddTo(TLData* data, int offsetPosition, int track); /*Für TLView*/
+		TLSelectionSet *AddTo(TLData* data, int offsetPosition, int track); /*Für TLView*/
 		TLSelItemList::Node *GetFirst();
 		bool IsActive();
 		void CalcBounds();

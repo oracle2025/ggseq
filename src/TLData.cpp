@@ -23,20 +23,9 @@
 #endif
 #include <sndfile.h>
 
-/*XML*/
-/*#include "XMLUtils.h"
-#include "XMLException.h"
-#include "XMLWriter.h"
-#include "SAX/AttributeList.h"
-#include "SAX/AttributeListImp.h"*/
 //#include <iostream>
 #include <fstream>
 
-/*#include "SAX2Parser.h"
-#include "SAX/Attributes.h"
-#include "SAX/ContentHandler.h"
-using namespace CSL::XML;
-#include "TLXMLLoader.h"*/
 #include "TLXmlLoader2.h"
 #include "UpdateListener.h"
 

@@ -37,6 +37,7 @@ TLItem::TLItem(TLSample *sample, int trackNr, int position)
 }
 TLItem::~TLItem()
 {
+//	std::cout << "Deleting Item: " << (const char*)m_sample->GetFilename().mb_str() << std::endl;
 	m_sample->UnRef();
 }
 int TLItem::FillBuffer(float* outBuffer, int pos, int count, bool mute, double volume)

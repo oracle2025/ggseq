@@ -42,6 +42,9 @@ static int callback(void *inputBuffer, void *outputBuffer, unsigned long framesP
 	SoundManager *bf = (SoundManager*)userData;
 	unsigned int res = bf->FillBuffer_TL(out,framesPerBuffer*2);
 	if (res < framesPerBuffer*2) {
+		//for (int i=res;i<framesPerBuffer*2;i++) {
+		//	out[i]=0.0;
+		//}
 		return 1;
 	}
 	return 0;
@@ -52,6 +55,9 @@ static int callback_sample(void *inputBuffer, void *outputBuffer, unsigned long 
 	SoundManager *bf = (SoundManager*)userData;
 	unsigned int res = bf->FillBuffer_Sample(out,framesPerBuffer*2);
 	if (res < framesPerBuffer*2) {
+		//for (int i=res;i<framesPerBuffer*2;i++) {
+		//	out[i]=0.0;
+		//}
 		return 1;
 	}
 	return 0;
@@ -98,8 +104,9 @@ void SoundManager::Stop()
 		return;
 	StopStream();
 	if (m_samplePlaying) {
-		if (m_sample->GetRefCount()==0)
+		if (m_sample->GetRefCount()==0) {
 			delete m_sample;
+		}
 	}
 	if (m_tlPlaying)
 		m_data->UnBlock();

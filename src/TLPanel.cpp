@@ -30,6 +30,7 @@
 #include <wx/listctrl.h>
 #include <wx/config.h>
 #include <wx/tglbtn.h>
+#include <wx/filename.h>
 #include <iostream>
 
 #include "TLView.h"
@@ -128,6 +129,7 @@ TLPanel::TLPanel(wxWindow* parent, wxScrollBar *scrollbar, wxWindowID id, const 
 	m_frameVisible=false;
 	UpdateButtons();
 	m_miniPlayer=NULL;
+	SetSizeHints(100, 200);
 }
 TLPanel::~TLPanel()
 {
@@ -382,9 +384,9 @@ void TLPanel::EndSampleDrag(int x, int y, bool copyOnDrag)
 	wxClientDC dc(this);
 	SetRubberframePen(&dc);
 	HideFrame(m_sampleFrame,&dc);
-	if (x-x_offset<0 || y<0 || x-x_offset>GetSize().GetWidth() || y>GetSize().GetHeight())
-		return;
-	m_TlView->DoDrop(x-x_offset, y, m_DragItem, m_SampleDragSrcTrackNr,copyOnDrag);
+//	if (x-x_offset<0 || y<0 || x-x_offset>GetSize().GetWidth() || y>GetSize().GetHeight())
+//		return;
+	m_TlView->DoDrop(x-x_offset, y, m_DragItem, m_SampleDragSrcTrackNr,x_offset,copyOnDrag);
 	ResetScrollBar();
 #ifdef __WXMSW__
 	Refresh(true);
@@ -473,10 +475,10 @@ void TLPanel::EndSelectionDrag(int x, int y, bool copyOnDrag)
 	m_dragImage->EndDrag();
 	delete m_dragImage;
 
-	if (m_selectionFrame.x<0 || y<0 || m_selectionFrame.x>GetSize().GetWidth() || y>GetSize().GetHeight())
-		return;
+//	if (m_selectionFrame.x<0 || y<0 || m_selectionFrame.x>GetSize().GetWidth() || y>GetSize().GetHeight())
+//		return;
 
-	m_TlView->EndSelectionDrag(x_, y_, copyOnDrag);
+	m_TlView->EndSelectionDrag(x_, y_, copyOnDrag, x_offset);
 /*	wxClientDC dc(this);
 	SetRubberframePen(&dc);
 	HideFrame(m_selectionFrame,&dc);*/
@@ -572,6 +574,8 @@ bool TLPanel::Load()
 	Refresh();
 	ResetScrollBar();
 	UpdateButtons();
+	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600);
+	m_ruler->Refresh();
 	return true;
 }
 bool TLPanel::SaveAs()
@@ -627,7 +631,20 @@ void TLPanel::WavExport()
 	wxConfig config(wxT("ggseq"));
 	wxString lastFolder = config.Read(wxT("LastExportFolder"), wxT(""));
 	
-	wxFileDialog dlg1(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(), wxT("Save WAV-File as"),lastFolder,wxT(""),wxT("WAV files (*.wav)|*.wav"),wxSAVE);
+	wxString filename = wxFileSelector(wxT("Save WAV-File as"),lastFolder,wxT(""),wxT("wav"),wxT("WAV files (*.wav)|*.wav"),wxSAVE,this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent());
+	if ( !filename.empty() ) {
+		if (wxFileExists(filename)) {
+			wxMessageDialog msg_dlg(m_parent,wxT("File exists!\nOverride?"), wxT("Override File?"), wxYES_NO |wxICON_QUESTION );
+			if (msg_dlg.ShowModal()==wxID_NO)
+				return;
+		}
+		wxString dir;
+		wxFileName::SplitPath(filename, &dir, NULL, NULL);
+		config.Write(wxT("LastExportFolder"),dir);
+		m_data->SaveWAV(filename);
+	}
+
+/*	wxFileDialog dlg1(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(), wxT("Save WAV-File as"),lastFolder,wxT(""),wxT("WAV files (*.wav)|*.wav"),wxSAVE);
 	if (dlg1.ShowModal()==wxID_OK) {
 		wxString filename = dlg1.GetDirectory() +wxT("/")+ dlg1.GetFilename();
 		if (wxFileExists(filename)) {
@@ -638,7 +655,7 @@ void TLPanel::WavExport()
 		config.Write(wxT("LastExportFolder"),dlg1.GetDirectory());
 		m_data->SaveWAV(filename);
 	}
-
+*/
 }
 bool TLPanel::UpdateCaret()
 {
@@ -703,7 +720,7 @@ bool TLPanel::UpdateCaret()
 
 wxString TLPanel::GetFilename()
 {
-	if (m_data->GetFilename()==wxT(""))
+	if (m_data->GetFilename().IsEmpty())
 		return wxT("Unnamed");
 	return m_data->GetFilename();
 }
@@ -724,12 +741,12 @@ void TLPanel::SetColours(wxString path)
 }
 void TLPanel::SetSnap()
 {
-	TLSetSnapDialog dlg(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),-1,m_TlView->GetSnapValue()/*m_SnapPosition*/,wxT("Set Sample Snapping Position"));
+	TLSetSnapDialog dlg(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),-1,m_TlView->GetSnapValue()/2,wxT("Set Sample Snapping Position"));
 	dlg.Centre();
 	if (dlg.ShowModal()==wxID_OK) {
-		m_TlView->SetSnapValue(/*m_SnapPosition=*/dlg.m_SnapPosition);
+		m_TlView->SetSnapValue(dlg.m_SnapPosition*2);
 	}
-	m_ruler->SetSnap((m_TlView->GetSnapValue()/*m_SnapPosition*/*31)/117600);
+	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600);
 	m_ruler->Refresh();
 }
 

@@ -100,13 +100,19 @@ void TLSelectionSet::DeleteFrom(TLData* data)
 	}
 	Clear(data);
 }
-void TLSelectionSet::AddTo(TLData* data, int offsetPosition, int track)
+TLSelectionSet *TLSelectionSet::AddTo(TLData* data, int offsetPosition, int track)
 {
 //	CalcBounds();
+	TLSelectionSet *selSet = new TLSelectionSet();
+
 	for ( TLSelItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		TLSelectionItem *current = node->GetData();
-		data->AddItem(current->GetSample(),offsetPosition+current->GetPosition()-m_x1,track+current->GetTrack()-m_trackNr1);
+		TLItem *it=data->AddItem(current->GetSample(),offsetPosition+current->GetPosition()-m_x1,track+current->GetTrack()-m_trackNr1);
+		if (it)
+			selSet->AddSample(current->GetSample(),it);
 	}
+	selSet->CalcBounds();
+	return selSet;
 }
 /*void TLSelectionSet::Move(TLData* data, int offsetPosition, int track)*/
 bool TLSelectionSet::IsActive()

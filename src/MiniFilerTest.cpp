@@ -28,6 +28,7 @@
 #include <wx/dirctrl.h>
 #include <wx/config.h>
 #include <wx/dragimag.h>
+#include <wx/cmdline.h>
 
 #include "stuff.h"
 
@@ -39,6 +40,7 @@
 #include "DisableListener.h"
 #include "SidePanel.h"
 #include "FileInfoPanel.h"
+#include "ShortcutsDialog.h"
 
 #include "new1.xpm"
 #include "open.xpm"
@@ -52,24 +54,29 @@
 #include "dndfile.xpm"
 #include "snap.xpm"
 #include "ggseq_32.xpm"
+#include "prefs_misc.xpm"
 
 enum
 {
 	ID_But = 1,
-	ID_SaveAs,
-	ID_Save,
-	ID_Rewind,
-	ID_Play,
-	ID_Stop,
-	ID_Load,
-	ID_New,
+#if 0
+	ID_SaveAs, /*wxID_SAVEAS*/
+	ID_Save, /*wxID_SAVE*/
+	ID_Rewind, /*ID_REWIND*/
+	ID_Play, /*ID_PLAY*/
+	ID_Stop, /*ID_STOP*/
+	ID_Load, /*wxID_OPEN*/
+	ID_New, /*wxID_NEW*/
+	ID_Exit,  /*wxID_EXIT*/
+#endif
 	ID_WavExport,
 	ID_FileList,
 	ID_DirTree,
 	ID_SetColours,
 	ID_SetSnap,
 	ID_A_Test,
-	ID_ScrollBar
+	ID_ScrollBar,
+	ID_Preferences
 };
 
 class TestFrame1: public wxFrame
@@ -83,6 +90,7 @@ class TestFrame1: public wxFrame
 		void OnRewind(wxCommandEvent& event);
 		void OnDonePlaying(wxCommandEvent& event);
 		void OnStartDrag(wxCommandEvent& event);
+		void OnPreferences(wxCommandEvent& event);
 //		void OnActivate(wxCommandEvent& event);
 //		void OnUpdateCaret(wxCommandEvent& event);
 		void OnTimer(wxTimerEvent& event);
@@ -106,6 +114,7 @@ class TestFrame1: public wxFrame
 		void MakeToolBar();
 		void MakeTlPanel(wxWindow *parent);
 		void MakeMainWindow(wxWindow *parent);
+		void MakeShortcuts();
 		void RefreshWindowTitle();
 		void Stop();
 		FileList *m_fileList;
@@ -121,28 +130,31 @@ class TestFrame1: public wxFrame
 };
 
 BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
-//	EVT_BUTTON(ID_But,TestFrame1::OnBut)
-	EVT_TOOL(ID_Play,TestFrame1::OnPlay)
-	EVT_TOOL(ID_Rewind,TestFrame1::OnRewind)
-	EVT_TOOL(ID_Stop,TestFrame1::OnStop)
-	EVT_TOOL(ID_SaveAs,TestFrame1::OnSaveAs)
-	EVT_TOOL(ID_Save,TestFrame1::OnSave)
-	EVT_TOOL(ID_Load,TestFrame1::OnLoad)
-	EVT_TOOL(ID_New,TestFrame1::OnNew)
+	EVT_TOOL(ID_PLAY,TestFrame1::OnPlay)
+	EVT_TOOL(ID_REWIND,TestFrame1::OnRewind)
+	EVT_TOOL(ID_STOP,TestFrame1::OnStop)
+	EVT_TOOL(wxID_SAVEAS,TestFrame1::OnSaveAs)
+	EVT_TOOL(wxID_SAVE,TestFrame1::OnSave)
+	EVT_TOOL(wxID_OPEN,TestFrame1::OnLoad)
+	EVT_TOOL(wxID_NEW,TestFrame1::OnNew)
 	EVT_TOOL(ID_WavExport,TestFrame1::OnWavExport)
 	EVT_TOOL(ID_SetColours,TestFrame1::OnSetColours)
 	EVT_TOOL(ID_SetSnap,TestFrame1::OnSetSnap)
-//	EVT_DONE_PLAYING_COMMAND(-1, TestFrame1::OnDonePlaying)
-//	EVT_UPDATE_CARET_COMMAND(-1, TestFrame1::OnUpdateCaret)
-	
-/*	EVT_MF_STARTDRAG_COMMAND(-1, TestFrame1::OnStartDrag)*/
-//	EVT_MF_ACTIVATE_COMMAND(-1, TestFrame1::OnActivate)
+	EVT_TOOL(ID_Preferences,TestFrame1::OnPreferences)
+
+	EVT_MENU(wxID_OPEN, TestFrame1::OnLoad)
+	EVT_MENU(wxID_SAVE, TestFrame1::OnSave)
+	EVT_MENU(wxID_SAVEAS, TestFrame1::OnSaveAs)
+	EVT_MENU(wxID_NEW, TestFrame1::OnNew)
+	EVT_MENU(ID_PLAY, TestFrame1::OnPlay)
+	EVT_MENU(ID_REWIND, TestFrame1::OnRewind)
+	EVT_MENU(ID_STOP, TestFrame1::OnStop)
+
 	EVT_LIST_BEGIN_DRAG(ID_FileList,TestFrame1::OnFLStartDrag)
 	EVT_LIST_ITEM_ACTIVATED(ID_FileList,TestFrame1::OnFLItemActivated)	
 	EVT_LIST_ITEM_SELECTED(ID_FileList,TestFrame1::OnFLItemSelected)
 	EVT_TREE_SEL_CHANGED(-1,TestFrame1::OnSelChanged)
 	EVT_COMMAND_SCROLL_THUMBTRACK(ID_ScrollBar,TestFrame1::OnScroll)
-	EVT_MENU(ID_A_Test, TestFrame1::OnA_Test)
 	
 	EVT_TIMER(-1,TestFrame1::OnTimer)
 	EVT_CLOSE(TestFrame1::OnClose)
@@ -158,10 +170,12 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	wxPanel *panel1=new wxPanel(this,-1,wxDefaultPosition,wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE); /*Für richtige Hintergrundfarbe in osx und win32*/
 	wxBoxSizer *panelSizer = new wxBoxSizer( wxHORIZONTAL );
 
-	wxAcceleratorEntry entries[1];
-	entries[0].Set(wxACCEL_NORMAL,  WXK_SPACE/*(int) 'n'*/,     ID_A_Test);
-	wxAcceleratorTable accel(1, entries);
-	panel1->SetAcceleratorTable(accel);
+//	wxAcceleratorEntry entries[2];
+//	entries[0].Set(wxACCEL_NORMAL,  WXK_SPACE/*(int) 'n'*/,     ID_A_Test);
+//	entries[1].Set(wxACCEL_CTRL,  (int) 'o', wxID_OPEN);
+//	wxAcceleratorTable accel(2, entries);
+//	panel1->SetAcceleratorTable(accel);
+
 	panel1->SetFocus();
 //	panel1->Enable(false);
 
@@ -178,13 +192,30 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	panelSizer->Add(panel1,1,wxEXPAND);
 	SetSizer( panelSizer );
 	panelSizer->SetSizeHints(this);
+	SetSizeHints(470,500);
 
 	m_Timer = new wxTimer(this);
 	RefreshWindowTitle();
 	m_DraggingFile=false;
 	m_dragImage = new wxDragImage(wxBitmap(dndfile_xpm));
 
+	MakeShortcuts();
+
 	SetSize(size);
+}
+void TestFrame1::MakeShortcuts()
+{
+	wxAcceleratorEntry entries[8];
+	entries[0].Set(wxACCEL_NORMAL,  WXK_SPACE, ID_PLAY);
+	entries[1].Set(wxACCEL_NORMAL, 'S' , ID_STOP);
+	entries[2].Set(wxACCEL_NORMAL,'R', ID_REWIND);
+	entries[3].Set(wxACCEL_CTRL,'N', wxID_NEW);
+	entries[4].Set(wxACCEL_CTRL,'O', wxID_OPEN);
+	entries[5].Set(wxACCEL_CTRL,'S', wxID_SAVE);
+	entries[6].Set(wxACCEL_CTRL|wxACCEL_SHIFT,'S', wxID_SAVEAS);
+	entries[7].Set(wxACCEL_CTRL,'Q', wxID_EXIT);
+	wxAcceleratorTable accel(8, entries);
+	SetAcceleratorTable(accel);
 }
 TestFrame1::~TestFrame1()
 {
@@ -207,23 +238,35 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 //	MiniFiler *mf=new MiniFiler(SplitView);
 /*Hier kommt der neue Minifiler rein.*/
 
-	wxSplitterWindow* SplitView2 = new wxSplitterWindow(SplitView,-1,wxDefaultPosition,wxDefaultSize,wxSP_LIVE_UPDATE|wxSP_NOBORDER|wxNO_FULL_REPAINT_ON_RESIZE/*|wxSP_3DSASH| wxSP_FULLSASH*/);
+	wxPanel* SplitView2 = new wxPanel(SplitView);
+	wxBoxSizer * SplitV2Sizer = new wxBoxSizer(wxVERTICAL);
+
+//	wxSplitterWindow* SplitView2 = new wxSplitterWindow(SplitView,-1,wxDefaultPosition,wxDefaultSize,wxSP_LIVE_UPDATE|wxSP_NOBORDER|wxNO_FULL_REPAINT_ON_RESIZE/*|wxSP_3DSASH| wxSP_FULLSASH*/);
 //	MakeTlPanel(SplitView2);
-	SplitView2->SetMinimumPaneSize(20);
+//	SplitView2->SetMinimumPaneSize(20);
 
 	wxPanel *panel1 = new wxPanel(SplitView2,-1,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE);
+
 	wxBoxSizer * tlPanelSizer = new wxBoxSizer(wxVERTICAL);
 	wxScrollBar *sb = new wxScrollBar(panel1,ID_ScrollBar);
 	m_tp = new TLPanel(panel1,sb);
+	m_tp->Fit();
 	tlPanelSizer->Add(m_tp,1,wxEXPAND);
 	tlPanelSizer->Add(sb,0,wxEXPAND);
 	panel1->SetSizer(tlPanelSizer);
+	tlPanelSizer->SetSizeHints(panel1);
 //	sb->SetSizeHints(-1,25,-1,25);
+//	panel1->SetSizeHints(200,200);
+//	panel1->SetSize(200,200);
+	panel1->Fit();
+
+	SplitV2Sizer->Add(panel1,0,wxBOTTOM|wxEXPAND,3);
 	
 //	m_tp = new TLPanel(SplitView2);/*TODO Lautstärke regler einbauen*/
 
 
 	wxPanel *miniplayerPanel = new wxPanel(SplitView2,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE);
+	SplitV2Sizer->Add(miniplayerPanel,1,wxEXPAND);
 	
 	wxPanel *sidePanelHolder = new wxPanel(miniplayerPanel,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE);
 
@@ -258,14 +301,28 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 	m_DirTree->SetPath(config.Read(wxT("MiniFilerDirectory"), wxT("/")));
 
 	SplitView->SplitVertically(m_DirTree,SplitView2);
-	SplitView2->SplitHorizontally(/*m_tp*/panel1,miniplayerPanel);
+	SplitV2Sizer->Fit(SplitView2);
+	SplitView2->SetSizer(SplitV2Sizer);
+	
+//	SplitView2->SplitHorizontally(/*m_tp*/panel1,miniplayerPanel);
 	SplitView->SetSashPosition(200);
-	SplitView2->SetSashPosition(280);
+//	SplitView2->SetSashPosition(280);
 	
 }
 void TestFrame1::OnScroll(wxScrollEvent& event)
 {
 	m_tp->OnScroll(event);
+}
+void TestFrame1::OnPreferences(wxCommandEvent& event)
+{
+	ShortcutsDialog dlg(this);
+	dlg.Centre();
+	if (dlg.ShowModal()==wxID_OK) {
+		SetAcceleratorTable(dlg.GetAccelTable());
+		dlg.Save();
+		m_fileList->SetFocus();
+	}
+	
 }
 void TestFrame1::OnFLStartDrag(wxListEvent& event)
 {
@@ -335,20 +392,21 @@ void TestFrame1::OnSelChanged(wxTreeEvent& event)
 void TestFrame1::MakeToolBar()
 {
 	m_toolBar = new wxToolBar(this,-1,wxDefaultPosition,wxDefaultSize,wxTB_HORIZONTAL |/* wxNO_BORDER|*/wxTB_NODIVIDER|wxTB_FLAT  );
-	m_toolBar->AddTool(ID_New,wxT("New"),wxBitmap(new1_xpm),wxT("New"));
-	m_toolBar->AddTool(ID_Load,wxT("Open..."),wxBitmap(open_xpm),wxT("Open..."));
-	m_toolBar->AddTool(ID_Save,wxT("Save"),wxBitmap(save_xpm),wxT("Save"));
-	m_toolBar->AddTool(ID_SaveAs,wxT("Save as..."),wxBitmap(saveas_xpm),wxT("Save as..."));
+	m_toolBar->AddTool(wxID_NEW,wxT("New"),wxBitmap(new1_xpm),wxT("New"));
+	m_toolBar->AddTool(wxID_OPEN,wxT("Open..."),wxBitmap(open_xpm),wxT("Open..."));
+	m_toolBar->AddTool(wxID_SAVE,wxT("Save"),wxBitmap(save_xpm),wxT("Save"));
+	m_toolBar->AddTool(wxID_SAVEAS,wxT("Save as..."),wxBitmap(saveas_xpm),wxT("Save as..."));
 	m_toolBar->AddTool(ID_WavExport,wxT("Export WAV..."),wxBitmap(wav_export_xpm),wxT("Export WAV..."));
 	m_toolBar->AddSeparator();
-	m_toolBar->AddTool(ID_Rewind,wxT("Rewind"),wxBitmap(rewind_xpm),wxT("Rewind"));
-	m_toolBar->AddTool(ID_Play,wxT("Play"),wxBitmap(play_xpm),wxT("Play"));
-	m_toolBar->AddTool(ID_Stop,wxT("Stop"),wxBitmap(stop_xpm),wxT("Stop"));
+	m_toolBar->AddTool(ID_REWIND,wxT("Rewind"),wxBitmap(rewind_xpm),wxT("Rewind"));
+	m_toolBar->AddTool(ID_PLAY,wxT("Play"),wxBitmap(play_xpm),wxT("Play"));
+	m_toolBar->AddTool(ID_STOP,wxT("Stop"),wxBitmap(stop_xpm),wxT("Stop"));
 	m_toolBar->AddSeparator();
 	m_toolBar->AddTool(ID_SetColours,wxT("Setup Colours..."),wxBitmap(colours2_xpm),wxT("Setup Colours..."));
 	m_toolBar->AddTool(ID_SetSnap,wxT("Set Snap Width"),wxBitmap(snap_xpm),wxT("Set Snap Width"));
+//	m_toolBar->AddTool(ID_Preferences,wxT("Preferences"),wxBitmap(prefs_misc_xpm),wxT("Preferences"));
 	m_toolBar->Realize();
-	m_toolBar->EnableTool(ID_Stop,false);
+	m_toolBar->EnableTool(ID_STOP,false);
 	this->SetToolBar(m_toolBar);
 //	m_toolBar->Enable(false);
 }
@@ -377,8 +435,8 @@ void TestFrame1::OnBut(wxCommandEvent& event)
 void TestFrame1::OnPlay(wxCommandEvent& event)
 {
 	m_tp->Play();
-	m_toolBar->EnableTool(ID_Play,false);
-	m_toolBar->EnableTool(ID_Stop,true);
+	m_toolBar->EnableTool(ID_PLAY,false);
+	m_toolBar->EnableTool(ID_STOP,true);
 	m_Timer->Start(100);
 }
 
@@ -480,13 +538,15 @@ void TestFrame1::OnSetSnap(wxCommandEvent& event)
 void TestFrame1::Stop()
 {
 	m_Timer->Stop();
-	m_toolBar->EnableTool(ID_Play,true);
-	m_toolBar->EnableTool(ID_Stop,false);
+	m_toolBar->EnableTool(ID_PLAY,true);
+	m_toolBar->EnableTool(ID_STOP,false);
 }
 
 class Test: public wxApp
 {
-		virtual bool OnInit();
+	virtual bool OnInit();
+	wxArrayString m_fnames;
+	bool ProcessCmdLine (wxChar** argv, int argc = 0);
 };
 
 IMPLEMENT_APP(Test)
@@ -495,9 +555,33 @@ bool Test::OnInit()
 
 {
 	SetAppName(wxT("ggseq"));
+
+	ProcessCmdLine (argv, argc);
+	
 	TestFrame1 *frame = new TestFrame1( wxT("Test"), wxPoint(50,50), wxSize(600,450));
 	frame->SetIcon(wxICON(ggseq_32));
 	frame->Show( TRUE );
 	SetTopWindow( frame );
+//	wxMessageDialog dlg(frame, wxT("Abc"));
+//	dlg.ShowModal();
 	return TRUE;
+}
+bool Test::ProcessCmdLine (wxChar** argv, int argc)
+{
+	// get and process command line
+	static const wxCmdLineEntryDesc cmdLineDesc[] = {
+		{wxCMD_LINE_PARAM,  NULL, NULL, _T("input files"),
+		wxCMD_LINE_VAL_STRING,
+		wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE},
+		{wxCMD_LINE_NONE}
+	};
+	wxCmdLineParser parser (cmdLineDesc, argc, argv);
+	// get filenames from the command line
+	m_fnames.Clear();
+	if (parser.Parse() == 0) {
+		for (size_t paramNr=0; paramNr < parser.GetParamCount(); paramNr++) {
+			m_fnames.Add (parser.GetParam (paramNr));
+		}
+	}
+	return true;
 }

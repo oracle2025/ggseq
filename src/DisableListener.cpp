@@ -37,6 +37,7 @@ void DoubleDisabler::EnableAll()
 {
 	m_window1->Enable(true);
 	m_window2->Enable(true);
+	m_window1->SetFocus();
 }
 
 

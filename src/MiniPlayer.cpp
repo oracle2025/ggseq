@@ -25,6 +25,7 @@
 #include "MiniPlayer.h"
 #include "TLSample.h"
 #include "FileInfoPanel.h"
+#include <iostream>
 
 #include "play_12.xpm"
 #include "stop_12.xpm"
@@ -113,6 +114,7 @@ void MiniPlayer::Play()
 		long sampleRate;
 		m_soundManager->Play(m_filename,length,frames,channels,sampleRate,m_updateListener);
 		if (m_fileInfoListener) {m_fileInfoListener->SetInfo(m_filename,frames,channels,sampleRate);}
+//		std::cout << "length: " << length << std::endl;
 		m_slider->SetRange(0,length);
 	}
 	m_slider->SetValue(0);

@@ -29,6 +29,7 @@
 #include "TLSample.h"
 #include "TLColourManager.h"
 #include "UpdateListener.h"
+#include "TLView.h"
 #include <iostream>
 
 TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, UpdateListener* updateListener)/*100000 Frames als intervall*/
@@ -169,48 +170,13 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 	sf_close(sndfile);*/
 	m_valid=true;
 }
-void TLSample::UnRef()
-{
-	m_refCount--;
-}
-void TLSample::Ref()
-{
-	m_refCount++;
-}
-int TLSample::GetRefCount()
-{
-	return m_refCount;
-}
-int TLSample::GetId()
-{
-	return m_id;
-}
-	
 TLSample::~TLSample()
 {
+//	std::cout << "Deleting Sample: " << (const char*)m_filename.mb_str() << std::endl;
 	if (m_buffer!=NULL)
 	{
 		delete m_buffer;
 	}
-}
-float *TLSample::GetBuffer()
-{
-	return m_buffer;
-}
-
-int TLSample::GetLength()
-{
-	return m_length;
-}
-
-bool TLSample::IsValid()
-{
-	return m_valid;
-}
-
-wxString TLSample::GetFilename()
-{
-	return m_filename;
 }
 
 wxIcon TLSample::GetIcon()
@@ -231,10 +197,14 @@ wxIcon TLSample::GetIcon()
 void TLSample::Draw(wxDC& dc)
 {
 	wxBrush b1=dc.GetBrush();
-	b1.SetColour(GetColour());
-	dc.SetBrush(b1);
+/*	b1.SetColour(GetColour());
+	dc.SetBrush(b1);*/
 	int width=m_length/3793;
-	dc.DrawRectangle(0,0,width,25);
+//	dc.DrawRectangle(0,0,width,25);
+
+	TLView::Draw3dRect(&dc,0,0,width,25,GetColour());
+	dc.SetPen(*wxBLACK_PEN);
+
 	dc.SetClippingRegion(0,0,width,25);
 	dc.SetFont(*wxSMALL_FONT);
 	wxFileName fn(GetFilename());
@@ -245,3 +215,12 @@ wxColour TLSample::GetColour()
 {
 	return m_colourMan->GetColour(m_filename);
 }
+float *TLSample::GetBuffer()     { return m_buffer; }
+int TLSample::GetLength()        { return m_length; }
+bool TLSample::IsValid()         { return m_valid; }
+void TLSample::Ref()             { m_refCount++; }
+void TLSample::UnRef()           { m_refCount--; }
+int TLSample::GetRefCount()      { return m_refCount; }
+int TLSample::GetId()            { return m_id; }
+wxString TLSample::GetFilename() { return m_filename; }
+

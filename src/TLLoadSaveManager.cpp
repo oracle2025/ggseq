@@ -22,9 +22,11 @@
     #include "wx/wx.h"
 #endif
 #include <wx/config.h>
+#include <wx/filename.h>
 
 #include "TLLoadSaveManager.h"
 #include "TLData.h"
+#define GG_FILE_EXTS wxT("Gungirl files (*.ggseq)|*.ggseq")
 
 
 TLLoadSaveManager::TLLoadSaveManager(wxWindow *parent, TLData *data)
@@ -51,7 +53,7 @@ void TLLoadSaveManager::New()
 }
 bool TLLoadSaveManager::Save() /*return true on success*/
 {
-	if (m_data->GetFilename()==wxT("")) {
+	if (m_data->GetFilename().IsEmpty()) {
 		return SaveAs();
 	} else {
 		m_data->Save();
@@ -62,18 +64,20 @@ bool TLLoadSaveManager::SaveAs()/*Datei auf existenz prüfen*/
 {
 	wxConfig config(wxT("ggseq"));
 	wxString lastFolder = config.Read(wxT("LastSaveFolder"), wxT(""));
-	wxFileDialog dlg1(m_parent, wxT("Save File as"),lastFolder,wxT(""),wxT("Gungirl files (*.ggseq)|*.ggseq"),wxSAVE);
 	
-	if (dlg1.ShowModal()==wxID_OK) {
-		wxString filename = dlg1.GetDirectory() +wxT("/")+ dlg1.GetFilename();
+	wxString filename = wxFileSelector(wxT("Save File as"),lastFolder,wxT(""),wxT("ggseq"),GG_FILE_EXTS,wxSAVE,m_parent);
+	if ( !filename.empty() ) {
 		if (wxFileExists(filename)) {
 			wxMessageDialog msg_dlg(m_parent,wxT("File exists!\nOverride?"), wxT("Override File?"), wxYES_NO |wxICON_QUESTION );
 			if (msg_dlg.ShowModal()==wxID_NO)
 				return false;
 		}
-		config.Write(wxT("LastSaveFolder"),dlg1.GetDirectory());
+		wxString dir;
+		wxFileName::SplitPath(filename, &dir, NULL, NULL);
+		config.Write(wxT("LastSaveFolder"),dir);
 		m_data->Save(filename);
 		return true;
+
 	}
 	return false;
 }
@@ -96,10 +100,13 @@ void TLLoadSaveManager::Load()
 	}
 	wxConfig config(wxT("ggseq"));
 	wxString lastFolder = config.Read(wxT("LastLoadFolder"), wxT(""));
-	wxFileDialog dlg1(m_parent, wxT("Open File"),lastFolder,wxT(""),wxT("Gungirl files (*.ggseq)|*.ggseq"),wxOPEN|wxHIDE_READONLY);
-	if (dlg1.ShowModal()==wxID_OK) {
-		config.Write(wxT("LastLoadFolder"),dlg1.GetDirectory());
-		m_data->Load(dlg1.GetDirectory() +wxT("/")+ dlg1.GetFilename());
+
+	wxString filename = wxFileSelector(wxT("Open File"),lastFolder,wxT(""),wxT("ggseq"),GG_FILE_EXTS,wxOPEN|wxHIDE_READONLY,m_parent);
+	if ( !filename.empty() ) {
+		wxString dir;
+		wxFileName::SplitPath(filename, &dir, NULL, NULL);
+		config.Write(wxT("LastLoadFolder"),dir);
+		m_data->Load(filename);
 	}
 }
 bool TLLoadSaveManager::SaveOnExit()

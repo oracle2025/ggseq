@@ -36,7 +36,7 @@ BEGIN_EVENT_TABLE(StatusProgressBar, wxStatusBar)
 END_EVENT_TABLE()
 
 
-StatusProgressBar::StatusProgressBar(wxWindow* parent, wxWindowID id, long style, const wxString& name ) : wxStatusBar(parent,id,style|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN,name)
+StatusProgressBar::StatusProgressBar(wxWindow* parent, wxWindowID id, long style, const wxString& name ) : wxStatusBar(parent,id,style/*|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN*/,name)
 {
 	m_gauge = new wxGauge(this, -1, 100, wxPoint(85+200,5),wxSize(100,16));
 	m_gauge->SetValue(30);

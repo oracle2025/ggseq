@@ -137,7 +137,6 @@ TLView::TLView(TLData *TlData)
 	m_selectionSet=new TLSelectionSet();
 	wxConfig config(wxT("ggseq"));
 	m_TlData->SetSnapValue(config.Read(wxT("SnapPosition"), SNAP_POSITION));
-//	m_SnapPosition=config.Read(wxT("SnapPosition"), SNAP_POSITION);
 	
 }
 TLView::~TLView()
@@ -373,11 +372,13 @@ TLItem *TLView::GetDragItem(long x, long y)
 		return NULL;
 	return m_TlData->ItemAtPos(FromScreenXtoTL(x),track);
 }
-void TLView::DoDrop(long x, long y, TLItem *item, long srcTrack, bool copy)
+void TLView::DoDrop(long x, long y, TLItem *item, long srcTrack, long x_offset, bool copy)
 {
 	if (m_TlData->IsBlocked())
 		return;
 	long track=GetTrackByY(y);
+	if (x+x_offset<m_FrameX || x+x_offset>m_FrameX+m_FrameWidth)
+		track=-1;
 
 	/*Delete Item*/
 	if (track<0 && !copy) {
@@ -467,7 +468,7 @@ void TLView::Select(long x,long y,long width,long height)
 			TLTrack *track = trackNode->GetData();
 			for ( TLItemList::Node *node = track->GetFirst(); node; node = node->GetNext() ) {
 				TLItem *current = node->GetData();
-				if (current->GetPosition()>=TL_X1&&current->GetEndPosition()<=TL_X2) {
+				if (current->GetPosition()<=TL_X2&&current->GetEndPosition()>=TL_X1) {
 					m_selectionSet->AddSample(current->GetSample(),current);
 				}
 			
@@ -492,9 +493,9 @@ void TLView::GetTracksSurroundedBy(int &trackNr1, int &trackNr2, long y1, long y
 	for ( TLTrackList::Node *node = m_TlData->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
 		if (trackNr1<0)
-			if (y_offset>y1)
+			if (y_offset+current->GetHeight()>y1)
 				trackNr1=cnt;
-		if (y_offset+current->GetHeight()<y2)
+		if (y_offset/*+current->GetHeight()*/<y2)
 			trackNr2=cnt;
 		cnt++;
 		y_offset+=current->GetHeight()+m_TrackDrawDist;
@@ -535,7 +536,7 @@ void TLView::DrawSelection(wxDC *dc)
 		  25);
 	}
 }
-void TLView::EndSelectionDrag(int x, int y, bool copy)
+void TLView::EndSelectionDrag(int x, int y, bool copy, long x_offset)
 {
 	long TL_x=FromScreenXtoTL(x);
 	long pos=TL_x%m_TlData->GetSnapValue()/*m_SnapPosition*/;
@@ -547,10 +548,17 @@ void TLView::EndSelectionDrag(int x, int y, bool copy)
 	}
 
 	int track=GetTrackByY(y);
+	if (x+x_offset<m_FrameX || x+x_offset>m_FrameX+m_FrameWidth)
+		track=-1;
+	TLSelectionSet *SelSet;
 	if (track>=0)
-		m_selectionSet->AddTo(m_TlData,TL_x,track);
+		SelSet=m_selectionSet->AddTo(m_TlData,TL_x,track);
 	if (!copy)
 		m_selectionSet->DeleteFrom(m_TlData);
+	if (track>=0) {
+		delete m_selectionSet;
+		m_selectionSet=SelSet;
+	}
 }
 
 

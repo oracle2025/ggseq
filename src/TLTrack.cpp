@@ -87,7 +87,6 @@ long TLTrack::GetLength()
 }
 static int TlListCompare(const TLItem **arg1, const TLItem **arg2)
 {
-//	return ( (*arg1)->m_position > (*arg2)->m_position );
 	return ((*arg1)->m_position > (*arg2)->m_position) ? 1 :
 	 	(((*arg1)->m_position == (*arg2)->m_position) ? 0 : -1);
 }
