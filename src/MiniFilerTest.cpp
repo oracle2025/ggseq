@@ -58,7 +58,8 @@ enum
 	ID_FileList,
 	ID_DirTree,
 	ID_SetColours,
-	ID_SetSnap
+	ID_SetSnap,
+	ID_A_Test
 };
 
 class TestFrame1: public wxFrame
@@ -83,6 +84,7 @@ class TestFrame1: public wxFrame
 		void OnWavExport(wxCommandEvent& event);
 		void OnSetColours(wxCommandEvent& event);
 		void OnSetSnap(wxCommandEvent& event);
+		void OnA_Test(wxCommandEvent& event);
 		void OnFLStartDrag(wxListEvent& event);
 		void OnFLItemActivated(wxListEvent& event);
 		void OnSelChanged(wxTreeEvent& event);
@@ -124,7 +126,9 @@ BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
 	EVT_LIST_BEGIN_DRAG(ID_FileList,TestFrame1::OnFLStartDrag)
 	EVT_LIST_ITEM_ACTIVATED(ID_FileList,TestFrame1::OnFLItemActivated)	
 	EVT_TREE_SEL_CHANGED(-1,TestFrame1::OnSelChanged)
-		
+	
+	EVT_MENU(ID_A_Test, TestFrame1::OnA_Test)
+	
 	EVT_TIMER(-1,TestFrame1::OnTimer)
 	EVT_CLOSE(TestFrame1::OnClose)
 	
@@ -138,6 +142,12 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	MakeToolBar();
 	wxPanel *panel1=new wxPanel(this); /*Für richtige Hintergrundfarbe in osx und win32*/
 	wxBoxSizer *panelSizer = new wxBoxSizer( wxHORIZONTAL );
+
+	wxAcceleratorEntry entries[1];
+	entries[0].Set(wxACCEL_NORMAL,  WXK_SPACE/*(int) 'n'*/,     ID_A_Test);
+	wxAcceleratorTable accel(1, entries);
+	panel1->SetAcceleratorTable(accel);
+	panel1->SetFocus();
 
 	MakeMainWindow(panel1);
 
@@ -157,6 +167,10 @@ TestFrame1::~TestFrame1()
 	wxConfig config(wxT("ggseq"));
 	config.Write(wxT("MiniFilerDirectory"),m_DirTree->GetPath());
 	delete m_dragImage;
+}
+void TestFrame1::OnA_Test(wxCommandEvent& event)
+{
+	puts("A_Test");
 }
 void TestFrame1::MakeMainWindow(wxWindow *parent)
 {

@@ -39,6 +39,7 @@ TLTrack::TLTrack(int trackNr)
 	m_trackNr=trackNr;
 	m_itemList.DeleteContents(true);
 	m_volume=1.0;
+	m_mute=false;
 }
 TLTrack::~TLTrack()
 {

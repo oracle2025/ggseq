@@ -24,6 +24,7 @@
 
 #include <wx/filename.h>
 #include <sndfile.h>
+#include <samplerate.h>
 
 #include "TLSample.h"
 #include "TLColourManager.h"
@@ -40,7 +41,7 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan)
 	m_refCount=0;
 	m_filename=filename;
 	sndfile=sf_open(filename.mb_str(),SFM_READ,&sfinfo);
-	if (SF_ERR_NO_ERROR!=sf_error(sndfile)) {
+	if (SF_ERR_NO_ERROR!=sf_error(sndfile)) { /*TODO Error loggen !*/
 //		std::cerr << sf_strerror(sndfile) << std::endl;
 		return;
 	}
@@ -48,10 +49,10 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan)
 		sf_close(sndfile);
 		return;
 	}
-	if (sfinfo.samplerate!=44100) {
+/*	if (sfinfo.samplerate!=44100) {
 		sf_close(sndfile);
 		return;
-	}
+	}*/
 	m_length = sfinfo.frames*2;
 	m_buffer=new float[m_length];
 	sf_readf_float(sndfile,m_buffer,sfinfo.frames);
@@ -61,6 +62,33 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan)
 			m_buffer[2*i]=m_buffer[i];
 		}
 	/*Hier auf passende Samplerate strecken*/
+	if (sfinfo.samplerate!=44100) {
+		wxLogMessage(wxT("No 44100 Samplerate")); // TODO Fehler ausgeben.
+		SRC_DATA src_data;
+		src_data.src_ratio=44100.0/sfinfo.samplerate;
+			/*output_sample_rate / input_sample_rate*/
+		src_data.input_frames=m_length/2;
+		src_data.output_frames=(src_data.input_frames*src_data.src_ratio)+5;
+		
+		src_data.data_in=m_buffer;
+		src_data.data_out=new float[src_data.output_frames*2];
+		
+		
+puts("---");
+		src_simple(&src_data,SRC_SINC_BEST_QUALITY,2);
+puts("---");
+		delete src_data.data_in;
+		m_buffer=src_data.data_out;
+		m_length=src_data.output_frames_gen*2;
+/*		wxString Message;
+		Message << wxT("input_frames: ") << src_data.input_frames
+		<< wxT("\n output_frames: ") << src_data.output_frames
+		<< wxT("\n src_data.src_ratio: ") << src_data.src_ratio
+		<< wxT("\n output_frames_gen; ") << src_data.output_frames_gen;
+		wxLogMessage(Message);*/
+//		return;
+	}
+	
 	if (SF_ERR_NO_ERROR!=sf_error(sndfile))
 	{
 		sf_close(sndfile);/*???*/

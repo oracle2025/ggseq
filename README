@@ -12,8 +12,11 @@ wxWindows http://www.wxwindows.org/
 Portaudio http://www.portaudio.com/
 and
 libsndfile http://www.zipworld.com.au/~erikd/libsndfile/
+libsamplerate http://www.mega-nerd.com/SRC/
 
-type 'make' to build the 'ggseq' Executable
+And then:
+Thanks to Georg,
+The usual ./configure and make stuff.
 
 Hint: Drag and Drop with the right Mousebutten copies a sample
 

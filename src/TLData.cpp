@@ -49,7 +49,8 @@ using namespace CSL::XML;
 
 #include <wx/listimpl.cpp>
 WX_DEFINE_LIST(TLTrackList);
-
+#define LENGTH_TO_ADD 1176000
+#define LENGTH_ADD 1170000
 
 TLData::TLData()
 {
@@ -111,8 +112,8 @@ TLItem *TLData::AddItem(TLSample *sample, int Position, int TrackNr)
 	if (!tlTrack)
 		return NULL;
 	m_changed=true;
-	if (Position+sample->GetLength()>m_length) {
-		m_length=Position+sample->GetLength()+117600;
+	if (Position+sample->GetLength()>m_length-LENGTH_ADD) {
+		m_length=Position+sample->GetLength()+LENGTH_TO_ADD;
 	}
 
 	return tlTrack->AddItem(sample, Position);
@@ -127,8 +128,8 @@ TLItem *TLData::AddItem(wxString filename, int Position, int TrackNr)
 	TLSample *sample = m_sampleManager->GetSample(filename);
 	if (sample) {
 		m_changed=true;
-		if (Position+sample->GetLength()>m_length) {
-			m_length=Position+sample->GetLength()+117600;
+		if (Position+sample->GetLength()>m_length-LENGTH_ADD) {
+			m_length=Position+sample->GetLength()+LENGTH_TO_ADD;
 		}
 		return tlTrack->AddItem(sample, Position);
 	}
@@ -299,8 +300,8 @@ void TLData::SetItemPosition(TLItem *item,int Position)
 {
 	item->SetPosition(Position);
 	m_changed=true;
-	if (item->GetPosition()+item->GetSample()->GetLength()>m_length) {
-		m_length=item->GetPosition()+item->GetSample()->GetLength()+117600;
+	if (item->GetPosition()+item->GetSample()->GetLength()>m_length-LENGTH_ADD) {
+		m_length=item->GetPosition()+item->GetSample()->GetLength()+LENGTH_TO_ADD;
 	}
 
 }

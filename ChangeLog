@@ -1,3 +1,8 @@
+2003-11-20  Richard Spindler <oracle2025@gmx.de>
+
+ *  fixed "random Mute" on Startup issue.
+ *  added new Dependency on libsamplerate (http://www.mega-nerd.com/SRC/), this allows to load samples with various Samplerates, these are converted to 44100, there is a little delay when importing such samples.
+
 2003-11-13  Richard Spindler <oracle2025@gmx.de>
 
  *  fixed Load- and Save-Dialogs to remember their last Folder and to use '*.ggseq' as file-extension

@@ -115,6 +115,7 @@ TLPanel::TLPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSi
 	m_rubberDrag=false;
 	m_selectionDrag=false;
 	m_frameVisible=false;
+	UpdateButtons();
 }
 TLPanel::~TLPanel()
 {
@@ -139,7 +140,7 @@ void TLPanel::OnEraseBackground(wxPaintEvent& event)
 void TLPanel::OnSize(wxSizeEvent& event)
 {
 #ifdef __WXMSW__
-	m_TlView->SetVisibleFrame(GetSize().GetWidth()-11,GetSize().GetHeight()-22,5,5);
+	m_TlView->SetVisibleFrame(GetSize().GetWidth()-11-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-22,5+LEFT_OFFSET_TRACKS,5);
 	m_scrollBar->SetSize(0,GetSize().GetHeight()-22,GetSize().GetWidth()-6,16);
 #else
 	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-5,5+LEFT_OFFSET_TRACKS,5);

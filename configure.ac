@@ -45,6 +45,8 @@ dnl Soundkarte sndfile und portaudio
 PKG_CHECK_MODULES(SNDFILE, sndfile > 1.0.0,,
   AC_MSG_ERROR([*** libsndfile not found - this program requires libsndfile http://www.zip.com.au/~erikd/libsndfile/ ***]))
 
+PKG_CHECK_MODULES(SAMPLERATE, samplerate >= 0.0.15,, AC_MSG_ERROR([*** libsamplerate not found - this program requires libsamplerate http://www.zip.com.au/~erikd/libsndfile/ ***]))
+
 AC_CHECK_HEADERS(portaudio.h,,
   AC_MSG_ERROR([*** portaudio.h not found - this program requires portaudio http://www.portaudio.com/ ***]))
   
