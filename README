@@ -1,0 +1,22 @@
+Gungirl Sequencer README
+
+Gungirl Sequencer is an easy to use Audiosequencer.
+It includes a simple Filemanager and uses Drag & Drop to arrange Audiosamples.
+
+Gungirl Sequencer has suppport for 44100hz WAV-Audiofiles.
+
+HOWTO Compile?
+
+Download and install the following libraries
+wxWindows http://www.wxwindows.org/
+Portaudio http://www.portaudio.com/
+and
+libsndfile http://www.zipworld.com.au/~erikd/libsndfile/
+
+type 'make' to build the 'ggseq' Executable
+
+Hint: Drag and Drop with the right Mousebutten copies a sample
+
+
+Richard Spindler
+csad2715@uibk.ac.at

@@ -1,0 +1,20 @@
+2003-10-26  Richard Spindler  <oracle2025@gmx.de>
+
+ *  added a Dialog to configure the 'Snap Value'
+
+2003-10-25  Richard Spindler  <oracle2025@gmx.de>
+
+ *  fixed Bug where TL wasn't cleared before Loading a Song
+
+2003-10-17  Richard Spindler  <oracle2025@gmx.de>
+
+ * fixed Scrollbar Bug
+
+2003-09-20  Richard Spindler  <oracle2025@gmx.de>
+
+ * fixed Selection Bug
+
+2003-09-17  Richard Spindler  <oracle2025@gmx.de>
+
+ * switched to tinyXml for XML Parsing
+
