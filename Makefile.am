@@ -9,4 +9,4 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 EXTRA_DIST = reconf configure rpm_build.sh ggseq.spec ggseq.desktop FAQ
-SUBDIRS = src icons doc
+SUBDIRS = src icons doc config

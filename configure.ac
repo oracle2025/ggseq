@@ -9,12 +9,12 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AC_INIT([ggseq],
-        [0.2.0],
+        [0.2.0cvs],
         [Richard Spindler oracle2025@gmx.de],
         [ggseq])
 AC_CONFIG_AUX_DIR(config)
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE([dist-bzip2])
+AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 
 dnl then we have to ask if any compatible compiler and installer is installed
 dnl -------------------------------------------------------------------------
@@ -102,6 +102,7 @@ dnl --------------------------------------------------------------------------
 AC_CONFIG_FILES([
    Makefile
    src/Makefile
+   config/Makefile
    icons/Makefile
    doc/Makefile
    doc/pics/Makefile

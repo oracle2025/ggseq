@@ -1,3 +1,7 @@
+2004-10-24  Richard Spindler <oracle2025@gmx.de>
+
+ * make distcheck was broken on my new system, fixed it
+
 2004-10-23  Richard Spindler <oracle2025@gmx.de>
 
  * Fixed Segfault in DocManager
