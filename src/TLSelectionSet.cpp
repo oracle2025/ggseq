@@ -46,7 +46,6 @@ TLSelectionItem::~TLSelectionItem()
 {
 	m_sample->UnRef();
 	m_item->UnSelect();/*TODO: müßte eigentlich segfaulten*/
-	std::cout << "TLSelItem gelöscht" << std::endl;
 }
 TLSample *TLSelectionItem::GetSample()
 {
@@ -146,7 +145,6 @@ void TLSelectionSet::CalcBounds()
 		if (current->GetTrack()>m_trackNr2)
 			m_trackNr2=current->GetTrack();
 	}
-//	std::cout << "ff: " << m_x1 << " " << m_x2 << " " << m_trackNr1 << " " << m_trackNr2 << std::endl;
 }
 /*void TLSelectionSet::SetBounds(int trackNr1, int trackNr2, long x1, long x2)
 {

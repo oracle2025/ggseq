@@ -40,9 +40,9 @@ class TLTrack
 		int GetHeight();
 		long GetLength();
 
-		void SetPlaybackPosition(int Position);
-		unsigned int FillBuffer(float* outBuffer, unsigned int count);
-		void ResetOffsets(int Position);
+//		void SetPlaybackPosition(int Position);
+		unsigned int FillBuffer(float* outBuffer, unsigned int count, long position);
+		void ResetOffsets();
 		void Clear();
 		void SortItems();
 		void SetMute(bool mute=TRUE);
@@ -54,7 +54,7 @@ class TLTrack
 		TLItemList m_itemList;
 		int m_height;
 		int m_trackNr;
-		int m_pos;
+//		int m_pos;
 		bool m_mute;
 		double m_volume;
 		long m_length;

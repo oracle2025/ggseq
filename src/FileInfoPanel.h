@@ -32,6 +32,7 @@ class FileInfoPanel : public wxPanel, public FileInfoListener
 		FileInfoPanel(wxWindow* parent);
 		void SetInfo(const wxString &filename, long frames, long channels, long sampleRate);
 	private:
+		wxString GenerateLengthString(long frames, long sampleRate);
 		wxSizer *InfoPanel( wxWindow *parent, bool call_fit = true, bool set_sizer = true );
 		wxTextCtrl *m_fileNameTC;
 		wxTextCtrl *m_lengthTC;

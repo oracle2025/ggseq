@@ -40,12 +40,46 @@ void FileInfoPanel::SetInfo(const wxString &filename, long frames, long channels
 	wxString ab;
 	ab << frames;
 	m_framesTC->SetValue(ab);
+	m_lengthTC->SetValue(GenerateLengthString(frames,sampleRate));
 	ab=wxT("");
 	ab << channels;
 	m_channelsTC->SetValue(ab);
 	ab=wxT("");
 	ab << sampleRate;
 	m_sampleRateTC->SetValue(ab);
+}
+wxString FileInfoPanel::GenerateLengthString(long frames, long sampleRate)
+{
+	wxString result;
+	wxString tmp;
+
+	if (sampleRate < 1)
+		return result ;
+
+	int seconds = frames / sampleRate ;
+
+	result.Printf(wxT("%02d:"), seconds / 60 / 60) ;
+//	snprintf (str, sizeof (str) - 1, "%02d:", seconds / 60 / 60) ;
+
+	seconds = seconds % (60 * 60) ;
+	tmp.Printf(wxT("%02d:"), seconds / 60) ;
+	result << tmp;
+//	snprintf (str + strlen (str), sizeof (str) - strlen (str) - 1, "%02d:", seconds / 60) ;
+
+	seconds = seconds % 60 ;
+	tmp.Printf(wxT("%02d."), seconds) ;
+	result << tmp;
+//	snprintf (str + strlen (str), sizeof (str) - strlen (str) - 1, "%02d.", seconds) ;
+
+	loff_t f; /*nötig um mit großen Zahlen zu hantieren ?*/
+	f=frames;
+	seconds = ((1000 * f) / sampleRate) % 1000 ;
+	tmp.Printf(wxT("%03d"), seconds) ;
+	result << tmp;
+//	snprintf (str + strlen (str), sizeof (str) - strlen (str) - 1, "%03d", seconds) ;
+	
+
+	return result;
 }
 wxSizer *FileInfoPanel::InfoPanel( wxWindow *parent, bool call_fit, bool set_sizer)
 {

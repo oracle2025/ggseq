@@ -22,7 +22,6 @@
 
 bool SimpleUpdateListener::Update(int status)
 {
-	std::cout << "Status: " << status << std::endl;
 	return true;
 }
 void SimpleUpdateListener::StartUpdateProcess()

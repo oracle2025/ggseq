@@ -77,7 +77,6 @@ TLSample *TLSampleManager::AddSample(wxString filename, int id, UpdateListener* 
 		if (id>=m_MaxId)
 			m_MaxId=id+1;
 	} else {
-		//puts("FF1");
 		if (updateListener->Update(100)!=false)
 			wxLogError(wxT("Couldn't load Samplefile \"%s\""),filename.c_str());
 		delete tmp;
@@ -88,13 +87,13 @@ TLSample *TLSampleManager::AddSample(wxString filename, int id, UpdateListener* 
 
 void TLSampleManager::Clear(TLSample* tlSample)
 {
-//	std::cout << "TLSampleManager::Clear" << std::endl;
 	if (tlSample->GetRefCount())
 		return;
 	m_sampleList.DeleteObject(tlSample);
 }
 wxString TLSampleManager::NormalizePath(wxString filename)
 {
+
 	wxFileName fn(filename);
 	fn.Normalize();
 	return fn.GetFullPath();

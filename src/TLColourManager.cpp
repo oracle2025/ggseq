@@ -52,7 +52,9 @@ TLColourManager::TLColourManager()
 	for (unsigned int i=0;i<aNames.Count();i++) {
 		wxString str1=aNames.Item(i);
 		long d = config.Read(str1,-1);
+#ifndef __WXMSW__
 		str1.Replace(wxT("\\"),wxT("/"));
+#endif
 		if (d<0)
 			tdc1=new TLDirColour(str1,*wxGREEN);
 		else

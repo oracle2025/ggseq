@@ -82,6 +82,7 @@ class TLData
 		bool m_changed;
 		bool m_blocked;
 		long m_playbackPosition;
+		long m_position;/*Wird während des Abspielens inkrementiert*/
 		int m_length;
 		UpdateListener *m_updateListener;
 };

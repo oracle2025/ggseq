@@ -28,15 +28,27 @@ class TLSetSnapDialog: public wxDialog
 		TLSetSnapDialog(wxWindow* parent, wxWindowID id,int SnapPosition, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 		~TLSetSnapDialog();
 		void OnSpin(wxSpinEvent &event);
-		void OnHipHopButton(wxCommandEvent &event);
-		void OnOldSkoolButton(wxCommandEvent &event);
-		void OnFunkButton(wxCommandEvent &event);
+//		void OnHipHopButton(wxCommandEvent &event);
+//		void OnOldSkoolButton(wxCommandEvent &event);
+//		void OnFunkButton(wxCommandEvent &event);
 		void OnSecondsText(wxCommandEvent &event);
+		void OnAddButton(wxCommandEvent &event);
+		void OnDeleteButton(wxCommandEvent &event);
+		void OnPresetNameText(wxCommandEvent &event);
+		void OnPresetsList(wxCommandEvent &event);
+		void OnClose(wxCloseEvent &event);
 		wxString m_SnapSize;
 		int m_SnapPosition;
 		wxSpinCtrl *m_FramesSpinCtrl;
 		wxTextCtrl *m_SecondsTextCtrl;
+		wxListBox *m_presetsListBox;
+		wxTextCtrl *m_presetNameText;
 	private:
+		void Save();
+		void Load();
+		void Select(wxString str, int length);
+		void Modify(wxString str);
+		void Modify(int length);
 		bool m_Lock;
 		void FromFramesToSeconds(int Frames=-1);
 		DECLARE_EVENT_TABLE()

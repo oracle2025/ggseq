@@ -177,12 +177,9 @@ void TLPanel::OnMouseMotion(wxMouseEvent& event)
 		return;
 	}
 	if (event.m_leftDown||event.m_rightDown) {
-//		int a;
-//		int b;
 		int c;
 		int d;
 		if (m_TlView->IsSelectionAt(event.m_x,event.m_y,x_offset,y_offset,c,d)) {
-//			std::cout << "h: " << x_offset << " " << y_offset << std::endl;
 			StartSelectionDrag(event.m_x,event.m_y,c,d);
 			return;
 		}

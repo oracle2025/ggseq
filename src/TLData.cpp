@@ -158,9 +158,9 @@ void TLData::ResetOffsets()
 {
 	for ( TLTrackList::Node *node = m_trackList.GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
-		current->ResetOffsets(m_playbackPosition);
+		current->ResetOffsets();
 	}
-
+	m_position=m_playbackPosition;
 }
 void TLData::Block()
 {
@@ -251,8 +251,6 @@ bool TLData::UnsavedChanges()
 }
 wxString TLData::GetFilename()
 {
-//	puts("dd");
-	puts(m_filename.mb_str());
 	return m_filename;
 }
 void TLData::Save(wxString filename)
@@ -331,6 +329,7 @@ int TLData::GetLength()
 void TLData::SetPlaybackPosition(long Position)
 {
 	m_playbackPosition=Position;
+	m_position=m_playbackPosition;
 }
 long TLData::GetPlaybackPosition()
 {
@@ -348,7 +347,7 @@ unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 	}*/
 	if (!node)
 		return 0;
-	rv=node->GetData()->FillBuffer(buffer1,count);/*first Track*/
+	rv=node->GetData()->FillBuffer(buffer1,count,m_position);/*first Track*/
 	maxResultCount=rv;
 	node = node->GetNext();
 /*	while(node->GetData()->IsMuted()) {
@@ -357,22 +356,24 @@ unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 	if (!node) { /*Only one Track*/
 		for (unsigned int i=0; i<count; i++)
 			outBuffer[i]=buffer1[i];
+		m_position+=maxResultCount;
 		return maxResultCount;
 	}
-	rv=node->GetData()->FillBuffer(buffer2,count);/*second Track*/
+	rv=node->GetData()->FillBuffer(buffer2,count,m_position);/*second Track*/
 	if (rv>maxResultCount)
 		maxResultCount=rv;
 	mixChannels(buffer1,buffer2,outBuffer);
 	node = node->GetNext();
 	while(node) {
 	/*	if (!node->GetData()->IsMuted()){*/
-			rv=node->GetData()->FillBuffer(buffer1,count);
+			rv=node->GetData()->FillBuffer(buffer1,count,m_position);
 			if (rv>maxResultCount)
 				maxResultCount=rv;
 			mixChannels(outBuffer,buffer1,outBuffer);
 		/*}*/
 		node = node->GetNext();
 	}
+	m_position+=maxResultCount;
 	return maxResultCount;
 }
 int TLData::mixChannels(float *A, float *B, float* out)/*Mix function for (-1)-(1) float audio*/

@@ -32,13 +32,11 @@ TLItem::TLItem(TLSample *sample, int trackNr, int position)
 	m_sample=sample;
 	m_position=position;
 	m_sample->Ref();
-	m_playingOffset=0;
 	m_selected=false;
 	m_trackNr = trackNr;
 }
 TLItem::~TLItem()
 {
-	std::cout << "TLItem gelöscht" << std::endl;
 	m_sample->UnRef();
 }
 int TLItem::FillBuffer(float* outBuffer, int pos, int count, bool mute, double volume)
@@ -57,17 +55,18 @@ int TLItem::FillBuffer(float* outBuffer, int pos, int count, bool mute, double v
 			written++;
 		}
 	}
-	if (pos>m_position+m_playingOffset)
-		m_playingOffset = pos-m_position;
-	while(written<count && m_playingOffset<GetLength())
+	int playingOffset = pos-m_position;
+	if (playingOffset<0)
+		playingOffset=0;
+	while(written<count && playingOffset<GetLength())
 	{
 		if (mute) {
 			outBuffer[written]=0.0;
 		} else {
-			outBuffer[written]=buffer[m_playingOffset]*volume;
+			outBuffer[written]=buffer[playingOffset]*volume;
 		}
 		written++;
-		m_playingOffset++;
+		playingOffset++;
 	}
 	return written;
 
@@ -94,10 +93,6 @@ void TLItem::SetPosition(int position)
 		m_position=position+1;
 	else
 		m_position=position;
-}
-void TLItem::ResetOffset()
-{
-	m_playingOffset=0;
 }
 TLSample *TLItem::GetSample()
 {

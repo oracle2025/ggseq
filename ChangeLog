@@ -1,3 +1,8 @@
+2003-12-14  Richard Spindler <oracle2025@gmx.de>
+
+ *  Implemented Custom Snap Value Presets
+ *  removed some variables for playback Position in Item and Track
+
 2003-12-06  Richard Spindler <oracle2025@gmx.de>
 
  *  added stuff.h

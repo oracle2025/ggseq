@@ -35,7 +35,6 @@ WX_DEFINE_LIST(TLItemList);
 TLTrack::TLTrack(int trackNr)
 {
 	m_height=25;
-	m_pos=0;
 	m_trackNr=trackNr;
 	m_itemList.DeleteContents(true);
 	m_volume=1.0;
@@ -62,7 +61,7 @@ TLItem *TLTrack::ItemAtPos(int Position)
 void TLTrack::DeleteItem(TLItem *item)
 {
 	/*if (*/m_itemList.DeleteObject(item);/*)
-		delete item;*/
+		delete item;*/ //Weil die Liste das schon löscht
 }
 TLItem *TLTrack::AddItem(TLSample *sample, int position)
 {
@@ -96,24 +95,18 @@ int TLTrack::GetHeight()
 {
 	return m_height;
 }
-void TLTrack::ResetOffsets(int Position)
+void TLTrack::ResetOffsets()
 {
-	for ( TLItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
-		TLItem *current = node->GetData();
-		current->ResetOffset();
-	}
 	m_currentNode = m_itemList.GetFirst();
-	m_pos=Position;
-//	m_done=false;
 }
-unsigned int TLTrack::FillBuffer(float* outBuffer, unsigned int count)
+unsigned int TLTrack::FillBuffer(float* outBuffer, unsigned int count, long position)
 {
 	unsigned int inc;
 	unsigned int written=0;
 	unsigned int emptyItems=0;
 	float* incBuffer=outBuffer;
 	while(written<count && m_currentNode) {
-		inc=m_currentNode->GetData()->FillBuffer(incBuffer,m_pos+written,count-written, m_mute,m_volume);
+		inc=m_currentNode->GetData()->FillBuffer(incBuffer,position+written,count-written, m_mute,m_volume);
 		written+=inc;
 		incBuffer+=inc;
 		if (written<count) {
@@ -128,7 +121,6 @@ unsigned int TLTrack::FillBuffer(float* outBuffer, unsigned int count)
 			emptyItems++;
 		}
 	}
-	m_pos+=written;
 	return written-emptyItems;
 }
 void TLTrack::addXmlData(TiXmlElement *tracks)
@@ -156,15 +148,9 @@ void TLTrack::Clear()
 	m_itemList.Clear();
 }
 
-void TLTrack::SetPlaybackPosition(int Position)
-{
-	m_pos=Position;
-}
-
 void TLTrack::SetMute(bool mute)
 {
 	m_mute=mute;
-//	puts("TLTrack::SetMute");
 }
 bool TLTrack::IsMuted()
 {

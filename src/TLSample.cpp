@@ -87,7 +87,6 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 			cnt=100000;
 
 
-//		std::cout << i << ", " << sfinfo.channels << ", " << sfinfo.frames <<", "<< cnt<<", "<<m_length<< std::endl;
 		sf_readf_float(sndfile,m_buffer+i*sfinfo.channels,cnt);//segfault
 		if (SF_ERR_NO_ERROR!=sf_error(sndfile)) { /*TODO Error loggen !*/
 			wxLogError(wxT("Error Reading from Soundfile\n%s"), sf_strerror(sndfile));
@@ -138,7 +137,6 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 				src_data.input_frames=buffer_length;
 			error=src_process(src_state, &src_data);
 			if(error!=0) {
-//				std::cout << src_strerror(error) << std::endl;
 				wxLogError(wxT("Error converting Samplerate\n%s"), src_strerror(error));
 			}
 			src_data.output_frames-=src_data.output_frames_gen;
@@ -192,7 +190,6 @@ TLSample::~TLSample()
 {
 	if (m_buffer!=NULL)
 	{
-//		std::cout << "TLSample gelöscht " << m_filename.mb_str() << std::endl;
 		delete m_buffer;
 	}
 }

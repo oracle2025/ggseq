@@ -32,14 +32,12 @@ class TLItem
 		int GetTrack();
 		int GetEndPosition();
 		void SetPosition(int position);
-		void ResetOffset();
 		int m_position;
 		TLSample *GetSample();
 		void Select();
 		void UnSelect();
 		bool IsSelected();
 	private:
-		int m_playingOffset;
 		TLSample *m_sample;
 		bool m_selected;
 		int m_trackNr;

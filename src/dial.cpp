@@ -100,15 +100,12 @@ bool wxDial::Create(wxWindow* parent,
 
 wxDial::~wxDial()
 {
-	std::cout << "bla" << std::endl;
 }
 
 void wxDial::SetValue(int value)
 {
 	m_Value = value;
-	std::cout << value << " : " << m_MinValue << " : " << m_MaxValue << std::endl;
 	m_Angle = ((double)(m_Value-m_MinValue)/(double)(m_MaxValue-m_MinValue))*(PI/2 + PI);
-	std::cout << m_Angle << std::endl;
 	Refresh(true);
 }
 
@@ -201,7 +198,6 @@ void wxDial::TipEventLeftUp(wxPoint point)
 void wxDial::OnMouseDown(wxMouseEvent& event)
 {
 	wxPoint pos=ClientToScreen(wxPoint(0,0));
-//	std::cout << GetPosition().x << " " << GetPosition().y << " " << pos.x << " " << pos.y << std::endl;
 	m_dialTip->SetSize(pos.x,pos.y+GetSize().GetHeight(),40,15);
 	m_dialTip->Show();
 	m_dialTip->CaptureMouse();
