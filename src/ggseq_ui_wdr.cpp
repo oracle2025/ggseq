@@ -33,6 +33,7 @@
 
 // Custom source
 #include <wx/dirctrl.h>
+#include <wx/tglbtn.h>
 #include "ui_helper.h"
 
 // Implement window functions
@@ -585,6 +586,61 @@ wxSizer *SampleListFunc( wxWindow *parent, bool call_fit, bool set_sizer )
 //wxWindow *item2 = parent->FindWindow( ID_TL_SIDEPANEL );
     wxASSERT( item2 );
     item0->Add( item2, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+    if (set_sizer)
+    {
+        parent->SetSizer( item0 );
+        if (call_fit)
+            item0->SetSizeHints( parent );
+    }
+    
+    return item0;
+}
+
+wxSizer *TrimmerDialogFunc2( wxWindow *parent, bool call_fit, bool set_sizer )
+{
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    wxBoxSizer *item1 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxWindow *item2 = parent->FindWindow( ID_WAVE_EDITOR );
+    wxASSERT( item2 );
+    item1->Add( item2, 1, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxBoxSizer *item3 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxToggleButton *item4 = new wxToggleButton( parent, ID_LOOP_BUTTON, wxT("Loop"), wxDefaultPosition, wxSize(50,-1), 0 );
+    item3->Add( item4, 0, wxALIGN_CENTER|wxRIGHT, 5 );
+
+    item3->Add( 10, 10, 1, wxALIGN_CENTER|wxALL, 5 );
+
+    wxStaticText *item5 = new wxStaticText( parent, ID_TEXT, wxT("Timestretch"), wxDefaultPosition, wxDefaultSize, 0 );
+    item3->Add( item5, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    wxWindow *item6 = parent->FindWindow( ID_TIMESTRETCH_DIAL );
+    wxASSERT( item6 );
+    item3->Add( item6, 0, wxALIGN_CENTER|wxLEFT|wxRIGHT, 5 );
+
+    wxTextCtrl *item7 = new wxTextCtrl( parent, ID_TIMESTRECH_TEXTCTRL, wxT("1,0"), wxDefaultPosition, wxSize(80,-1), wxTE_READONLY );
+    item3->Add( item7, 0, wxALIGN_CENTER, 5 );
+
+    item0->Add( item3, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 5 );
+
+    wxStaticLine *item8 = new wxStaticLine( parent, ID_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL );
+    item0->Add( item8, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5 );
+
+    wxBoxSizer *item9 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxButton *item10 = new wxButton( parent, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    item9->Add( item10, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxButton *item11 = new wxButton( parent, wxID_OK, wxT("Apply and Close"), wxDefaultPosition, wxSize(130,-1), 0 );
+    item11->SetDefault();
+    item9->Add( item11, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    item0->Add( item9, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
     if (set_sizer)
     {

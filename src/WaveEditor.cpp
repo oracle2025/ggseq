@@ -62,6 +62,7 @@ WaveEditor::WaveEditor( wxWindow* parent, TLItem *item, wxWindowID id )
 	m_dragMarker = 0;
 	m_caretVisible = false;
 	m_caretOldPosition = 0;
+	SetSize(100, 100);
 }
 WaveEditor::~WaveEditor()
 {
@@ -87,7 +88,7 @@ void WaveEditor::HideCaret()
 	dc.DrawRectangle( m_caretOldPosition, 0, 1, GetSize().GetHeight() );
 	m_caretVisible = false;
 }
-void WaveEditor::UpdateCaret()
+void WaveEditor::UpdateCaret(float timestretch)
 {
 	if (!m_caretVisible)
 		return;
@@ -95,7 +96,7 @@ void WaveEditor::UpdateCaret()
 	dc.SetLogicalFunction( wxINVERT );
 	dc.SetPen( *wxTRANSPARENT_PEN );
 	dc.DrawRectangle( m_caretOldPosition, 0, 1, GetSize().GetHeight() );
-	m_caretOldPosition = m_marker[0].x + 5 + TrimToMark(g_ggseqProps.GetSoundManager()->GetPosition()/2);
+	m_caretOldPosition = m_marker[0].x + 5 + TrimToMark(timestretch*g_ggseqProps.GetSoundManager()->GetPosition()/2);
 	dc.DrawRectangle( m_caretOldPosition, 0, 1, GetSize().GetHeight() );
 }
 gg_tl_dat WaveEditor::MarkToTrim( int x )

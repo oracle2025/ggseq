@@ -48,14 +48,16 @@ public:
     virtual ~TrimmerDialog();
     
     // WDR: method declarations for TrimmerDialog
+    wxToggleButton* GetLoopButton()  { return (wxToggleButton*) FindWindow( ID_LOOP_BUTTON ); }
     WaveEditor* GetWaveEditor()  { return (WaveEditor*) FindWindow( ID_WAVE_EDITOR ); }
     wxTextCtrl* GetTimestrechTextctrl()  { return (wxTextCtrl*) FindWindow( ID_TIMESTRECH_TEXTCTRL ); }
     
 private:
     // WDR: member variable declarations for TrimmerDialog
     TLItem *m_item;
-    bool m_playing;
+//    bool m_playing;
     wxTimer *m_timer;
+    double m_amount;
     
 private:
     // WDR: handler declarations for TrimmerDialog

@@ -41,7 +41,7 @@ class WaveEditor : public wxPanel
 		void GetTrims( gg_tl_dat &start, gg_tl_dat &end );
 		void ShowCaret();
 		void HideCaret();
-		void UpdateCaret();
+		void UpdateCaret(float timestretch);
 		// variables
 		gg_tl_dat  m_leftTrim;
 		gg_tl_dat  m_rightTrim;
