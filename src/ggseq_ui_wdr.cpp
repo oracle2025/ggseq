@@ -475,7 +475,7 @@ wxSizer *TrimmerDialogFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     wxBitmapButton *item13 = new wxBitmapButton( parent, ID_BITMAPBUTTON, GgseqBitmapsFunc( 14 ), wxDefaultPosition, wxDefaultSize );
     item10->Add( item13, 0, wxALIGN_CENTER|wxRIGHT, 5 );
 
-    wxButton *item14 = new wxButton( parent, ID_BUTTON, wxT("Loop"), wxDefaultPosition, wxSize(50,-1), 0 );
+    wxButton *item14 = new wxButton( parent, ID_LOOP_BUTTON, wxT("Loop"), wxDefaultPosition, wxSize(50,-1), 0 );
     item10->Add( item14, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL, 5 );
 
     item9->Add( item10, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5 );
@@ -502,7 +502,7 @@ wxSizer *TrimmerDialogFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     wxStaticText *item20 = new wxStaticText( parent, ID_TEXT, wxT("Timestrech"), wxDefaultPosition, wxDefaultSize, 0 );
     item19->Add( item20, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
-    wxTextCtrl *item21 = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), 0 );
+    wxTextCtrl *item21 = new wxTextCtrl( parent, ID_TIMESTRECH_TEXTCTRL, wxT("1,0"), wxDefaultPosition, wxSize(80,-1), 0 );
     item19->Add( item21, 0, wxALIGN_CENTER, 5 );
 
     wxStaticText *item22 = new wxStaticText( parent, ID_TEXT, wxT("Volume"), wxDefaultPosition, wxDefaultSize, 0 );
