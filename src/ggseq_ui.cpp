@@ -179,7 +179,7 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     GetToolBar()->EnableTool( ID_REDO, false );
     GetMenuBar()->Enable( ID_UNDO, false );
     GetMenuBar()->Enable( ID_REDO, false );
-    SetSizeHints(470,500);
+    SetSizeHints(470,460);
     GetMainSplitter()->SetSashPosition(200);
     GetTlPanel()->SetFocus();//Nötig, damit unter wxGTK die Cursor funktionieren.
 //    GetTimelineSplitter()->SetSashPosition(300);
@@ -269,8 +269,8 @@ void MyFrame::OnHelp( wxCommandEvent &event )
 
 void MyFrame::OnTimelineSplitterChanging( wxSplitterEvent &event )
 {
-    if ( event.GetSashPosition() < 290 ) {
-        event.SetSashPosition( 290 );
+    if ( event.GetSashPosition() < 200 ) {
+        event.SetSashPosition( 200 );
     } else {
         event.Skip();
     }
@@ -507,7 +507,7 @@ bool GgseqApp::OnInit()
     wxFileSystem::AddHandler(new wxZipFSHandler);
     ProcessCmdLine (argv, argc);
     MyFrame *frame = new MyFrame( NULL, -1,
-        wxT("SuperApp"), wxPoint(20,20), wxSize(600,340) );
+        wxT("SuperApp"), wxPoint(20,20), wxSize(600,460) );
     frame->SetIcon(wxICON(ggseq_32));
     frame->Show( TRUE );
     wxFileSystem::AddHandler(new wxZipFSHandler);

@@ -26,8 +26,10 @@
 
 #include "TLTrack.h"
 #include "TLMuteButton.h"
+#ifndef __WXMSW__
 #include "mute_off.xpm"
 #include "mute_on.xpm"
+#endif
 
 #ifdef __WXMSW__
 BEGIN_EVENT_TABLE(TLMuteButton, wxToggleButton)

@@ -85,6 +85,7 @@ BEGIN_EVENT_TABLE(TLPanel, wxPanel)
 	EVT_ERASE_BACKGROUND(TLPanel::OnEraseBackground)
 	EVT_MENU(ID_PopupMenu, TLPanel::OnEdit)
 	EVT_MENU(ID_PopupMenuEnvelope, TLPanel::OnToggleEnvelope)
+//	EVT_ACTIVATE(TLPanel::OnActivate)
 END_EVENT_TABLE()
 
 TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar, Ruler *ruler, wxScrollBar *scrollbar2, wxWindowID id)
@@ -152,11 +153,21 @@ void TLPanel::OnPaint( wxPaintEvent& event )
 	int width, height;
 	GetClientSize( &width, &height );
 	wxBufferedPaintDC dc( this );
+//	wxPaintDC dc( this ); //(win32)
 	dc.SetBrush( wxBrush( GetBackgroundColour(), wxSOLID ) );
 	dc.SetPen( *wxTRANSPARENT_PEN );
 	dc.DrawRectangle( 0, 0, width, height );
 	m_view->Draw( dc );
 	DrawCaret( dc );
+#ifndef __WXMSW__
+	static bool once = true;
+	if (once) {
+		for ( wxWindowList::Node *node = GetChildren().GetFirst(); node; node = node->GetNext() ) {
+			node->GetData()->Refresh();
+		}
+		once = false;
+	}
+#endif
 }
 void TLPanel::OnEraseBackground( wxEraseEvent& event )
 {
@@ -165,6 +176,7 @@ void TLPanel::OnSize( wxSizeEvent& event )
 {
 	m_view->SetSize( GetSize().GetWidth(), GetSize().GetHeight() );
 	ResetScrollBar();
+	Refresh();//win32
 }
 void TLPanel::OnMouseMotion( wxMouseEvent& event )
 {
@@ -295,6 +307,13 @@ void TLPanel::OnScroll( wxScrollEvent& event )
 	UpdateRulerTicks();
 	Refresh();
 }
+/*void TLPanel::OnActivate( wxActivateEvent& event )
+{
+	for ( wxWindowList::Node *node = GetChildren().GetFirst(); node; node = node->GetNext() ) {
+		node->GetData()->Refresh();
+	}
+}*/
+
 void TLPanel::DrawCaret(wxDC& dc)
 {
 	if ( m_CaretPosition < 5 + LEFT_OFFSET_TRACKS )

@@ -1,3 +1,7 @@
+2005-04-06  Richard Spindler <richard.spindler AT gmail.com>
+
+ * Fixed win32 Redraw Errors
+
 2005-03-14  Richard Spindler <richard.spindler AT gmail.com>
 
  * Set a minimum Size for Trimming
