@@ -11,6 +11,10 @@
 bin_PROGRAMS = ggseq
 ggseq_SOURCES = PreferencesDialog.h\
                 PreferencesDialog.cpp\
+		SampleEdit.cpp\
+		SampleEdit.h\
+		PlayerInterface.h\
+		PlayerInterface.cpp\
 		ggseq_ui.cpp\
 		MouseDragHandler.cpp\
 		MouseDragHandler.h\
@@ -19,15 +23,15 @@ ggseq_SOURCES = PreferencesDialog.h\
 		RubberDragHandler.h\
 		RubberDragHandler.cpp\
                 ggseq_ui.h\
-								EnvelopeDragHandler.h\
-								EnvelopeDragHandler.cpp\
-								TrimmerDialog.h\
-								TrimmerDialog.cpp\
-								WaveEditor.h\
-								WaveEditor.cpp\
+		EnvelopeDragHandler.h\
+		EnvelopeDragHandler.cpp\
+		TrimmerDialog.h\
+		TrimmerDialog.cpp\
+		WaveEditor.h\
+		WaveEditor.cpp\
                 ggseq_ui_wdr.cpp\
-								colour_helper.h\
-								colour_helper.cpp\
+		colour_helper.h\
+		colour_helper.cpp\
                 ggseq_ui_wdr.h\
                 ui_helper.cpp\
                 ui_helper.h\
@@ -96,9 +100,10 @@ ggseq_SOURCES = PreferencesDialog.h\
 		TLMuteButton.h
                 #MiniFilerTest.cpp
 
-ggseq_LDFLAGS = $(CLIBS) @SNDFILE_LIBS@ @SAMPLERATE_LIBS@ -lportaudio `wx-config --libs`
+ggseq_LDFLAGS = $(CLIBS) @SNDFILE_LIBS@ @SAMPLERATE_LIBS@ -lportaudio `wx-config --libs` 
+ggseq_LDADD = /usr/local/lib/libSoundTouch.a  
 #ggseq_LDFLAGS = $(CLIBS)  `wx-config --libs`
 #ggseq_LDADD = /usr/lib/libsndfile.a /usr/lib/libsamplerate.a /usr/local/lib/libportaudio.a /tmp/wx_static/lib/libwx_gtk-2.4.a 
 
-AM_CPPFLAGS = @CPPFLAGS@ $(CPPFLAGS) @SNDFILE_CFLAGS@ @SAMPLERATE_CFLAGS@ -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons
+AM_CPPFLAGS = @CPPFLAGS@ $(CPPFLAGS) @SNDFILE_CFLAGS@ @SAMPLERATE_CFLAGS@  -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons 
 

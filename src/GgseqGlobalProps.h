@@ -16,6 +16,8 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+#ifndef _GGSEQ_GLOBAL_PROPS_H_
+#define _GGSEQ_GLOBAL_PROPS_H_
 
 class SoundManager;
 class MiniPlayerInterface;
@@ -54,3 +56,4 @@ class GgseqGlobalProps
 };
 extern GgseqGlobalProps g_ggseqProps;
 
+#endif /* _GGSEQ_GLOBAL_PROPS_H_ */

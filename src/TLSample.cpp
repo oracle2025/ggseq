@@ -44,7 +44,7 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 	m_id=id;
 	m_refCount=0;
 	m_filename=filename;
-	sndfile=sf_open(filename.mb_str(),SFM_READ,&sfinfo);
+	sndfile = sf_open(filename.mb_str(),SFM_READ,&sfinfo);
 	if (SF_ERR_NO_ERROR!=sf_error(sndfile)) { /*TODO Error loggen !*/
 //		std::cerr << sf_strerror(sndfile) << std::endl;
 		wxLogError(wxT("Error Opening Soundfile\n%s"), sf_strerror(sndfile));

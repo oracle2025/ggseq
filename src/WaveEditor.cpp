@@ -28,7 +28,10 @@
     #pragma hdrstop
 #endif
 
+#include <math.h>
+
 #include <wx/dcbuffer.h>
+#include <math.h>
 
 #include "WaveEditor.h"
 #include "stuff.h"
@@ -40,6 +43,9 @@
 BEGIN_EVENT_TABLE(WaveEditor, wxPanel)
 	EVT_PAINT(WaveEditor::OnPaint)
 	EVT_ERASE_BACKGROUND(WaveEditor::OnEraseBackground)
+	EVT_LEFT_DOWN(WaveEditor::OnMouseDown)
+	EVT_MOTION(WaveEditor::OnMouseMotion)
+	EVT_LEFT_UP(WaveEditor::OnMouseUp)
 END_EVENT_TABLE()
 
 
@@ -47,6 +53,10 @@ WaveEditor::WaveEditor( wxWindow* parent, TLItem *item, wxWindowID id )
 	:wxPanel(parent, id, wxDefaultPosition, wxDefaultSize, wxCLIP_CHILDREN)
 {
 	m_item = item;
+	m_marker[0] = wxRect( 0, 0, 10, 5 );
+	m_marker[1] = wxRect( 20, 0, 10, 5 );
+	m_dragOffset = 0;
+	m_dragMarker = 0;
 }
 WaveEditor::~WaveEditor()
 {
@@ -64,6 +74,10 @@ void WaveEditor::OnPaint( wxPaintEvent& event )
 	int width, height;
 	float *buffer;
 	gg_tl_dat len;
+	wxPoint marker[3];
+	marker[0] = wxPoint( 0, 0 );
+	marker[1] = wxPoint( 10, 0 );
+	marker[2] = wxPoint( 5, 5 );
 	// Paint a WaveForm here
 	wxBufferedPaintDC dc( this );
 	GetClientSize( &width, &height );
@@ -74,33 +88,62 @@ void WaveEditor::OnPaint( wxPaintEvent& event )
 	dc.SetBrush( wxBrush( GetBackgroundColour(), wxSOLID ) );
 	dc.SetPen( *wxTRANSPARENT_PEN );
 	dc.DrawRectangle( 0, 0, width, height );
-	
 	dc.SetPen( *wxBLACK_PEN );
 	int inc = len / ( width + 4 );
 	for ( int i=0; i < width; i ++ ) {
 		int h = ( get_average( &buffer[i * inc], inc * 4 ) * float( height  ) * 2 );
 		dc.DrawLine( i, ( height / 2 ) - h, i, ( height / 2 ) + h );
-//		dc.DrawLine( i, height / 2, i, (height / 2) +
-//				( (height / 2)*buffer[ int( (float(i) / float(width)) * float(len)) ] ) );
 	}
 	dc.DrawLine( 0, height / 2, width, height / 2 );
-	/* Taken from MixMagic
-	 	for (i = 0; i < width;i++) {
-		value = index_get_average (block->sample->index, 
-					   offset, block->start / INDEX_RATIO,
-					   block->track->song->x_scale / INDEX_RATIO, 
-					   block->sample->length / INDEX_RATIO / 2) / ((float)0x7f / height);
-		gdk_draw_line (block->pixmap,
-			       block->wav_gc,
-			       i, height / 2 + value,
-			       i, height / 2 - value);
-		
-		offset += block->track->song->x_scale / INDEX_RATIO;
-	}
-
-	 */
+	dc.SetPen( *wxRED_PEN );
+	dc.DrawLine( m_marker[0].x + 5, 0, m_marker[0].x + 5, height );
+	dc.DrawLine( m_marker[1].x + 5, 0, m_marker[1].x + 5, height );
+	dc.SetBrush( *wxBLACK_BRUSH );
+	dc.SetPen( *wxBLACK_PEN );
+	dc.DrawPolygon( 3, marker, m_marker[0].x, m_marker[0].y );
+	dc.DrawPolygon( 3, marker, m_marker[1].x, m_marker[1].y );
 }
 void WaveEditor::OnEraseBackground( wxEraseEvent& event )
 {
 	
 }
+
+void WaveEditor::OnMouseDown( wxMouseEvent& event )
+{
+	for ( int i = 0; i < 2; i++ ) {
+		if ( m_marker[i].Inside( event.GetPosition() ) ) {
+			m_dragMarker = &m_marker[i];
+			m_dragOffset = event.m_x - m_marker[i].x;
+			CaptureMouse();
+			break;
+		}
+	}
+}
+
+void fit_between( int *value, int min, int max )
+{
+	if ( *value < min ) {
+		*value = min;
+	} else if ( *value > max ) {
+		*value = max;
+	}
+}
+
+void WaveEditor::OnMouseMotion( wxMouseEvent& event )
+{
+	if ( !m_dragMarker )
+		return;
+	m_dragMarker->x = event.m_x - m_dragOffset;
+	fit_between( &m_dragMarker->x, - 5, GetClientSize().GetWidth() - 5 );
+	Refresh();
+}
+
+void WaveEditor::OnMouseUp( wxMouseEvent& event )
+{
+	if ( m_dragMarker ) {
+		ReleaseMouse();
+	}
+	m_dragMarker = 0;
+}
+		
+

@@ -48,13 +48,16 @@ public:
     virtual ~TrimmerDialog();
     
     // WDR: method declarations for TrimmerDialog
+    wxTextCtrl* GetTimestrechTextctrl()  { return (wxTextCtrl*) FindWindow( ID_TIMESTRECH_TEXTCTRL ); }
     
 private:
     // WDR: member variable declarations for TrimmerDialog
     TLItem *m_item;
+    bool m_playing;
     
 private:
     // WDR: handler declarations for TrimmerDialog
+    void OnLoopButton( wxCommandEvent &event );
 
 private:
     DECLARE_EVENT_TABLE()

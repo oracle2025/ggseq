@@ -31,11 +31,29 @@
 #include "TLSample.h"
 #include "SoundManager.h"
 #include "UpdateListener.h"
+#include "PlayerInterface.h"
 
 //DEFINE_EVENT_TYPE(wxEVT_DONE_SAMPLE_COMMAND)
 
+/*
+PlayerInterface
+	TimelinePlayer
+	SamplePlayer
+	LoopEditPlayer
+class PlayerInterface {
+	int FillBuffer( float *, unsigned long frames );
+}
+*/
+
+
 static PortAudioStream* stream;
 
+static int callback(void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, PaTimestamp outTime, void *userData)
+{
+	PlayerInterface *PlIface = (PlayerInterface*)userData;
+	return PlIface->FillBuffer( (float*)outputBuffer, framesPerBuffer );
+}
+/*
 static int callback(void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, PaTimestamp outTime, void *userData)
 {
 	float *out = (float*)outputBuffer;
@@ -62,7 +80,22 @@ static int callback_sample(void *inputBuffer, void *outputBuffer, unsigned long 
 	}
 	return 0;
 }
-
+static int callback_loop(void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, PaTimestamp outTime, void *userData)
+{
+	float *out = (float*)outputBuffer;
+	SoundManager *bf = (SoundManager*)userData;
+	unsigned long count = 0;
+	while ( count < framesPerBuffer ) {
+		if ( bf->m_loopPos >= bf->m_loopLen ) {
+			bf->m_loopPos = 0;
+		}
+		out[count*2] = bf->m_loopSample[bf->m_loopPos];
+		out[count*2+1] = bf->m_loopSample[bf->m_loopPos+1];
+		count++;
+		bf->m_loopPos += 2;
+	}
+	return 0;
+}*/
 
 /*BEGIN_EVENT_TABLE(SoundManager, wxEvtHandler)
 	EVT_DONE_SAMPLE_COMMAND(-1,SoundManager::OnDonePlayingSample)
@@ -71,15 +104,23 @@ END_EVENT_TABLE()*/
 SoundManager::SoundManager(TLData *TlData)//:wxEvtHandler()
 {
 	m_data = TlData;
-	m_tlPlaying = false;
-	m_samplePlaying=false;
-	m_position = 0;
-  g_ggseqProps.SetSoundManager( this );
+	//m_tlPlaying = false;
+	//m_samplePlaying=false;
+	//m_loopPlaying=false;
+	//m_position = 0;
+	g_ggseqProps.SetSoundManager( this );
+	m_playerInterface = 0;
 }
 SoundManager::~SoundManager()
 {
 }
-void SoundManager::Play()
+void SoundManager::Play( PlayerInterface *playerIface )
+{
+	Stop();
+	m_playerInterface = playerIface;
+	StartStream((void*)callback);
+}
+/*void SoundManager::Play()
 {
 	m_data->Block();
 	if (m_tlPlaying)
@@ -97,11 +138,18 @@ unsigned int SoundManager::FillBuffer_TL(float* outBuffer, unsigned int count)
 	int written_samples=m_data->FillLoopBuffer(outBuffer,count);
 	m_position+=written_samples;
 	return written_samples;
-}
-
+}*/
 void SoundManager::Stop()
 {
-	if (!m_tlPlaying && !m_samplePlaying)
+	if ( !m_playerInterface )
+		return;
+	StopStream();
+	delete m_playerInterface;
+	m_playerInterface = 0;
+}
+/*void SoundManager::Stop()
+{
+	if (!m_tlPlaying && !m_samplePlaying && !m_loopPlaying)
 		return;
 	StopStream();
 	if (m_samplePlaying) {
@@ -113,8 +161,9 @@ void SoundManager::Stop()
 		m_data->UnBlock();
 	m_tlPlaying = false;
 	m_samplePlaying=false;
-}
-unsigned int SoundManager::FillBuffer_Sample(float* outBuffer, unsigned int count)
+	m_loopPlaying=false;
+}*/
+/*unsigned int SoundManager::FillBuffer_Sample(float* outBuffer, unsigned int count)
 {
 	float *buffer = m_sample->GetBuffer();
 	int length = m_sample->GetLength();
@@ -130,7 +179,7 @@ void SoundManager::Play(wxString filename, long &length,long &frames,long &chann
 {
 	if (m_tlPlaying)
 		return;
-	if (m_samplePlaying)
+	if (m_samplePlaying||m_loopPlaying)
 		Stop();
 	if (updateListener)
 		updateListener->StartUpdateProcess();
@@ -155,28 +204,37 @@ void SoundManager::Play(TLSample *sample)
 {
 	if (m_tlPlaying)
 		return;
-	if (m_samplePlaying)
+	if (m_samplePlaying||m_loopPlaying)
 		Stop();
 	m_sample = sample;//new TLSample(filename,0,NULL);
 	m_position=0;
 	m_samplePlaying=true;
 	StartStream((void*)callback_sample);
 }
+void SoundManager::Loop( float* sample, gg_tl_dat len )
+{
+	m_loopPos = 0;
+	m_loopSample = sample;
+	m_loopLen = len;
+	m_loopPlaying = true;
+	StartStream((void*)callback_loop);
+}*/
 void SoundManager::StartStream(void* callback)
 {
 	PortAudioCallback *cb=(PortAudioCallback*)callback;
 	PaError err;
 	err = Pa_Initialize();
 	if (err!=paNoError) goto error;
-	err = Pa_OpenDefaultStream(&stream, 0, 2, paFloat32, 44100, 256, 0, cb, this);
+	err = Pa_OpenDefaultStream(&stream, 0, 2, paFloat32, 44100, 256, 0, cb, m_playerInterface /*this*/);
 	if( err != paNoError ) goto error;
 	err = Pa_StartStream(stream);
 	if( err != paNoError ) goto error;
 	return;
 	error:
 	wxLogError(wxT("Soundoutput failed: \"%s\""),Pa_GetErrorText( err ));
-	m_tlPlaying = false;
-	m_samplePlaying = false;
+	//m_tlPlaying = false;
+	//m_samplePlaying = false;
+	//m_loopPlaying = false;
 	return;
 }
 void SoundManager::StopStream()
@@ -195,15 +253,21 @@ void SoundManager::StopStream()
 
 gg_tl_dat SoundManager::GetPosition()
 {
-	if (m_tlPlaying)
+	if ( m_playerInterface ) {
+		return m_playerInterface->GetPosition();
+	}
+	return 0;
+/*	if (m_tlPlaying)
 		return m_data->m_position;
-	return m_position;
+	return m_position;*/
 } /*TODO beim TL-Data die Position aus data auslesen*/
 bool SoundManager::Done()
 {
-	if (!m_tlPlaying && !m_samplePlaying)
+	if ( !m_playerInterface )
 		return true;
-	if (Pa_StreamActive(stream)<=0)
+	/*if (!m_tlPlaying && !m_samplePlaying)
+		return true;*/
+	if ( Pa_StreamActive(stream) <= 0 )
 		return true;
 	else
 		return false;

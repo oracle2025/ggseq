@@ -60,6 +60,7 @@
 #include "RubberDragHandler.h"
 #include "EnvelopeDragHandler.h"  //TODO Alle Handler in MouseDragHandler.h?
 #include "TrimmerDialog.h"
+#include "PlayerInterface.h"
 
 #define LEFT_OFFSET_TRACKS 52
 
@@ -401,7 +402,7 @@ void TLPanel::Rewind()
 void TLPanel::Play()
 {
 	g_ggseqProps.GetMiniPlayer()->Stop();
-	g_ggseqProps.GetSoundManager()->Play();
+	g_ggseqProps.GetSoundManager()->Play( new TimelinePlayer( m_data ) );
 }
 void TLPanel::Stop()
 {

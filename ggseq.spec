@@ -1,58 +1,73 @@
-Summary : Gungirl Sequencer NOT a midi seqenser
+Summary : Gungirl Sequencer
 Name: ggseq
 Version: 0.2.0
-Release: 1
-Copyright: GPL
-Group: Applications/Multimedia
-Packager: Richard Spindler <oracle2025@gmx.de>, Georg E Schneider <georg@georgs.org>
-Source: http:/prdownload.sf.net/%{name}/%{name}-%{version}.tar.bz2
-URL: http://ggseq.sourceforge.net/
+Release: cvs.20051902
 Vendor: Richard  Spindler <oracle2025@gmx.de>
+Packager: Richard Spindler <oracle2025@gmx.de>, Georg E Schneider <georg@georgs.org>
+License: GPL
+Group: Applications/Multimedia
+Source: http:/dl.sf.net/%{name}/%{name}-%{version}.tar.bz2
+URL: http://ggseq.sourceforge.net/
 BuildRoot: %{_tmppath}/%{name}-root
-Provides: ggseq
-Requires: portaudio libsndfile wxGTK >= 2.4.0  libsamplerate >= 0.0.15
-#Requires: libgtk-1.2.so.0 libgdk-1.2.so.0 libgmodule-1.2.so.0 libgthread-1.2.so.0 libglib-1.2.so.0 libpthread.so.0 libdl.so.2 libXext.so.6 libX11.so.6 libz.so.1 libm.so.6 libstdc++.so.5 libgcc_s.so.1 libc.so.6 ld-linux.so.2
-BuildRequires: portaudio-devel libsndfile-devel wxGTK-devel >= 2.4.0 libsamplerate-devel >= 0.0.15
+
+BuildRequires: portaudio-devel libsndfile-devel wxGTK-devel >= 2.4.0 samplerate-devel >= 0.0.15 libxml2-devel
 
 %description
 Gungirl Sequencer is NOT a midi seqencer. 
-But it is helpfull to sample different
-PCM-audio-files (at the moment just WAV - files)
+But it is helpful to sample different
+PCM audio files (at the moment just WAV files)
 
 %description -l de
 Gungirl Sequencer ist KEIN midi Sequencer.
 Aber er ist sehr hilfreich um verschiedene
-PCM-Audio-Dateien zu Sampeln (im Augenblick nur WAV - Dateien)
+PCM Audio Dateien zu Sampeln (im Augenblick nur WAV Dateien)
+
 
 %prep
 
 %setup -q
-sh ./reconf
 
-%configure --prefix=/usr
+%build 
+
+%configure
+
+make %{?_smp_mflags}
 
 %install
+rm -rf $RPM_BUILD_ROOT
 
 %makeinstall
-mkdir -p %{buildroot}/usr/share/icons/
-mkdir -p %{buildroot}/usr/share/applications/
-#mkdir -p %{buildroot}/usr/share/doc/
-install -m 644 icons/ggseq_32.xpm %{buildroot}/usr/share/icons/
-install -m 644 ggseq.desktop %{buildroot}/usr/share/applications/
-#install -m 644 doc/ggseq.htb %{buildroot}/usr/doc/$NAME-$VERSION-$RELEASE
-strip %{buildroot}/usr/bin/ggseq
-cd %{buildroot}/usr/share/icons/;rm -f c* d* m* n* o* p* r* s* w*
+mkdir -p %{buildroot}%{_datadir}/icons/
+mkdir -p %{buildroot}%{_datadir}/applications/
+install -m 644 icons/ggseq_32.xpm %{buildroot}%{_datadir}/icons/
+desktop-file-install --dir %{buildroot}%{_datadir}/applications/ --vendor="Richard Spindler <oracle2025@gmx.de>" -m 644 ggseq.desktop
+cd %{buildroot}%{_datadir}/icons/;rm -f c* d* m* n* o* p* r* s* w*
 
 %clean
+rm -rf $RPM_BUILD_ROOT
 
 %files
+%defattr(-,root,root,-)
 %doc README COPYING NEWS AUTHORS THANKS ChangeLog
-/usr/bin/ggseq
-/usr/share/icons/ggseq_32.xpm
-/usr/share/applications/*
-#/usr/share/doc/ggseq.htb
+%{_bindir}/ggseq
+%{_datadir}/icons/ggseq_32.xpm
+%{_datadir}/applications/*
+
 
 %changelog
+* Sat Feb 19 2005 Georg E Schneider <georg@georgs.org>
+- build from cvs
+- Added "include <math.h>" src/WaveEditor.cpp
+- Added request for SoundTouch in configure.ac
+
+* Wed Feb 16 2005 Georg E Schneider <georg@georgs.org>
+- corrected horrible bugs in the spec-file
+
+* Mon Feb 14 2005 Georg E Schneider <georg@georgs.org>
+- rebuild for FC3
+- Added "#include <math.h>" in src/TLView.cpp
+- reonfigured *.desktop-file
+
 * Mon Feb 16 2004 Richard Spindler <oracle2025@gmx.de>
 - strip ggseq executable
 

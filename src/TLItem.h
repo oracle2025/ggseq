@@ -24,7 +24,7 @@ typedef struct {
 	int x;    // Position in Samples
 	float y;  // 0.0 bis 1.0
 } Env;
-
+#include <soundtouch/SoundTouch.h>
 class TLSample;
 class GetItemTrackListener;
 class TLItem
@@ -63,8 +63,11 @@ class TLItem
 		void DrawEnvelope( wxDC &dc, int xOffset, int yOffset );
 		wxRect *TouchingEnvelopeCtrl( int x, int y );
 		void GuiEnvToDataEnv();
-//		void Stretch(float amount);
+		void Stretch( float amount );
+//		void Trim( gg_tl_dat start, gg_tl_dat end );
 		bool m_toggleEnvelope;
+		float *m_stretchedBuffer;
+		gg_tl_dat m_stretchedLen;
 	private:
 		float GetEnvelopValue( int position );
 		Env m_realEnvelope[4];
@@ -73,6 +76,7 @@ class TLItem
 		bool m_selected;
 		//int m_trackNr;
 		GetItemTrackListener* m_trackListener;
+		SoundTouch m_SoundTouch;
 };
 /*
 class TLStoreItem : public TLItem

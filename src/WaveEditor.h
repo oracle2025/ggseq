@@ -41,10 +41,16 @@ class WaveEditor : public wxPanel
 	private:
 		// member variable declarations
 		TLItem *m_item;
+		wxRect  m_marker[2];
+		int     m_dragOffset;
+		wxRect *m_dragMarker;
 	private:
 		// handler declarations
 		void OnPaint( wxPaintEvent& event );
 		void OnEraseBackground( wxEraseEvent& event );
+		void OnMouseDown( wxMouseEvent& event );
+		void OnMouseMotion( wxMouseEvent& event );
+		void OnMouseUp( wxMouseEvent& event );
 	private:
 		DECLARE_EVENT_TABLE()
 };

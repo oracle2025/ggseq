@@ -28,6 +28,7 @@
 #include "TLItem.h"
 #include "TLTrack.h"
 #include "TLSample.h"
+#include "SampleEdit.h"
 #include <iostream>
 //TODO: trackNr überall eliminieren
 TLItem::TLItem(TLSample *sample/*, int trackNr*/ , gg_tl_dat position, long reference, GetItemTrackListener* trackListener )
@@ -49,6 +50,7 @@ TLItem::TLItem(TLSample *sample/*, int trackNr*/ , gg_tl_dat position, long refe
 	m_rightFadeIn.x = m_rightFadeOut.x / 2;
 	m_leftFadeOut.x = m_rightFadeIn.x;
 	GuiEnvToDataEnv();
+	m_stretchedBuffer = 0;
 
 }
 void DrawWxRect( wxDC &dc, const wxRect &rect ) // TODO make Helper Functions File
@@ -89,6 +91,10 @@ wxRect *TLItem::TouchingEnvelopeCtrl( int x, int y )
 TLItem::~TLItem()
 {
 //	std::cout << "Deleting Item: " << (const char*)m_sample->GetFilename().mb_str() << std::endl;
+	if ( m_stretchedBuffer ) {
+		delete m_stretchedBuffer;
+		m_stretchedBuffer = 0;
+	}
 	m_sample->UnRef();
 }
 float *get_keys(int a, int b, int size)
@@ -298,17 +304,31 @@ bool TLItem::IsSelected()
 	return m_selected;
 }
 long TLItem::GetReference() { return m_referenceId; }
-/*void TLItem::Stretch(float amount)
+void TLItem::Stretch(float amount)
 {
-	float *new = new_buffer float[length*amount];
+/*	if ( m_stretchedBuffer ) {
+		delete m_stretchedBuffer;
+		m_stretchedBuffer = 0;
+	}
+	int new_len = m_sample->GetLength() * amount + 50;
+	wxString s;
+	s.Printf( wxT("hello: %d, %e\n"), new_len, amount );
+	wxLogError( s );
+	float *new_buffer = new float[new_len];
 
-	SoundTouch soundTouch;
-	soundTouch.setSampleRate( 44100 );
-	soundTouch.setChannels( 2 );
-	soundTouch.setTempo(); // +/- 1.0
-	//pSoundTouch->putSamples(m_sample->m_buffer, m_sample->length);
-	//m_length = pSoundTouch->receiveSamples(new_buffer, length*amount);
-
-
-	
-}*/
+	m_SoundTouch.clear();
+	m_SoundTouch.setSampleRate( 44100 );
+	m_SoundTouch.setChannels( 2 );
+	m_SoundTouch.setTempo( amount ); // +/- 1.0
+	m_SoundTouch.putSamples( m_sample->GetBuffer(), m_sample->GetLength()/2 );
+	m_stretchedLen = m_SoundTouch.receiveSamples( new_buffer, new_len/2 )*2;
+	m_stretchedBuffer = new_buffer;*/
+	SampleEdit pSampleEdit( m_sample->GetBuffer(), m_sample->GetLength() );
+	pSampleEdit.SetTempo( amount );
+	int len;
+	m_stretchedBuffer = pSampleEdit.Convert( len );
+	m_stretchedLen = len;
+/*	wxString s;
+	s.Printf( wxT("hello: %d\n"), m_stretchedLen );
+	wxLogError( s );*/
+}

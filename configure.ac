@@ -29,6 +29,8 @@ dnl ---------------------------------------------------------------------
 
 AC_HEADER_STDC
 
+AC_LANG(C++)
+
 
 
 dnl now extentions X soundcard etc..
@@ -53,6 +55,9 @@ AC_CHECK_HEADERS(portaudio.h,,
 dnl and last check  your(our) own things like wxWindows ....
 dnl ----------------------------------------------------------------------
 
+ AC_CHECK_HEADER(soundtouch/SoundTouch.h,,
+  AC_MSG_ERROR([*** soundtouch/SoundTouch.h not found - this program requires the SoundTouch Audio Processing Library http://www.iki.fi/oparviai/soundtouch ***]))
+
 dnl Check for XML support
 dnl ---------------------
 
@@ -68,6 +73,11 @@ AC_PATH_PROG(WXWIN_CONFIG,wx-config,no)
 if test "x$WXWIN_CONFIG" == "xno";then
   AC_MSG_ERROR([*** wxWidgets not installed but needed - http://www.wxwidgets.org/***])
 fi
+
+dnl checking for needed features
+
+ AC_CHECK_HEADER(soundtouch/SoundTouch.h,,
+  AC_MSG_ERROR([*** soundtouch/SoundTouch.h is needed - //sky.prohosting.com/oparviai/soundtouch/***]))
 
 dnl checking for optional featues (sould we compile for i386 or i686 etc..)
 dnl ----------------------------------------------------------------------
@@ -86,6 +96,60 @@ AC_PATH_PROG(OGGENC,oggenc,no)
 AC_PATH_PROG(OGGDEC,oggdec,no)
 dnl now how to configure it all
 dnl --------------------------------------------------------------------------
+
+dnl ---Soundtouch Check---
+dnl        min version not supported yet
+dnl AM_PATH_SOUNDTOUCH([MINMUM-VERSION, [(additional) ACTION-IF-FOUND] [, ACTION-IF-NOT-FOUND]]])
+
+AH_TEMPLATE([HAVE_LIBSOUNDTOUCH], [defined by $0])
+SOUNDTOUCH_CXXFLAGS=""
+SOUNDTOUCH_LIBS=""
+
+AC_DEFUN(AM_PATH_SOUNDTOUCH,[
+	AC_ARG_WITH(soundtouch-prefix,[  --with-soundtouch-prefix=DIR   Prefix where SoundTouch was installed (optional)], [soundtouch_prefix="$withval"],[soundtouch_prefix=""])
+
+	AC_ARG_ENABLE(soundtouch-check,[  --disable-soundtouch-check   Do not look for the SoundTouch Library],[enable_soundtouch_check="$enableval"],[enable_soundtouch_check="yes"])
+
+	if test "$enable_soundtouch_check" = "yes"
+	then
+		saved_CPPFLAGS="$CPPFLAGS"
+		saved_LDFLAGS="$LDFLAGS"
+	   
+		CPPFLAGS="$CPPFLAGS -I$soundtouch_prefix/include"
+		LDFLAGS="$LDFLAGS -L$soundtouch_prefix/lib"
+   
+		dnl make sure SoundTouch.h header file exists
+			dnl could use AC_CHECK_HEADERS to check for all of them, but the supporting .h file names may change later
+		AC_CHECK_HEADER([soundtouch/SoundTouch.h],[
+				dnl SoundTouch.h found
+				dnl make sure libSoundTouch is linkable
+				AC_CHECK_LIB([SoundTouch],[soundtouch_ac_test],[
+					dnl libSoundTouch found
+					SOUNDTOUCH_CXXFLAGS="-I$soundtouch_prefix/include"
+					SOUNDTOUCH_LIBS="-L$soundtouch_prefix/lib -lSoundTouch"
+					AC_DEFINE([HAVE_LIBSOUNDTOUCH])
+
+					dnl run action-if-found
+					dnl ifelse([$2], , :, [$2])
+				],[ 
+					dnl run action-if-not-found
+					dnl ifelse([$3], , :, [$3])
+          AC_MSG_ERROR([*** libSoundTouch not found ***])
+				])
+			],[
+				dnl run action-if-not-found
+				dnl ifelse([$3], , :, [$3])
+        AC_MSG_ERROR([*** soundtouch/SoundTouch.h not found  ***])
+			])
+
+		CPPFLAGS="$saved_CPPFLAGS"
+		LDFLAGS="$saved_LDFLAGS"
+	fi
+
+	AC_SUBST(SOUNDTOUCH_CXXFLAGS)
+	AC_SUBST(SOUNDTOUCH_LIBS)
+])
+dnl ---Soundtouch end---
 
 CXXFLAGS="$CXXFLAGS -ggdb -Wall -O2 `wx-config --cxxflags`"
 CPPFLAGS="$CPPFLAGS -ggdb -Wall -O2 `wx-config --cxxflags`" 

@@ -30,6 +30,10 @@
 
 #include "TrimmerDialog.h"
 #include "WaveEditor.h"
+#include "stuff.h"
+#include "TLItem.h"
+#include "PlayerInterface.h"
+#include "SoundManager.h"
 
 
 // WDR: class implementations
@@ -41,6 +45,7 @@
 // WDR: event table for TrimmerDialog
 
 BEGIN_EVENT_TABLE(TrimmerDialog,wxDialog)
+    EVT_BUTTON( ID_LOOP_BUTTON, TrimmerDialog::OnLoopButton )
 END_EVENT_TABLE()
 
 TrimmerDialog::TrimmerDialog( wxWindow *parent, TLItem *item /*, wxWindowID id, const wxString &title,
@@ -48,16 +53,39 @@ TrimmerDialog::TrimmerDialog( wxWindow *parent, TLItem *item /*, wxWindowID id, 
     wxDialog( parent, -1, wxT("Trimmer"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER )
 {
     m_item = item;
-    wxWindow *w = new WaveEditor( this, item, ID_WAVE_EDITOR );
+    m_playing = 0;
+    /*wxWindow *w = */new WaveEditor( this, item, ID_WAVE_EDITOR );
     // WDR: dialog function TrimmerDialogFunc for TrimmerDialog
     TrimmerDialogFunc( this, TRUE ); 
 }
 
 TrimmerDialog::~TrimmerDialog()
 {
+	g_ggseqProps.GetSoundManager()->Stop();
 }
 
 // WDR: handler implementations for TrimmerDialog
+
+void TrimmerDialog::OnLoopButton( wxCommandEvent &event )
+{
+	double amount;
+	if ( !GetTimestrechTextctrl()->GetValue().ToDouble( &amount ) )
+		return;
+	m_item->Stretch( amount );
+	if ( m_playing ) {
+		g_ggseqProps.GetSoundManager()->Stop();
+	} else {
+//		wxLogError(wxT("playsnd"));
+/*		g_ggseqProps.GetSoundManager()->Loop(
+				m_item->m_stretchedBuffer,
+				m_item->m_stretchedLen );*/
+		g_ggseqProps.GetSoundManager()->Play(
+				new LoopPlayer( m_item->m_stretchedBuffer,
+					m_item->m_stretchedLen )
+				);
+	}
+	m_playing = !m_playing;
+}
 
 
 

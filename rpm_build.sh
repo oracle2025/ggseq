@@ -26,10 +26,17 @@ echo
 # Abfragen ob als root
 echo -n "Testing if you are root........................"
 if [ ! `/usr/bin/id -u` = 0 ];then
-echo "You have to be root to build a rpm"
-exit 0;
+	if [ ! -f $HOME/.rpmmacros ];then
+	echo "no userbuild possible - EXIT"
+	exit 0;
+	else
+	echo -n " User build bulding user=$USER"
+	RPMBUILDPATH=`cat $HOME/.rpmmacros | grep %_topdir | cut -d " " -f2`
+	fi
+
+else
+echo -n " root build OK"
 fi
-echo -n " OK"
 echo
 if 
 test "x`cd "${dir}" 2>/dev/null && pwd`" != "x`pwd`"
@@ -70,6 +77,8 @@ sleep 1
 RPMBUILD=$(whereis rpmbuild | cut -d " " -f2)" -ba"
 fi 
 sleep 1
+if [ `/usr/bin/id -u` = 0 ];then
+
 #Abfragen wo das RPM - Build verzeichniss (wie z.Bsp. /usr/src/redhat/) ist
 #Zur Zeit weiss ich gerade ein paar andere sollen folgen
 #ALTLinux = /usr/src/RPM
@@ -82,35 +91,36 @@ sleep 1
 #PLD = ?
 #Slackware = /usr/src/rpm
 RPMBUILDPATH=
-echo -n "Default RPM Build -Directory .................. "
-if [ -r /usr/src/RPM ];then
-RPMBUILDPATH=/usr/src/RPM
-echo $RPMBUILDPATH
-fi
-if [ -r /usr/src/arc ];then
-RPMBUILDPATH=/usr/src/arc
-echo $RPMBUILDPATH
-fi
-if [ -r /usr/src/OpenLinux ];then
-RPMBUILDPATH=/usr/src/OpenLinux
-echo $RPMBUILDPATH
-fi
-if [ -r /usr/src/packages ];then
-RPMBUILDPATH=/usr/src/packages
-echo $RPMBUILDPATH
-fi
-if [ -r /usr/src/redhat ];then
-RPMBUILDPATH=/usr/src/redhat
-echo $RPMBUILDPATH
-fi
-if [ -r /usr/src/rpm ];then
-RPMBUILDPATH=/usr/src/rpm
-echo $RPMBUILDPATH
-fi
-if [ $RPMBUILDPATH = "" ];then
-echo
-echo "No RPM-Build Path found"
-exit 2
+	echo -n "Default RPM Build -Directory .................. "
+	if [ -r /usr/src/RPM ];then
+	RPMBUILDPATH=/usr/src/RPM
+	echo $RPMBUILDPATH
+	fi
+	if [ -r /usr/src/arc ];then
+	RPMBUILDPATH=/usr/src/arc
+	echo $RPMBUILDPATH
+	fi
+	if [ -r /usr/src/OpenLinux ];then
+	RPMBUILDPATH=/usr/src/OpenLinux
+	echo $RPMBUILDPATH
+	fi
+	if [ -r /usr/src/packages ];then
+	RPMBUILDPATH=/usr/src/packages
+	echo $RPMBUILDPATH
+	fi
+	if [ -r /usr/src/redhat ];then
+	RPMBUILDPATH=/usr/src/redhat
+	echo $RPMBUILDPATH
+	fi
+	if [ -r /usr/src/rpm ];then
+	RPMBUILDPATH=/usr/src/rpm
+	echo $RPMBUILDPATH
+	fi
+	if [ $RPMBUILDPATH = "" ];then
+	echo
+	echo "No RPM-Build Path found"
+	exit 2
+	fi
 fi
 rm -f $RPMBUILDPATH/SPECS/$SOFWARENAME.spec
 rm -f $RPMBUILDPATH/SOURCES/$SOFWARENAME.tar.bz2

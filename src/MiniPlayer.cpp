@@ -27,6 +27,7 @@
 #include "TLSample.h"
 #include "ggEvtHandler.h"
 #include "FileInfoPanel.h"
+#include "PlayerInterface.h"
 #include <iostream>
 
 #include "play_12.xpm"
@@ -126,7 +127,7 @@ void MiniPlayer::Play()
 		if (g_ggseqProps.GetFileInfoListener()) {g_ggseqProps.GetFileInfoListener()->SetInfo(m_sample->GetFilename(),m_sample->m_infoFrames,m_sample->m_infoChannels,m_sample->m_infoSampleRate);}
 //		m_slider->SetRange(0,m_sample->GetLength());
 		m_length=m_sample->GetLength();
-		g_ggseqProps.GetSoundManager()->Play(m_sample);
+		g_ggseqProps.GetSoundManager()->Play( new SamplePlayer( m_sample ) );
 	} else {
 		if (m_filename.IsEmpty()) {
 			return;
@@ -136,7 +137,11 @@ void MiniPlayer::Play()
 		long frames;
 		long channels;
 		long sampleRate;
-		g_ggseqProps.GetSoundManager()->Play(m_filename,length,frames,channels,sampleRate,m_updateListener);
+		g_ggseqProps.GetSoundManager()->Play(
+				new SamplePlayer( m_filename, length,
+					frames, channels, sampleRate, 
+					m_updateListener )
+				);
 		if (g_ggseqProps.GetFileInfoListener()) {g_ggseqProps.GetFileInfoListener()->SetInfo(m_filename,frames,channels,sampleRate);}
 //		std::cout << "length: " << length << std::endl;
 //		m_slider->SetRange(0,length);

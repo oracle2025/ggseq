@@ -22,6 +22,7 @@
 class TLData;
 class TLSample;
 class UpdateListener;
+class PlayerInterface;
 
 /*BEGIN_DECLARE_EVENT_TYPES()
     DECLARE_EVENT_TYPE(wxEVT_DONE_SAMPLE_COMMAND, 7778)
@@ -45,23 +46,33 @@ class SoundManager// : public wxEvtHandler
 //		bool Done_PlayingTL();
 //		void OnDonePlayingSample(wxCommandEvent& event);
 //		int GetPlaybackPosition();
-		void Play();
+		void Play( PlayerInterface *playerIface );
+/*		void Play();
 		void Play(wxString filename, long &length,long &frames,long &channels, long &sampleRate, UpdateListener *updateListener=NULL);
 		void Play(TLSample *sample);
+		void Loop( TLSample *sample, gg_tl_dat start, gg_tl_dat end, float timestrech = 1.0 );
+// --- FIXME
+		void Loop( float* sample, gg_tl_dat len );
+		float *m_loopSample;
+		gg_tl_dat m_loopLen;
+		gg_tl_dat m_loopPos;*/
+// ---		
 		void Stop();
 		bool Done();
 		gg_tl_dat GetPosition();
 		
-		unsigned int FillBuffer_TL(float* outBuffer, unsigned int count);
-		unsigned int FillBuffer_Sample(float* outBuffer, unsigned int count);
+/*		unsigned int FillBuffer_TL(float* outBuffer, unsigned int count);
+		unsigned int FillBuffer_Sample(float* outBuffer, unsigned int count);*/
 	private:
+		PlayerInterface *m_playerInterface;
 		void StartStream(void* callback);
 		void StopStream();
 		TLData *m_data;
-		bool m_tlPlaying;
+/*		bool m_tlPlaying;
 		bool m_samplePlaying;
+		bool m_loopPlaying;
 		gg_tl_dat m_position;
-		TLSample *m_sample;
+		TLSample *m_sample;*/
 //		DECLARE_EVENT_TABLE()
 };
 
