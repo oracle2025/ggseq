@@ -58,11 +58,11 @@ void FileInfoPanel::SetInfo(const wxString &filename, long frames, long channels
 FileInfoPanel::~FileInfoPanel()
 {
 #ifdef __WXMSW__
-    FindWindow("item4")->PopEventHandler(true);
-    FindWindow("item6")->PopEventHandler(true);
-    FindWindow("item8")->PopEventHandler(true);
-    FindWindow("item10")->PopEventHandler(true);
-    FindWindow("item12")->PopEventHandler(true);
+    FindWindow(wxT("item4"))->PopEventHandler(true);
+    FindWindow(wxT("item6"))->PopEventHandler(true);
+    FindWindow(wxT("item8"))->PopEventHandler(true);
+    FindWindow(wxT("item10"))->PopEventHandler(true);
+    FindWindow(wxT("item12"))->PopEventHandler(true);
 #endif
 }
 wxString FileInfoPanel::GenerateLengthString(long frames, long sampleRate)
