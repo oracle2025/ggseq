@@ -578,6 +578,33 @@ bool TLPanel::Load()
 	m_ruler->Refresh();
 	return true;
 }
+bool TLPanel::Load(wxString& filename)
+{
+	m_soundManager->Stop();
+
+
+	if (m_data->UnsavedChanges()) {
+		wxMessageDialog msg_dlg(m_parent,wxT("Save Changes?"), wxT("Unsaved Changes"), wxYES_NO | wxCANCEL|wxICON_QUESTION );
+
+		int result = msg_dlg.ShowModal();
+		switch (result) {
+			case wxID_CANCEL:
+				return FALSE;
+			case wxID_YES:
+				if (!m_loadSaveManager->Save())
+					return FALSE;
+				break;
+		}
+	}
+	m_data->Load(filename);
+	Refresh();
+	ResetScrollBar();
+	UpdateButtons();
+	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600);
+	m_ruler->Refresh();
+	return true;
+
+}
 bool TLPanel::SaveAs()
 {
 	return m_loadSaveManager->SaveAs();

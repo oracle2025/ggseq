@@ -46,7 +46,11 @@ TLSelectColourDialog::TLSelectColourDialog(wxWindow* parent, wxWindowID id,TLCol
 	:wxDialog(parent, -1, title, pos, size, wxDEFAULT_DIALOG_STYLE |wxRESIZE_BORDER  )
 {
 	wxBoxSizer *MainSizer = new wxBoxSizer( wxVERTICAL );
-	
+
+	wxStaticText *item1 = new wxStaticText( this, -1, wxT("Colours"), wxDefaultPosition, wxDefaultSize, 0 );
+	item1->SetFont( wxFont( 20, wxDEFAULT, wxNORMAL, wxBOLD ) );
+	MainSizer->Add( item1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+    
 	wxBoxSizer *Sizer1 = new wxBoxSizer( wxHORIZONTAL );
 	MainSizer->Add(Sizer1,1,wxEXPAND);
 

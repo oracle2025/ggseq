@@ -63,6 +63,7 @@ class TLPanel : public wxPanel
 
 		bool New();
 		bool Load();
+		bool Load(wxString& filename);
 		bool SaveAs();
 		bool Save();
 		bool SaveOnExit();

@@ -29,8 +29,10 @@
 #include <wx/config.h>
 #include <wx/dragimag.h>
 #include <wx/cmdline.h>
+#include<wx/dnd.h>
 
 #include "stuff.h"
+#define _DISABLE_CONFIG_SHORTCUTS_
 
 #include "TLPanel.h"
 #include "TLMiniFiler2.h"
@@ -40,7 +42,10 @@
 #include "DisableListener.h"
 #include "SidePanel.h"
 #include "FileInfoPanel.h"
-#include "ShortcutsDialog.h"
+
+#ifndef _DISABLE_CONFIG_SHORTCUTS_
+	#include "ShortcutsDialog.h"
+#endif
 
 #include "new1.xpm"
 #include "open.xpm"
@@ -54,7 +59,8 @@
 #include "dndfile.xpm"
 #include "snap.xpm"
 #include "ggseq_32.xpm"
-#include "prefs_misc.xpm"
+//#include "prefs_misc.xpm"
+
 
 enum
 {
@@ -110,6 +116,7 @@ class TestFrame1: public wxFrame
 		void OnMouseLeftUp(wxMouseEvent& event);
 		void OnMouseMotion(wxMouseEvent& event);
 		void OnScroll(wxScrollEvent& event);
+		void LoadFile(wxString& filename);
 	private:
 		void MakeToolBar();
 		void MakeTlPanel(wxWindow *parent);
@@ -127,6 +134,15 @@ class TestFrame1: public wxFrame
 		bool m_DraggingFile;
 		wxDragImage *m_dragImage;
 		DECLARE_EVENT_TABLE()
+};
+
+class DropFiles: public wxFileDropTarget
+{
+	public:
+		DropFiles (TestFrame1 *frame) {m_frame = frame;}
+		virtual bool OnDropFiles (wxCoord x, wxCoord y, const wxArrayString& filenames);
+	private:
+		TestFrame1 *m_frame;
 };
 
 BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
@@ -202,6 +218,7 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	MakeShortcuts();
 
 	SetSize(size);
+	SetDropTarget (new DropFiles (this));
 }
 void TestFrame1::MakeShortcuts()
 {
@@ -315,6 +332,7 @@ void TestFrame1::OnScroll(wxScrollEvent& event)
 }
 void TestFrame1::OnPreferences(wxCommandEvent& event)
 {
+#ifndef _DISABLE_CONFIG_SHORTCUTS_
 	ShortcutsDialog dlg(this);
 	dlg.Centre();
 	if (dlg.ShowModal()==wxID_OK) {
@@ -322,7 +340,7 @@ void TestFrame1::OnPreferences(wxCommandEvent& event)
 		dlg.Save();
 		m_fileList->SetFocus();
 	}
-	
+#endif
 }
 void TestFrame1::OnFLStartDrag(wxListEvent& event)
 {
@@ -541,7 +559,25 @@ void TestFrame1::Stop()
 	m_toolBar->EnableTool(ID_PLAY,true);
 	m_toolBar->EnableTool(ID_STOP,false);
 }
+void TestFrame1::LoadFile(wxString& filename)
+{
+	m_tp->Load(filename);	
+}
 
+bool DropFiles::OnDropFiles (wxCoord x, wxCoord y, const wxArrayString& filenames) {
+    for (size_t n = 0; n < filenames.Count(); n++) {
+        if (wxFileName(filenames[n]).IsDir()) {
+            wxMessageBox (_("It is currently not allowed to drop \n"
+                            "directories onto the editor!"),
+                          _("Error"), wxOK | wxICON_EXCLAMATION);
+            return FALSE;
+        }
+    }
+    if (filenames.Count()<=0)
+    	return FALSE;
+    m_frame->LoadFile(filenames[0]);
+    return TRUE;
+}
 class Test: public wxApp
 {
 	virtual bool OnInit();
@@ -562,6 +598,10 @@ bool Test::OnInit()
 	frame->SetIcon(wxICON(ggseq_32));
 	frame->Show( TRUE );
 	SetTopWindow( frame );
+	if (m_fnames.GetCount()>0) {
+		frame->LoadFile(m_fnames[0]);
+	}
+	
 //	wxMessageDialog dlg(frame, wxT("Abc"));
 //	dlg.ShowModal();
 	return TRUE;

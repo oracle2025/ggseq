@@ -1,3 +1,10 @@
+2003-12-29  Richard Spindler <oracle2025@gmx.de>
+
+ *  A Projectfile can now be opened by Commandline now
+ *  A Project-File can be dropped to ggseq and will be opened
+ *  (thanks to wxGuide ;)
+ *  ShortcutsDialog won't be build -> scheduled for 0.3.0 
+
 2003-12-27  Richard Spindler <oracle2025@gmx.de>
 
  *  Rubberframe only needs to touch the samples to select from now on
