@@ -37,15 +37,13 @@
 #include "TLSelectionSet.h"
 #include "GgseqDocManager.h"
 #include "gun_girl.xpm"
+#include "drop_down_mini.xpm"
 #include "TLMuteButton.h"
 #include "dial.h"
 #include "TLTrackVolumeDial.h"
+#include "colour_helper.h"
 
 #define SNAP_POSITION 117600
-//OLD_SKOOL 110250
-//FUNK 94500
-
-// Zoom 1.0 == 117600 / 31
 
 #define LEFT_OFFSET_TRACKS 52
 #define TOP_OFFSET_TRACKS 3 //22
@@ -54,272 +52,173 @@
 #define VIEW_RIGHT_BORDER  5
 #define VIEW_TOP_BORDER    3
 #define HARD_ZOOM ( 117600.0 / 31.0 )
-float MAX(float a, float b, float c)
-{
-	if (a>=b && a>=c)
-		return a;
-	if (b>=a && b>=c)
-		return b;
-	return c;
-}
-float MIN(float a, float b, float c)
-{
-	if (a<=b && a<=c)
-		return a;
-	if (b<=a && b<=c)
-		return b;
-	return c;
-}
-void RGBtoHSV( float r, float g, float b, float *h, float *s, float *v )
-{
-	float min, max, delta;
-	min = MIN( r, g, b );
-	max = MAX( r, g, b );
-	*v = max; // v
-	delta = max - min;
-	if( max != 0 )
-		*s = delta / max; // s
-	else {
-		// r = g = b = 0 // s = 0, v is undefined
-		*s = 0;
-		*h = -1;
-		return;
-	}
-	if( r == max ) {
-		*h = ( g - b ) / delta; // between yellow & magenta
-	} else if( g == max ) {
-		*h = 2 + ( b - r ) / delta; // between cyan & yellow
-	} else {
-		*h = 4 + ( r - g ) / delta; // between magenta & cyan
-	}
-	*h *= 60; // degrees
-	if( *h < 0 )
-		*h += 360;
-}
-void HSVtoRGB( float *r, float *g, float *b, float h, float s, float v )
-{
-	int i;
-	float f, p, q, t;
-	if( s == 0 ) {
-		// achromatic (grey)
-		*r = *g = *b = v;
-		return;
-	}
-	h /= 60; // sector 0 to 5
-	i = (int)floor( h );
-	f = h - i; // factorial part of h
-	p = v * ( 1 - s );
-	q = v * ( 1 - s * f );
-	t = v * ( 1 - s * ( 1 - f ) );
-	switch( i ) {
-		case 0:
-			*r = v;
-			*g = t;
-			*b = p;
-			break;
-		case 1:
-			*r = q;
-			*g = v;
-			*b = p;
-			break;
-		case 2:
-			*r = p;
-			*g = v;
-			*b = t;
-			break;
-		case 3:
-			*r = p;
-			*g = q;
-			*b = v;
-			break;
-		case 4:
-			*r = t;
-			*g = p;
-			*b = v;
-			break;
-		default: // case 5:
-			*r = v;
-			*g = p;
-			*b = q;
-			break;
-	}
-}
 
 TLView::TLView(TLData *TlData)
 {
-	m_TlData=TlData;
-	m_TrackDrawDist=5;
-	m_selectionSet=new TLSelectionSet();
-	wxConfigBase *conf=wxConfigBase::Get();
-	conf->SetPath(wxT("/"));
-	m_TlData->SetSnapValue(conf->Read(wxT("SnapPosition"), SNAP_POSITION));
-	m_gungirl=new wxIcon(gun_girl_xpm);	
-	m_SnapSuspended=false;
-	m_docManager = new GgseqDocManager( m_TlData );
-	m_TlData->SetDocManager(m_docManager);
-	m_YscrollPosition=0;
-	m_zoom = 1.0;
+	m_TlData          = TlData;
+	m_TrackDrawDist   = 5;
+	m_YscrollPosition = 0;
+	m_SnapSuspended   = false;
+	m_zoom            = 1.0;
+	m_selectionSet    = new TLSelectionSet();
+	m_gungirl         = new wxIcon( gun_girl_xpm );
+	m_drop_down_mini  = new wxIcon( drop_down_mini_xpm );
+	m_docManager      = new GgseqDocManager( m_TlData );
+	m_TlData->SetDocManager( m_docManager );
+	{
+		wxConfigBase *conf = wxConfigBase::Get();
+		conf->SetPath( wxT("/") );
+		m_TlData->SetSnapValue( conf->Read( wxT("SnapPosition"), SNAP_POSITION ) );
+	}
 }
-void TLView::SuspendSnap() { m_SnapSuspended=true; }
-void TLView::ResumeSnap() { m_SnapSuspended=false; }
 TLView::~TLView()
 {
-	wxConfigBase *conf=wxConfigBase::Get();
-	conf->Write(wxT("SnapPosition"),m_TlData->GetSnapValue()/*m_SnapPosition*/);
+	{
+		wxConfigBase *conf = wxConfigBase::Get();
+		conf->Write( wxT("SnapPosition"), m_TlData->GetSnapValue() );
+	}
 	delete m_selectionSet;
 	delete m_TlData;
 	delete m_gungirl;
+	delete m_drop_down_mini;
 	delete m_docManager;
 }
-/*void TLView::SetVisibleFrame(long width, long height, long x, long y)
-{
-	//m_FrameX=x;
-	//m_FrameY=y;
-	//m_FrameWidth=width;
-	//m_FrameHeight=height;
-	//m_Faktor=(float)m_FrameWidth/(float)m_LengthVisible;
-	//SetVisibleLength(width);
-}*/
+
+
+void TLView::SuspendSnap() { m_SnapSuspended = true; }
+void TLView::ResumeSnap() { m_SnapSuspended = false; }
+void TLView::SetZoom( float zoom ) { m_zoom = zoom; }
+void TLView::SetSnapValue(long snapValue)
+	{ m_TlData->SetSnapValue( snapValue ); }
+long TLView::GetSnapValue()
+	{ return m_TlData->GetSnapValue(); }
 float TLView::GetRealZoom()
-{
-	return HARD_ZOOM/m_zoom;
-}
-/*void TLView::SetVisibleLength(gg_tl_dat Length)
-{
-	//m_LengthVisible=(Length*117600)/31; //TODO: Nicht Hardcoden
-	//m_Faktor=(float)m_FrameWidth/(float)m_LengthVisible;
-}*/
+	{ return HARD_ZOOM/m_zoom; }
 void TLView::SetSize( long width, long height )
-{	
-	m_width = width;
-	m_height = height;
-	m_LengthVisible=(gg_tl_dat)((m_width-VIEW_LEFT_BORDER-VIEW_RIGHT_BORDER)*GetRealZoom());
-}
-void TLView::SetZoom( float zoom )
+	{ m_width = width; m_height = height; }
+gg_tl_dat TLView::VisibleLength()
 {
-	m_zoom = zoom;
-	m_LengthVisible=(gg_tl_dat)((m_width-VIEW_LEFT_BORDER-VIEW_RIGHT_BORDER)*GetRealZoom());
-	
+	return (gg_tl_dat)( ( m_width - VIEW_LEFT_BORDER - VIEW_RIGHT_BORDER ) * GetRealZoom() );
 }
 void TLView::SetPosition(gg_tl_dat Position)
-{
-	m_PositionVisible=(gg_tl_dat)(Position*GetRealZoom());
-}
+	{ m_PositionVisible = (gg_tl_dat) ( Position * GetRealZoom() ); }
 gg_tl_dat TLView::GetPosition()
-{
-	return (gg_tl_dat)(m_PositionVisible/GetRealZoom());
-}
-
+	{ return (gg_tl_dat) ( m_PositionVisible / GetRealZoom() ); }
 gg_tl_dat TLView::GetScrollBarRange()
-{
-	return (gg_tl_dat)(m_TlData->GetLength()/GetRealZoom());
-}
+	{ return (gg_tl_dat) ( m_TlData->GetLength() / GetRealZoom() ); }
 gg_tl_dat TLView::GetScrollBarThumbSize()
-{
-	return m_width-VIEW_LEFT_BORDER-VIEW_RIGHT_BORDER;
-	//return (m_LengthVisible/117600)*31; //TODO: Nicht Hardcoden
-}
-void TLView::Draw(wxDC& dc/*_screen*/)
-{
-//	wxMemoryDC dc;
-	long yoffset;
-//	dc.SelectObject(wxBitmap(m_FrameWidth,m_FrameHeight));
-	dc.SetBrush(*wxLIGHT_GREY_BRUSH);
-//	dc.DrawRectangle(0,0,m_FrameWidth,m_FrameHeight);
+	{ return m_width - VIEW_LEFT_BORDER - VIEW_RIGHT_BORDER; }
 
-//-.-
-	dc.SetBrush(*wxGREY_BRUSH);
-	wxBrush brush1=dc.GetBrush();
-	brush1.SetColour(wxColour(166,166,166));
-	dc.SetBrush(brush1);
-	dc.SetPen(wxPen(wxColour(100,100,100),1,wxSOLID));
-	yoffset=TOP_OFFSET_TRACKS;//m_FrameY;
+void TLView::SetBrushColour( wxDC& dc, wxColour colour )
+{
+	wxBrush brush1 = dc.GetBrush();
+	brush1.SetColour( colour );
+	dc.SetBrush( brush1 );
+}
+void TLView::Draw( wxDC& dc )
+{
+	long yoffset;
+	dc.SetBrush( *wxGREY_BRUSH );
+	SetBrushColour( dc, wxColour( 166, 166, 166 ) );
+	dc.SetPen( wxPen( wxColour( 100, 100, 100), 1, wxSOLID ) );
+	yoffset = TOP_OFFSET_TRACKS;
 	for ( TLTrackList::Node *node = m_TlData->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *track = node->GetData();
 		if (track->GetSelected()) {
-			wxBrush brush1=dc.GetBrush();
-			brush1.SetColour(wxColour(199,199,188));
-			dc.SetBrush(brush1);
+			SetBrushColour( dc, wxColour( 199, 199, 188 ) );
 		}
-		dc.DrawRectangle(VIEW_LEFT_BORDER,yoffset-m_YscrollPosition,m_width-VIEW_LEFT_BORDER-VIEW_RIGHT_BORDER ,track->GetHeight());
-		yoffset+=track->GetHeight()+m_TrackDrawDist;
+		dc.DrawRectangle( VIEW_LEFT_BORDER,
+		                  yoffset - m_YscrollPosition,
+		                  m_width - VIEW_LEFT_BORDER - VIEW_RIGHT_BORDER,
+		                  track->GetHeight() );
+		yoffset += track->GetHeight() + m_TrackDrawDist;
 		if (track->GetSelected()) {
-			wxBrush brush1=dc.GetBrush();
-			brush1.SetColour(wxColour(166,166,166));
-			dc.SetBrush(brush1);
+			SetBrushColour( dc, wxColour( 166, 166, 166 ) );
 		}
-
 	}
-
-//-.-
-	//dc.DrawIcon(*m_gungirl,m_FrameWidth+m_FrameX-m_gungirl->GetWidth(),m_FrameHeight+TOP_OFFSET_TRACKS-m_gungirl->GetHeight());
-
-	yoffset=TOP_OFFSET_TRACKS;
+	yoffset = TOP_OFFSET_TRACKS;
 	for ( TLTrackList::Node *node = m_TlData->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
-		yoffset = DrawTrack(dc, yoffset, current);
+		yoffset = DrawTrack( dc, yoffset, current );
 	}
 }
 void TLView::UpdateDialsAndButtons()
 {
-	int i=0;
+	int i = TOP_OFFSET_TRACKS - m_YscrollPosition ;
 	for ( TLTrackList::Node *node = m_TlData->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
-		current->m_muteButton->SetSize(5,TOP_OFFSET_TRACKS+i*30-m_YscrollPosition,25,25 );
-		current->m_volumeDial->SetSize(31,TOP_OFFSET_TRACKS+i*30-m_YscrollPosition,25,25 );
-		i++;
+		current->m_muteButton->SetSize( 5, i, 25, 25 );
+		current->m_volumeDial->SetSize( 31, i, 25, 25 );
+		i += 30;
 	}
-
 }
+void TLView::DrawItem(wxDC& dc, TLItem* item, long left, long delta_left, long top, long width, long height)
+{
+/* - Item itself - */
+	Draw3dRect( &dc, left, top, width, height, item->GetSample()->GetColour() );
+/* - Selection - */
+	if ( item->IsSelected() ) {
+		dc.SetPen( wxPen( *wxWHITE, 3, wxSHORT_DASH ) );
+		dc.SetBrush( *wxTRANSPARENT_BRUSH );
+		dc.DrawRectangle( left, top, width, height );
+	}
+/* - Label (Filename) - */
+	if ( width > 1 ) {
+		dc.SetPen( *wxBLACK_PEN );
+		dc.SetClippingRegion( left, top, width, height );
+		dc.SetFont( *wxSMALL_FONT );
+		wxFileName fn( item->GetSample()->GetFilename() );
+		long v3 = left + delta_left;
+			dc.DrawText( fn.GetName(), v3, top + 1 );
+		dc.DestroyClippingRegion();
+	}
+/* - Extras ;) -*/ 
+	dc.SetPen( *wxBLACK_PEN );
+	dc.SetBrush( *wxWHITE_BRUSH );
+	dc.DrawRectangle( left + item->m_x_test, top+item->m_y_test, 10, 10);
+}
+
+bool TLView::ItemVisible( TLItem* item )
+{
+	gg_tl_dat i_left = item->GetPosition();
+	gg_tl_dat i_right = item->GetEndPosition();
+	gg_tl_dat vis_right = m_PositionVisible + VisibleLength();
+	gg_tl_dat vis_left = m_PositionVisible;
+	if ( (i_left  >= vis_left && i_left  <= vis_right) ||
+	     (i_right >= vis_left && i_right <= vis_right) || 
+	     (i_left  <= vis_left && i_right >= vis_right) )
+		return true;
+	return false;
+}
+/*
+bool TLView::ItemPosOnScreen(TLItem* item)
+{
+}
+*/
 long TLView::DrawTrack(wxDC& dc, long yoffset, TLTrack* track)
 {
-	gg_tl_dat start,end;
-	wxPen pen1=dc.GetPen();
-	pen1.SetColour(*wxBLACK);
-	dc.SetPen(pen1);
-	dc.SetBrush(*wxRED_BRUSH);
+	gg_tl_dat start, end, delta_start;
 	for ( TLItemList::Node *node = track->GetFirst(); node; node = node->GetNext() ) {
 		TLItem *current = node->GetData();
-		if ((current->GetPosition() >= m_PositionVisible &&
-		  current->GetPosition() <= m_PositionVisible+m_LengthVisible) ||
-		  (current->GetPosition()+current->GetLength() >= m_PositionVisible &&
-		  current->GetPosition()+current->GetLength()<= m_PositionVisible+m_LengthVisible) || 
-		  (current->GetPosition() <= m_PositionVisible && current->GetPosition()+current->GetLength() >= m_PositionVisible+m_LengthVisible)) {
-			start=current->GetPosition()-m_PositionVisible;
-			if (start<0)
-				start=0;
-			end=current->GetPosition()+current->GetLength()-m_PositionVisible;
-			if (end > m_LengthVisible)
-				end=m_LengthVisible;
-			wxBrush b1=dc.GetBrush();
-			b1.SetColour(current->GetSample()->GetColour());
-			dc.SetBrush(b1);
-			dc.SetPen(*wxBLACK_PEN);
-			dc.SetBrush(*wxBLACK_BRUSH);
-			Draw3dRect(&dc,(long)(start /  GetRealZoom() )+VIEW_LEFT_BORDER,yoffset-m_YscrollPosition,(long)((end-start)/  GetRealZoom()),track->GetHeight(),current->GetSample()->GetColour());
-			if (current->IsSelected()) {
-				pen1=dc.GetPen();
-				pen1.SetColour(*wxWHITE);
-				pen1.SetStyle(wxSHORT_DASH);
-				pen1.SetWidth(3);
-				dc.SetPen(pen1);
-				dc.SetBrush(*wxTRANSPARENT_BRUSH);
-				dc.DrawRectangle((long)(start /  GetRealZoom())+VIEW_LEFT_BORDER,yoffset-m_YscrollPosition,(long)((end-start)/  GetRealZoom() ),track->GetHeight());
-			}
-
-			dc.SetPen(*wxBLACK_PEN);
-			dc.SetClippingRegion((long)(start/  GetRealZoom())+VIEW_LEFT_BORDER,yoffset-m_YscrollPosition,(long)((end-start)/ GetRealZoom()),track->GetHeight());
-			dc.SetFont(*wxSMALL_FONT);
-			wxFileName fn(current->GetSample()->GetFilename());
-//#ifndef __WXMSW__ 
-			if ( (long)(end/  GetRealZoom())+VIEW_LEFT_BORDER>(long)(start/  GetRealZoom())+1+VIEW_LEFT_BORDER ) //TODO Evil Hack ;)
-				dc.DrawText(fn.GetName(),(long)((current->GetPosition()-m_PositionVisible)/*start*/ /  GetRealZoom())+1+VIEW_LEFT_BORDER,yoffset+1-m_YscrollPosition);
-				
-//#endif
-			dc.DestroyClippingRegion();
+		if ( !ItemVisible( current ) )
+			continue;
+		start = current->GetPosition() - m_PositionVisible;
+		delta_start = 0;
+		if ( start < 0 ) {
+			delta_start = start;
+			start = 0;
 		}
+		end = current->GetEndPosition() - m_PositionVisible;
+		if ( end > VisibleLength() )
+			end = VisibleLength();
+		long left       = (long) ( start /  GetRealZoom() ) + VIEW_LEFT_BORDER;
+		long delta_left = (long) ( delta_start / GetRealZoom() );
+		long top        = yoffset - m_YscrollPosition;
+		long width      = (long) ( ( end - start ) /  GetRealZoom() );
+		long height     = track->GetHeight();
+		DrawItem( dc, current, left, delta_left, top, width, height );
 	}
-	return yoffset+track->GetHeight()+m_TrackDrawDist;
+	return yoffset + track->GetHeight() + m_TrackDrawDist;
 }
 void TLView::Draw3dRect(wxDC *dc, wxCoord x, wxCoord y, wxCoord width, wxCoord height, wxColour colour)
 {
@@ -330,69 +229,44 @@ void TLView::Draw3dRect(wxDC *dc, wxCoord x, wxCoord y, wxCoord width, wxCoord h
 	wxPen pen1=dc->GetPen();
 	pen1.SetColour(GetLightColour(colour));
 	dc->SetPen(pen1);
-
 	dc->DrawLine(x,y,x+width-1,y);
 	dc->DrawLine(x,y,x,y+height-1);
-
-
 	pen1=dc->GetPen();
 	pen1.SetColour(GetDarkColour(colour));
 	dc->SetPen(pen1);
-
 	dc->DrawLine(x,y+height-1,x+width-1,y+height-1);
 	dc->DrawLine(x+width-1,y,x+width-1,y+height);
 }
-wxColour TLView::GetDarkColour(wxColour colour)
-{
-	float H, S, V;
-	float R, G, B;
-	R=((float)colour.Red())/256.0;
-	G=((float)colour.Green())/256.0;
-	B=((float)colour.Blue())/256.0;
-	RGBtoHSV(R,G,B,&H,&S,&V);
-	V-=0.2;
-	if (V<0)
-		V=0;
-	HSVtoRGB(&R,&G,&B,H,S,V);
-	wxColour result((unsigned char)(R*255),(unsigned char)(G*255),(unsigned char)(B*255));
-	return result;
-}
-wxColour TLView::GetLightColour(wxColour colour)
-{
-	float H, S, V;
-	RGBtoHSV(((float)colour.Red())/256.0,((float)colour.Green())/256.0,((float)colour.Blue())/256.0,&H,&S,&V);
-	S-=0.3;
-	if (S<0)
-		S=0;
-	float R,G,B;
-	HSVtoRGB(&R,&G,&B,H,S,V);
-	wxColour result((unsigned char)(R*255),(unsigned char)(G*255),(unsigned char)(B*255));
-	return result;
-}
-void TLView::AddItem(TLSample *sample, long position, long trackNr)
+void TLView::AddItem( TLSample *sample, long position, long trackNr )
 {
 	if (m_TlData->IsBlocked())
 		return;
-	m_docManager->SubmitCommand( new GgseqAddItemCommand( m_TlData, sample->GetFilename(), GetSnap(FromScreenXtoTL(position)), trackNr, sample ));
+	m_docManager->SubmitCommand(
+		new GgseqAddItemCommand(
+			m_TlData, sample->GetFilename(),
+			GetSnap( FromScreenXtoTL( position ) ),
+			trackNr, sample
+			)
+		);
 }
 
 void TLView::AddItem(wxString filename, long position, long trackNr)
 {
 	if (m_TlData->IsBlocked())
 		return;
-	m_docManager->SubmitCommand( new GgseqAddItemCommand( m_TlData, filename,
-		GetSnap(FromScreenXtoTL(position)),trackNr ) );
-/*	TLItem *item=m_TlData->AddItem(filename,FromScreenXtoTL(position),trackNr);
-	if (!item)
-		return;
-	SnapItem(item);*/
+	m_docManager->SubmitCommand(
+		new GgseqAddItemCommand(
+			m_TlData, filename,
+			GetSnap( FromScreenXtoTL( position ) ),
+			trackNr
+			)
+		);
 }
 
 void TLView::DeleteItem(TLItem *item, long trackNr)
 {
 	if (m_TlData->IsBlocked())
 		return;
-//	m_TlData->DeleteItem(item,trackNr);
 	m_docManager->SubmitCommand( new GgseqDeleteItemCommand( m_TlData, item ) );
 }
 
@@ -403,10 +277,8 @@ gg_tl_dat TLView::FromScreenXtoTL(long x)
 }
 long TLView::FromTLtoScreenX(gg_tl_dat x)
 {
-
 	double result = (double)(x-m_PositionVisible) / GetRealZoom() + VIEW_LEFT_BORDER;
 	return (long) result;
-
 }
 long TLView::GetTrackByY(long y)
 {
@@ -414,76 +286,85 @@ long TLView::GetTrackByY(long y)
 	long cnt = 0;
 	for ( TLTrackList::Node *node = m_TlData->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
-		if (y>y_offset && y<current->GetHeight()+y_offset)
+		if ( y > y_offset && y < current->GetHeight() + y_offset )
 			return cnt;
 		cnt++;
-		y_offset+=current->GetHeight()+m_TrackDrawDist;
+		y_offset += current->GetHeight() + m_TrackDrawDist;
 	}
 	return -1;
 }
-TLItem *TLView::GetDragItem(long x, long y)
+wxRect TLView::GetItemBoundaries(TLItem *item)
 {
-	if (m_TlData->IsBlocked())
-		return NULL;
-	long track=GetTrackByY(y);
-	if (track<0)
-		return NULL;
-	return m_TlData->ItemAtPos(FromScreenXtoTL(x),track);
-}
-void TLView::DoDrop(long x, long y, TLItem *item, long srcTrack, long x_offset, bool copy)
-{
-	if (m_TlData->IsBlocked())
-		return;
-	long track=GetTrackByY(y);
-	if (x+x_offset<VIEW_LEFT_BORDER || x+x_offset>m_width-VIEW_RIGHT_BORDER)
-		track=-1;
 
+}
+TLItem *TLView::GetDragItem( long x, long y )
+{
+	if (m_TlData->IsBlocked())
+		return NULL;
+	long track = GetTrackByY(y);
+	if ( track < 0 )
+		return NULL;
+	return m_TlData->ItemAtPos( FromScreenXtoTL( x ), track );
+}
+void TLView::DoDrop( long x, long y, TLItem *item, long srcTrack, long x_offset, bool copy )
+{
+	if ( m_TlData->IsBlocked() )
+		return;
+	long track = GetTrackByY( y );
+	if ( x + x_offset < VIEW_LEFT_BORDER || x + x_offset > m_width - VIEW_RIGHT_BORDER )
+		track = -1;
 	/*Delete Item*/
-	if (track<0 && !copy) {
-		DeleteItem(item,srcTrack);
+	if ( track < 0 && !copy ) {
+		DeleteItem( item, srcTrack );
 		return;
-	} else if (track<0)
+	} else if ( track < 0 )
 		return;
-	if (copy) {
-		AddItem(item->GetSample(),x,track);
+	if ( copy ) {
+		AddItem( item->GetSample(), x, track );
 	} else {
-		m_docManager->SubmitCommand( new GgseqMoveItemCommand( m_TlData, item, GetSnap(FromScreenXtoTL(x)), track ) );
+		m_docManager->SubmitCommand(
+			new GgseqMoveItemCommand(
+				m_TlData, item,
+				GetSnap( FromScreenXtoTL( x ) ),
+				track
+				)
+			);
 	}
 }
 gg_tl_dat TLView::GetSnap( gg_tl_dat x )
 {
 	if ( m_SnapSuspended )
 		return x;
-	gg_tl_dat pos=x%(gg_tl_dat)m_TlData->GetSnapValue();
-	if (pos) {
-		if (pos> (gg_tl_dat)m_TlData->GetSnapValue()/2)
-			x=x-pos+ (gg_tl_dat)m_TlData->GetSnapValue();
+	gg_tl_dat pos = x % (gg_tl_dat)m_TlData->GetSnapValue();
+	if ( pos ) {
+		if ( pos > (gg_tl_dat)m_TlData->GetSnapValue() / 2 )
+			x = x - pos + (gg_tl_dat)m_TlData->GetSnapValue();
 		else
-			x=x-pos;
+			x = x - pos;
 	}
 	//TODO: Snap To Sample implementieren
 	return x;
 }
 
-void TLView::SetPlaybackPosition(long Position)
+void TLView::SetPlaybackPosition( long Position )
 {
-	if (m_TlData->IsBlocked())
+	if ( m_TlData->IsBlocked() )
 		return;
-	m_TlData->SetPlaybackPosition(FromScreenXtoTL(Position));
+	m_TlData->SetPlaybackPosition( FromScreenXtoTL( Position ) );
 }
-TLSample *TLView::GetSample(long position, long trackNr)
+TLSample *TLView::GetSample( long position, long trackNr )
 {
-	TLItem *item = m_TlData->ItemAtPos(FromScreenXtoTL(position), trackNr);
-	if (!item)
+	TLItem *item = m_TlData->ItemAtPos( FromScreenXtoTL( position ), trackNr );
+	if ( !item )
 		return NULL;
 	return item->GetSample();
 }
 
-long TLView::GetScreenSnapPosition(long position)
+long TLView::GetScreenSnapPosition( long position )
 {	
-	gg_tl_dat pos1=FromScreenXtoTL(position);
-	pos1=GetSnap(pos1);
-	return FromTLtoScreenX(pos1);
+	gg_tl_dat pos1 = FromScreenXtoTL( position );
+	pos1 = GetSnap( pos1 );
+	return FromTLtoScreenX( pos1 );
 }
 
 long TLView::GetCaretPosition()
@@ -498,23 +379,21 @@ long TLView::GetCaretPosition( gg_tl_dat Position )
 void TLView::Select( long x, long y, long width, long height )
 {
 	ClearSelection();
-	int i=0;
+	int i = 0;
 	int firstTrackNr;
 	int scndTrackNr;
-	GetTracksSurroundedBy(firstTrackNr, scndTrackNr, y,y+height );
-	/*FromScreenXtoTL*/
-	gg_tl_dat TL_X1=FromScreenXtoTL(x);
-	gg_tl_dat TL_X2=FromScreenXtoTL(x+width);
-
+	GetTracksSurroundedBy( firstTrackNr, scndTrackNr, y, y + height );
+	gg_tl_dat TL_X1 = FromScreenXtoTL( x );
+	gg_tl_dat TL_X2 = FromScreenXtoTL( x + width );
 	for ( TLTrackList::Node *trackNode = m_TlData->GetFirst(); trackNode; trackNode = trackNode->GetNext() ) {
-		if (i>=firstTrackNr && i<=scndTrackNr) {
-			TLTrack *track = trackNode->GetData();
-			for ( TLItemList::Node *node = track->GetFirst(); node; node = node->GetNext() ) {
-				TLItem *current = node->GetData();
-				if (current->GetPosition()<=TL_X2&&current->GetEndPosition()>=TL_X1) {
-					m_selectionSet->AddSample(current->GetSample(),current);
-				}
-			
+		if ( !( i >= firstTrackNr && i <= scndTrackNr ) )
+			continue;
+		TLTrack *track = trackNode->GetData();
+		for ( TLItemList::Node *node = track->GetFirst(); node; node = node->GetNext() ) {
+			TLItem *current = node->GetData();
+			if ( current->GetPosition()    <= TL_X2 &&
+			     current->GetEndPosition() >= TL_X1 ) {
+				m_selectionSet->AddSample( current->GetSample(), current );
 			}
 		}
 		i++;
@@ -524,106 +403,109 @@ void TLView::Select( long x, long y, long width, long height )
 
 void TLView::ClearSelection()
 {
-	m_selectionSet->Clear(m_TlData);
+	m_selectionSet->Clear( m_TlData );
 }
 
-void TLView::GetTracksSurroundedBy(int &trackNr1, int &trackNr2, long y1, long y2)
+void TLView::GetTracksSurroundedBy( int &trackNr1, int &trackNr2, long y1, long y2 )
 {
-	trackNr1=-1;
-	trackNr2=-1;
-	long y_offset = TOP_OFFSET_TRACKS-m_YscrollPosition;
+	trackNr1 = -1;
+	trackNr2 = -1;
+	long y_offset = TOP_OFFSET_TRACKS - m_YscrollPosition;
 	int cnt = 0;
 	for ( TLTrackList::Node *node = m_TlData->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
-		if (trackNr1<0)
-			if (y_offset+current->GetHeight()>y1)
-				trackNr1=cnt;
-		if (y_offset/*+current->GetHeight()*/<y2)
-			trackNr2=cnt;
+		if ( trackNr1 < 0 )
+			if ( y_offset + current->GetHeight() > y1 )
+				trackNr1 = cnt;
+		if ( y_offset < y2 )
+			trackNr2 = cnt;
 		cnt++;
-		y_offset+=current->GetHeight()+m_TrackDrawDist;
+		y_offset += current->GetHeight() + m_TrackDrawDist;
 	}
 }
-bool TLView::IsSelectionAt(int x, int y, int& x_offset, int& y_offset, int& width, int& height)
+bool TLView::IsSelectionAt( int x, int y, int& x_offset, int& y_offset, int& width, int& height )
 {
-	if (m_TlData->IsBlocked())
+	if ( m_TlData->IsBlocked() )
 		return false;
-	if (!m_selectionSet->IsActive())
+	if ( !m_selectionSet->IsActive() )
 		return false;
-	gg_tl_dat TL_x=FromScreenXtoTL(x);
-	int track=GetTrackByY(y);
+	gg_tl_dat TL_x = FromScreenXtoTL( x );
+	int track = GetTrackByY( y );
 
-	width=FromTLtoScreenX(m_selectionSet->GetX2())-FromTLtoScreenX(m_selectionSet->GetX1());
-	height=(m_selectionSet->GetTrack2()-m_selectionSet->GetTrack1()+1)*30-5;
-	if (track>=m_selectionSet->GetTrack1() && track<=m_selectionSet->GetTrack2() && TL_x>=m_selectionSet->GetX1() && TL_x<=m_selectionSet->GetX2()) {
-		x_offset = x-FromTLtoScreenX(m_selectionSet->GetX1());
-		y_offset = y-(m_selectionSet->GetTrack1()*30+5);
+	width = FromTLtoScreenX( m_selectionSet->GetX2() )
+		- FromTLtoScreenX( m_selectionSet->GetX1() );
+	height = ( m_selectionSet->GetTrack2() - m_selectionSet->GetTrack1() + 1 ) * 30 - 5;
+	if ( track >= m_selectionSet->GetTrack1() &&
+	     track <= m_selectionSet->GetTrack2() &&
+	     TL_x  >= m_selectionSet->GetX1() &&
+	     TL_x  <= m_selectionSet->GetX2()) {
+		x_offset = x - FromTLtoScreenX( m_selectionSet->GetX1() );
+		y_offset = y - ( m_selectionSet->GetTrack1() * 30 + 5 );
 		return true;
 	}
 	return false;
 }
-void TLView::DrawSelection(wxDC *dc)
+void TLView::DrawSelection( wxDC *dc )
 {
 	for ( TLSelItemList::Node *node = m_selectionSet->GetFirst(); node; node = node->GetNext() ) {
 		TLItem *current = node->GetData()->GetItem();
-		dc->DrawRectangle((int)((current->GetPosition()-m_selectionSet->GetX1())/  GetRealZoom()),
-		  (current->GetTrack()-m_selectionSet->GetTrack1())*30,
-		  (int)(current->GetLength()/  GetRealZoom()),
-		  25);
+		dc->DrawRectangle( (int) ( ( current->GetPosition() - m_selectionSet->GetX1() ) /  GetRealZoom() ),
+		  ( current->GetTrack() - m_selectionSet->GetTrack1() ) * 30,
+		  (int)( current->GetLength() /  GetRealZoom() ), 25);
 	}
 }
 void TLView::EndSelectionDrag(int x, int y, bool copy, long x_offset)
 {
-	gg_tl_dat TL_x=FromScreenXtoTL(x);/*TODO: festellen wann: Add, Move, Delete*/
-	TL_x=GetSnap(TL_x);
-
-	int track=GetTrackByY(y);
-	if (x+x_offset<VIEW_LEFT_BORDER || x+x_offset>m_width-VIEW_RIGHT_BORDER)
-		track=-1;
+	gg_tl_dat TL_x = FromScreenXtoTL(x);
+	TL_x = GetSnap( TL_x );
+	int track = GetTrackByY(y);
+	if ( x + x_offset < VIEW_LEFT_BORDER || x + x_offset > m_width - VIEW_RIGHT_BORDER )
+		track = -1;
 	TLSelectionSet *SelSet;
-	//Add: track>=0 and copy==true
-	//Move: track>=0 and copy==false
-	//Delete: track<0 and copy==false
-	if ( track>=0 && copy ) { /*Add*/
-		m_docManager->SubmitCommand( new GgseqAddItemsCommand( m_TlData, m_selectionSet, &SelSet, TL_x, track ));
+	if ( track >= 0 && copy ) {
+		m_docManager->SubmitCommand(
+			new GgseqAddItemsCommand(
+				m_TlData, m_selectionSet,
+				&SelSet, TL_x, track
+				)
+			);
 		delete m_selectionSet;
-		m_selectionSet=SelSet;
+		m_selectionSet = SelSet;
 	}
-	if ( track>=0 && !copy ) {
-		m_docManager->SubmitCommand( new GgseqMoveItemsCommand( m_TlData, m_selectionSet, &SelSet, TL_x, track ));
+	if ( track >= 0 && !copy ) {
+		m_docManager->SubmitCommand(
+			new GgseqMoveItemsCommand(
+				m_TlData, m_selectionSet,
+				&SelSet, TL_x, track
+				)
+			);
 		delete m_selectionSet;
-		m_selectionSet=SelSet;
+		m_selectionSet = SelSet;
 	}
-	if ( track<0 and !copy ) {
-		m_docManager->SubmitCommand( new GgseqDeleteItemsCommand( m_TlData, m_selectionSet ));
+	if ( track < 0 and !copy ) {
+		m_docManager->SubmitCommand(
+			new GgseqDeleteItemsCommand( m_TlData, m_selectionSet )
+			);
 	}
 }
 
 
-void TLView::SetSnapValue(long snapValue)
-{
-	m_TlData->SetSnapValue(snapValue);
-}
-long TLView::GetSnapValue()
-{
-	return m_TlData->GetSnapValue();
-}
 void TLView::Undo()
 {
-	if (m_docManager->CanUndo()) {
+	if ( m_docManager->CanUndo() ) {
 		ClearSelection();
 		m_docManager->Undo();
 	}
 }
 void TLView::Redo()
 {
-	if (m_docManager->CanRedo()) {
+	if ( m_docManager->CanRedo() ) {
 		ClearSelection();
 		m_docManager->Redo();
 	}
 }
-void TLView::SelectTrack(long y)
+void TLView::SelectTrack( long y )
 {
-	int track=GetTrackByY(y);
-	m_TlData->SelectTrack(track);
+	int track = GetTrackByY( y );
+	m_TlData->SelectTrack( track );
 }

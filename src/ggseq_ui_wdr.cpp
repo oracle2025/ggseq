@@ -302,18 +302,22 @@ wxSizer *PreferencesFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     HelpProgsFunc( item6, FALSE );
     item2->AddPage( item6, wxT("Helper Programs") );
 
+    wxPanel *item7 = new wxPanel( item2, -1 );
+    MiscOptsDlgFunc( item7, FALSE );
+    item2->AddPage( item7, wxT("Misc. Options") );
+
     item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    wxBoxSizer *item7 = new wxBoxSizer( wxHORIZONTAL );
+    wxBoxSizer *item8 = new wxBoxSizer( wxHORIZONTAL );
 
-    wxButton *item8 = new wxButton( parent, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    item7->Add( item8, 0, wxALIGN_CENTER|wxRIGHT, 5 );
+    wxButton *item9 = new wxButton( parent, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    item8->Add( item9, 0, wxALIGN_CENTER|wxRIGHT, 5 );
 
-    wxButton *item9 = new wxButton( parent, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
-    item9->SetDefault();
-    item7->Add( item9, 0, wxALIGN_CENTER, 5 );
+    wxButton *item10 = new wxButton( parent, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
+    item10->SetDefault();
+    item8->Add( item10, 0, wxALIGN_CENTER, 5 );
 
-    item0->Add( item7, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxTOP|wxBOTTOM, 5 );
+    item0->Add( item8, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxTOP|wxBOTTOM, 5 );
 
     if (set_sizer)
     {
@@ -420,6 +424,23 @@ wxSizer *HelpProgsFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     return item0;
 }
 
+wxSizer *MiscOptsDlgFunc( wxWindow *parent, bool call_fit, bool set_sizer )
+{
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    wxCheckBox *item1 = new wxCheckBox( parent, ID_LOAD_LAST_CHECKBOX, wxT("Load last File on startup"), wxDefaultPosition, wxDefaultSize, 0 );
+    item0->Add( item1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    if (set_sizer)
+    {
+        parent->SetSizer( item0 );
+        if (call_fit)
+            item0->SetSizeHints( parent );
+    }
+    
+    return item0;
+}
+
 // Implement menubar functions
 
 wxMenuBar *MyMenuBarFunc()
@@ -482,6 +503,7 @@ void MyToolBarFunc( wxToolBar *parent )
     parent->AddTool( ID_REWIND, wxT(""), GgseqBitmapsFunc( 10 ), wxNullBitmap, wxITEM_NORMAL, wxT("Rewind") );
     parent->AddTool( ID_PLAY, wxT(""), GgseqBitmapsFunc( 2 ), wxNullBitmap, wxITEM_NORMAL, wxT("Play") );
     parent->AddTool( ID_STOP, wxT(""), GgseqBitmapsFunc( 14 ), wxNullBitmap, wxITEM_NORMAL, wxT("Stop") );
+    parent->EnableTool( ID_STOP, FALSE );
     parent->AddSeparator();
     wxString strs1[] = 
     {
@@ -497,7 +519,7 @@ void MyToolBarFunc( wxToolBar *parent )
     parent->AddTool( ID_UNDO, wxT(""), GgseqBitmapsFunc( 16 ), wxNullBitmap, wxITEM_NORMAL, wxT("Undo") );
     parent->AddTool( ID_REDO, wxT(""), GgseqBitmapsFunc( 17 ), wxNullBitmap, wxITEM_NORMAL, wxT("Redo") );
     parent->AddSeparator();
-    parent->AddTool( ID_TOOL, wxT(""), GgseqBitmapsFunc( 4 ), wxNullBitmap, wxITEM_NORMAL, wxT("Help") );
+    parent->AddTool( ID_HELP, wxT(""), GgseqBitmapsFunc( 4 ), wxNullBitmap, wxITEM_NORMAL, wxT("Help") );
     
     parent->Realize();
 }

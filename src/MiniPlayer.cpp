@@ -44,16 +44,17 @@ BEGIN_EVENT_TABLE(MiniPlayer, wxPanel)
 	EVT_TIMER(-1,MiniPlayer::OnTimer)
 END_EVENT_TABLE()
 
-MiniPlayer::MiniPlayer(wxWindow* parent, wxWindowID id, SoundManager *soundManager, UpdateListener *updateListener, FileInfoListener *fiListener)
+MiniPlayer::MiniPlayer(wxWindow* parent, wxWindowID id, UpdateListener *updateListener/*, FileInfoListener *fiListener*/)
 		:wxPanel(parent, id, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN,wxT("MiniPlayer"))
 {
 	MakeMiniPlayerWindow(this);
-	m_soundManager=soundManager;
+	//m_soundManager=soundManager;
 	m_timer = new wxTimer(this);
 	m_updateListener = updateListener;
-	m_fileInfoListener = fiListener;
+	//m_fileInfoListener = fiListener;
 	m_sample=NULL;
 	m_length=100;
+	g_ggseqProps.SetMiniPlayer(this);
 }
 MiniPlayer::~MiniPlayer()
 {
@@ -122,10 +123,10 @@ void MiniPlayer::Play()
 	m_playButton->Enable(false);
 	if (m_sample) {
 		wxLogStatus(wxT("Playing Sample: %s"),m_sample->GetFilename().c_str());
-		if (m_fileInfoListener) {m_fileInfoListener->SetInfo(m_sample->GetFilename(),m_sample->m_infoFrames,m_sample->m_infoChannels,m_sample->m_infoSampleRate);}
+		if (g_ggseqProps.GetFileInfoListener()) {g_ggseqProps.GetFileInfoListener()->SetInfo(m_sample->GetFilename(),m_sample->m_infoFrames,m_sample->m_infoChannels,m_sample->m_infoSampleRate);}
 //		m_slider->SetRange(0,m_sample->GetLength());
 		m_length=m_sample->GetLength();
-		m_soundManager->Play(m_sample);
+		g_ggseqProps.GetSoundManager()->Play(m_sample);
 	} else {
 		if (m_filename.IsEmpty()) {
 			return;
@@ -135,8 +136,8 @@ void MiniPlayer::Play()
 		long frames;
 		long channels;
 		long sampleRate;
-		m_soundManager->Play(m_filename,length,frames,channels,sampleRate,m_updateListener);
-		if (m_fileInfoListener) {m_fileInfoListener->SetInfo(m_filename,frames,channels,sampleRate);}
+		g_ggseqProps.GetSoundManager()->Play(m_filename,length,frames,channels,sampleRate,m_updateListener);
+		if (g_ggseqProps.GetFileInfoListener()) {g_ggseqProps.GetFileInfoListener()->SetInfo(m_filename,frames,channels,sampleRate);}
 //		std::cout << "length: " << length << std::endl;
 //		m_slider->SetRange(0,length);
 		m_length=length;
@@ -146,11 +147,11 @@ void MiniPlayer::Play()
 }
 void MiniPlayer::OnTimer(wxTimerEvent &event)
 {
-	if (m_soundManager->Done()) {
+	if (g_ggseqProps.GetSoundManager()->Done()) {
 		Stop();
 	} else {
 		//m_slider->SetValue(m_soundManager->GetPosition());
-		SetPosition(m_soundManager->GetPosition());
+		SetPosition(g_ggseqProps.GetSoundManager()->GetPosition());
 	}
 }
 
@@ -169,7 +170,7 @@ void MiniPlayer::Stop()
 	m_playButton->Enable(true);
 	m_timer->Stop();
 	m_slider->SetValue(0);
-	m_soundManager->Stop();
+	g_ggseqProps.GetSoundManager()->Stop();
 	m_sample=NULL;
 }
 void MiniPlayer::SetPosition(gg_tl_dat position)

@@ -33,7 +33,6 @@ class TLView;
 class TLItem;
 class TLMuteButton;
 class TLTrackVolumeDial;
-class MiniPlayerInterface;
 class Ruler; 
 class UpdateListener;
 class BigScrollBar;
@@ -44,10 +43,7 @@ class TLPanel : public wxPanel
 	public:
 		TLPanel(wxWindow* parent, BigScrollBar *scrollbar,
 			Ruler *ruler, wxScrollBar *scrollbar2, wxWindowID id = -1 );
-
-		/*,wxWindowID id = -1,const wxPoint& pos = wxDefaultPosition,const wxSize& size = wxDefaultSize,long style = wxTAB_TRAVERSAL,const wxString& name = wxT("panel")*/
 		~TLPanel();
-
 		void OnPaint(wxPaintEvent& event);
 		void OnEraseBackground(wxEraseEvent& event);
 		void OnSize(wxSizeEvent& event);
@@ -59,7 +55,6 @@ class TLPanel : public wxPanel
 		void OnScroll2(wxScrollEvent& event);
 		void ResetScrollBar();
 		void DropFileAt(int x, int y, wxString filename);
-
 		bool New();
 		bool Load();
 		bool Load(wxString& filename);
@@ -76,8 +71,6 @@ class TLPanel : public wxPanel
 		bool UpdateCaret();
 		void SetPrefs();
 		void SetZoom( float zoom );
-		SoundManager *GetSoundManager();
-		void SetMiniPlayer(MiniPlayerInterface *mp);
 		void SetUpdateListener(UpdateListener *updateListener);
 		wxString GetFilename();
 		void SetMasterVolume(float volume);
@@ -106,9 +99,7 @@ class TLPanel : public wxPanel
 		wxScrollBar *m_scrollBar2;
 		TLData *m_data;
 		TLLoadSaveManager *m_loadSaveManager;
-		SoundManager *m_soundManager;
 		TLItem *m_DragItem;
-		MiniPlayerInterface *m_miniPlayer;
 #ifdef __WXMSW__ 
 		wxGenericDragImage *m_dragImage;
 #else
@@ -138,7 +129,6 @@ class TLPanel : public wxPanel
 		Ruler *m_ruler;
 		int m_CaretPosition;
 		bool m_CaretVisible;
-		//bool m_DeleteFromGUI;
 		DECLARE_EVENT_TABLE()
 };
 

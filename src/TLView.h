@@ -32,20 +32,25 @@ class TLView
 	public:
 		TLView(TLData *TlData);
 		~TLView();
-
-		/* - Die zwei: - */
-		//void SetVisibleFrame(long width, long height, long x=0, long y=0);
-		//void SetVisibleLength(gg_tl_dat Length);
-		/* - werden durch das ersetzt: - */
+/* - Get Set - */
 		void SetSize( long width, long height );
 		void SetZoom( float zoom );
-
 		void SetPosition(gg_tl_dat Position);
 		gg_tl_dat GetPosition();
+		void SetSnapValue(long snapValue);
+		long GetSnapValue();
+		void SuspendSnap();
+		void ResumeSnap();
+		void SetYScrollPosition( long position ){m_YscrollPosition=position;};
+		long GetYScrollPosition() {return m_YscrollPosition;};
+/* - Get Set End - */
 		gg_tl_dat GetScrollBarRange();
 		gg_tl_dat GetScrollBarThumbSize();
-
+/* - Draw related Functions - */
 		void Draw(wxDC& dc_screen);
+		void DrawSelection(wxDC *dc);
+		static void Draw3dRect(wxDC *dc, wxCoord x,
+			wxCoord y, wxCoord width, wxCoord height, wxColour colour);
 
 		void DeleteItem(TLItem *item, long trackNr);
 		void AddItem(TLSample *sample, long position, long trackNr);
@@ -59,7 +64,7 @@ class TLView
 
 		TLItem *GetDragItem(long x, long y);
 		void DoDrop( long x, long y, TLItem *item,
-			long srcTrack, long x_offset, bool copy=false);
+		long srcTrack, long x_offset, bool copy=false);
 
 		void SetPlaybackPosition(long Position);
 		long GetCaretPosition();
@@ -71,44 +76,35 @@ class TLView
 		long GetScreenSnapPosition(long position);
 		bool IsSelectionAt(int x, int y, int& x_offset,
 			int& y_offset, int& width, int& height);
-		void DrawSelection(wxDC *dc);
-		static void Draw3dRect(wxDC *dc, wxCoord x,
-			wxCoord y, wxCoord width, wxCoord height, wxColour colour);
 		void EndSelectionDrag(int x, int y, bool copy, long x_offset);
-		void SetSnapValue(long snapValue);
-		long GetSnapValue();
-		static wxColour GetDarkColour(wxColour colour);
-		static wxColour GetLightColour(wxColour colour);
-		void SuspendSnap();
-		void ResumeSnap();
 		void Undo();
 		void Redo();
 		void SelectTrack(long y);
-		void SetYScrollPosition( long position ){m_YscrollPosition=position;};
-		long GetYScrollPosition() {return m_YscrollPosition;};
 		void UpdateDialsAndButtons();
 		GgseqDocManager *m_docManager;
 		float GetRealZoom();
+		wxRect GetItemBoundaries(TLItem *item);
+		//Redraw Item => Zeichnet nur das Item.
 	private:
+		gg_tl_dat VisibleLength();
 		gg_tl_dat GetSnap(gg_tl_dat x);
 		long DrawTrack(wxDC& dc_screen, long yoffset, TLTrack* track);
+		void DrawItem(wxDC& dc, TLItem* item, long left, long delta_left, long top, long width, long height);
 		TLData *m_TlData;
 		TLSelectionSet *m_selectionSet;
-		gg_tl_dat m_LengthVisible;
 		gg_tl_dat m_PositionVisible; // TODO: muss weg
 		long m_YscrollPosition;
 		bool m_SnapSuspended;
-		//float m_Faktor; // TODO: muss weg
-		//long m_FrameX; // TODO: muss weg
-		//long m_FrameY; // TODO: muss weg
-		//long m_FrameWidth; // TODO: muss weg
-		//long m_FrameHeight; // TODO: muss weg
 		long m_TrackDrawDist;
 
 		long m_width;
 		long m_height;
 		float m_zoom;
+		wxIcon *m_drop_down_mini;
 		wxIcon *m_gungirl;
+		/* - Helper Functions - */
+		void SetBrushColour( wxDC& dc, wxColour colour );
+		bool ItemVisible( TLItem* item );
 };
 
 #endif /*_TLVIEW_H_*/

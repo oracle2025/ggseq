@@ -37,13 +37,13 @@ class MiniPlayerInterface
 class MiniPlayer : public wxPanel, public MiniPlayerInterface
 {
 	public:
-		MiniPlayer(wxWindow* parent, wxWindowID id, SoundManager *soundManager,
-				UpdateListener *updateListener=NULL, FileInfoListener *fiListener=NULL);
+		MiniPlayer(wxWindow* parent, wxWindowID id,
+				UpdateListener *updateListener=NULL/*, FileInfoListener *fiListener=NULL*/);
 		~MiniPlayer();
-		void SetSoundManager(SoundManager *soundManager){m_soundManager=soundManager;};
+		//void SetSoundManager(SoundManager *soundManager){m_soundManager=soundManager;};
 		void SetUpdateListener(UpdateListener *updateListener){m_updateListener=updateListener;};
-		void SetFileInfoListener( FileInfoListener *fiListener )
-			{ m_fileInfoListener = fiListener; }
+//		void SetFileInfoListener( FileInfoListener *fiListener )
+//			{ m_fileInfoListener = fiListener; }
 		void MakeMiniPlayerWindow(wxWindow *parent);
 		void SetFilename(wxString filename);
 		void SetSample(TLSample *sample);
@@ -61,9 +61,9 @@ class MiniPlayer : public wxPanel, public MiniPlayerInterface
 		wxString m_filename;
 		TLSample *m_sample;
 		gg_tl_dat m_length;
-		SoundManager *m_soundManager;
+		//SoundManager *m_soundManager;
 		UpdateListener *m_updateListener;
-		FileInfoListener *m_fileInfoListener;
+//		FileInfoListener *m_fileInfoListener;
 		DECLARE_EVENT_TABLE()
 
 };

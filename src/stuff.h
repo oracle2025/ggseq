@@ -12,4 +12,7 @@
 
 typedef long long gg_tl_dat;
 
+#include "GgseqGlobalProps.h"
+
+
 #endif /* _STUFF_H_ */

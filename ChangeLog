@@ -1,3 +1,11 @@
+2004-10-23  Richard Spindler <oracle2025@gmx.de>
+
+ * Fixed Segfault in DocManager
+
+2004-07-15  Richard Spindler <oracle2025@gmx.de>
+
+ * Added Load Last Project Option
+
 2004-07-11  Richard Spindler <oracle2025@gmx.de>
 
  * Implemented Package loading and saving based on zip/unzip

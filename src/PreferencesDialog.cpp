@@ -1,4 +1,4 @@
-/* PreferencesDialog.h
+/* PreferencesDialog.cpp
  *
  *  Copyright (C) 2003 Richard Spindler <oracle2025@gmx.de>
  *
@@ -130,6 +130,12 @@ PreferencesDialog::PreferencesDialog( wxWindow *parent, wxWindowID id, int frame
     colGrid->EnableEditing(false);
     colGrid->AutoSizeColumns();
     SetColourButtons();
+    
+    wxConfigBase *conf=wxConfigBase::Get();
+    conf->SetPath(wxT("/"));
+    bool loadLastProject = false;
+    conf->Read( wxT("LoadLastProject"), &loadLastProject );
+    GetLoadLastCheckbox()->SetValue(loadLastProject);
 }
 PreferencesDialog::~PreferencesDialog()
 {
@@ -138,6 +144,9 @@ PreferencesDialog::~PreferencesDialog()
         int *t=(int*)GetPresetListbox()->GetClientData(i);
         delete t;
     }
+    /*wxConfigBase *conf=wxConfigBase::Get();
+    conf->SetPath(wxT("/"));
+    conf->Write( wxT("LoadLastProject"), GetLoadLastCheckbox()->GetValue() );*/ //TODO: Only on OK
 /*    for (int i=GetColourListbox()->GetCount()-1; i>=0;i--) {
         wxColour *colour = (wxColour*)GetColourListbox()->GetClientData(i);
         delete colour;  
@@ -289,15 +298,15 @@ void PreferencesDialog::SetColourButtons( int row )
         GetColourButton()->SetBackgroundColour( *(wxColour*)lb->GetClientData( lb->GetSelection() ) );
     }
 #endif
-	wxGrid *gr = GetColourGrid();
-	if ( row < 0 ) {
-		GetColourButton()->Enable(false);
-		GetColourRemoveButton()->Enable(false);
-	} else {
-		GetColourButton()->Enable();
-		GetColourRemoveButton()->Enable();
-		GetColourButton()->SetBackgroundColour( gr->GetCellBackgroundColour(row,0) );
-	}
+    wxGrid *gr = GetColourGrid();
+    if ( row < 0 ) {
+        GetColourButton()->Enable(false);
+        GetColourRemoveButton()->Enable(false);
+    } else {
+        GetColourButton()->Enable();
+        GetColourRemoveButton()->Enable();
+        GetColourButton()->SetBackgroundColour( gr->GetCellBackgroundColour(row,0) );
+    }
     
 
 }
@@ -309,9 +318,9 @@ void PreferencesDialog::LoadColours( TLColourManager* cm )
         TLDirColour *current = node->GetData();
         /*wxColour *colour = new wxColour(current->m_colour);
         lb->Append(current->m_directory,(void*)colour);*/
-	gr->AppendRows();
-	gr->SetCellValue( current->m_directory, gr->GetRows()-1, 0 );
-	gr->SetCellBackgroundColour( gr->GetRows()-1, 0, current->m_colour );
+    gr->AppendRows();
+    gr->SetCellValue( current->m_directory, gr->GetRows()-1, 0 );
+    gr->SetCellBackgroundColour( gr->GetRows()-1, 0, current->m_colour );
     }
 
 }
@@ -329,19 +338,19 @@ void PreferencesDialog::SaveColours( TLColourManager* cm )
 
 void PreferencesDialog::OnColourGridClicked( wxGridEvent &event )
 {
-	if ( !event.Selecting() ) {
-		SetColourButtons();
-	}
-	event.Skip();
+    if ( !event.Selecting() ) {
+        SetColourButtons();
+    }
+    event.Skip();
 }
 void PreferencesDialog::OnColourGrid( wxGridEvent &event )
 {
-	if ( event.Selecting() ) {
-		SetColourButtons( event.GetRow() );
-	} else {
-		SetColourButtons();
-	}
-	event.Skip();
+    if ( event.Selecting() ) {
+        SetColourButtons( event.GetRow() );
+    } else {
+        SetColourButtons();
+    }
+    event.Skip();
 }
 
 void PreferencesDialog::OnColourListbox( wxCommandEvent &event )

@@ -80,38 +80,41 @@ wxSizer *ImportPackDlgFunc( wxWindow *parent, bool call_fit = TRUE, bool set_siz
 #define ID_TREECTRL 10030
 wxSizer *HelpProgsFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
+#define ID_LOAD_LAST_CHECKBOX 10031
+wxSizer *MiscOptsDlgFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
+
 // Declare menubar functions
 
-#define ID_MENU 10031
-#define ID_NEW 10032
-#define ID_OPEN 10033
-#define ID_SAVE 10034
-#define ID_SAVEAS 10035
-#define ID_WAV_EXPORT 10036
-#define ID_SAVEAS_PACK 10037
-#define ID_IMPORT_PACK 10038
-#define ID_QUIT 10039
-#define ID_UNDO 10040
-#define ID_REDO 10041
-#define ID_ADD_TRACK 10042
-#define ID_DELETE_TRACK 10043
-#define ID_MOVE_TRACK_UP 10044
-#define ID_MOVE_TRACK_DOWN 10045
-#define ID_PREFERENCES 10046
-#define ID_SHOW_MIXER 10047
-#define ID_ZOOM_50 10048
-#define ID_ZOOM_100 10049
-#define ID_ZOOM_150 10050
-#define ID_ABOUT 10051
+#define ID_MENU 10032
+#define ID_NEW 10033
+#define ID_OPEN 10034
+#define ID_SAVE 10035
+#define ID_SAVEAS 10036
+#define ID_WAV_EXPORT 10037
+#define ID_SAVEAS_PACK 10038
+#define ID_IMPORT_PACK 10039
+#define ID_QUIT 10040
+#define ID_UNDO 10041
+#define ID_REDO 10042
+#define ID_ADD_TRACK 10043
+#define ID_DELETE_TRACK 10044
+#define ID_MOVE_TRACK_UP 10045
+#define ID_MOVE_TRACK_DOWN 10046
+#define ID_PREFERENCES 10047
+#define ID_SHOW_MIXER 10048
+#define ID_ZOOM_50 10049
+#define ID_ZOOM_100 10050
+#define ID_ZOOM_150 10051
+#define ID_ABOUT 10052
 wxMenuBar *MyMenuBarFunc();
 
 // Declare toolbar functions
 
-#define ID_REWIND 10052
-#define ID_PLAY 10053
-#define ID_STOP 10054
-#define ID_CHOICE 10055
-#define ID_TOOL 10056
+#define ID_REWIND 10053
+#define ID_PLAY 10054
+#define ID_STOP 10055
+#define ID_CHOICE 10056
+#define ID_HELP 10057
 void MyToolBarFunc( wxToolBar *parent );
 
 // Declare bitmap functions

@@ -47,20 +47,21 @@ class TLData: public LoopSetupListener, GetTrackNrListener
 		~TLData();
 		TLTrackList::Node *GetFirst(); /*Soll weg*/
 		int GetTrackCount();
-		void AddTrack( /*long referenceId = 0,*/ int trackPos = -1 );
-		/*void AddTrack( long referenceId = 0, int trackPos)*/
-		void DeleteTrack(int TrackNr /* , long referenceId*/);
+		void AddTrack( int trackPos = -1 );
+		void DeleteTrack(int TrackNr );
 		void MoveTrack(int TrackNr, int newTrackPos);
 		
 		void SelectTrack( int TrackNr );
 
 		void SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2);
 
-		TLItem *AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long referenceId = 0 );
-		TLItem *AddItem(wxString& filename, gg_tl_dat Position, int TrackNr, long referenceId = 0 );
+		TLItem *AddItem( TLSample *sample,gg_tl_dat  Position,
+		                 int TrackNr, long referenceId = 0 );
+		TLItem *AddItem( wxString& filename, gg_tl_dat Position,
+		                 int TrackNr, long referenceId = 0 );
 		TLItem *ItemAtPos(gg_tl_dat Position, int TrackNr);
 		void SetItemPosition(TLItem *item, gg_tl_dat Position);
-		void DeleteItem(TLItem *item, int TrackNr/*, long referenceId*/ );
+		void DeleteItem(TLItem *item, int TrackNr );
 		void SetTrackMute(bool mute, int TrackNr);
 		void SetTrackVolume(double vol, int TrackNr);
 		int GetTrackNr(TLTrack *track);
@@ -96,7 +97,6 @@ class TLData: public LoopSetupListener, GetTrackNrListener
 		TLItem* GetItem(long referenceId);
 		void SetDocManager(GgseqDocManager *docManager);
 		void SetPanel( TLPanel *panel ) { m_panel = panel; }
-		//void GetTrackNrFromRef( long referenceId );
 		bool ExportPackage(wxString filename);
 	private:
 		gg_tl_dat m_loopPos1;

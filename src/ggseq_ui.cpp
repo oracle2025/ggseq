@@ -143,14 +143,14 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
 
 
     // Connecting various Components
-    GetMiniplayer()->SetSoundManager( GetTlPanel()->GetSoundManager() );
-    GetMiniplayer()->SetFileInfoListener( GetFileInfoPanel() );
+    //GetMiniplayer()->SetSoundManager( GetTlPanel()->GetSoundManager() );
+//    GetMiniplayer()->SetFileInfoListener( GetFileInfoPanel() );
     GetMiniplayer()->SetUpdateListener( m_updateListener );
     RefreshWindowTitle();
     SetDropTarget (new DropFiles (this));
     GetTlPanel()->SetUpdateListener(m_updateListener);
     ((StatusProgressBar*)m_updateListener)->SetDisableListener(new DoubleDisabler(panel1,GetToolBar())); //TODO: Wer löscht die Dinger?, Menü kann nicht komplett disabled werden.
-    GetTlPanel()->SetMiniPlayer(GetMiniplayer());
+//    GetTlPanel()->SetMiniPlayer(GetMiniplayer());
     m_timer = new wxTimer(this);
     wxConfigBase *conf=wxConfigBase::Get();
     GetDirtree()->SetPath(conf->Read(wxT("MiniFilerDirectory"), wxT("/")));
@@ -169,7 +169,9 @@ MyFrame::~MyFrame()
     conf->SetPath(wxT("/"));
     conf->Write(wxT("MiniFilerDirectory"), GetDirtree()->GetPath());
     conf->Write(wxT("Version"), wxT(GG_VERSION));
-    conf->Write(wxT("LastProject"), GetTlPanel()->GetFilename());
+//    if ( GetTlPanel()->GetFilename().Cmp(wxT("Unnamed")) ) {
+        conf->Write(wxT("LastProject"), GetTlPanel()->GetFilename());
+//    }
     conf->Flush();
     delete m_dragImage;
 }
@@ -241,6 +243,7 @@ void MyFrame::OnImportPack( wxCommandEvent &event )
         //puts(dlg.GetContentsPath().mb_str());
         //puts(dlg.GetPackageFile().mb_str());
 	GetTlPanel()->ImportPackage(dlg.GetPackageFile(), dlg.GetContentsPath());
+    	RefreshWindowTitle();
     }
 }
 
@@ -454,6 +457,18 @@ bool GgseqApp::OnInit()
     SetTopWindow( frame );
     if (m_fnames.GetCount()>0) {
         frame->LoadFile(m_fnames[0]);
+    } else {
+    	wxConfigBase *conf=wxConfigBase::Get();
+    	conf->SetPath(wxT("/"));
+	bool loadLastProject=false;
+	conf->Read(wxT("LoadLastProject"), &loadLastProject);
+	if (loadLastProject) {
+	    wxString lastFile;
+	    conf->Read(wxT("LastProject"), &lastFile );
+	    if (wxFileExists(lastFile)) {
+                frame->LoadFile(lastFile);
+            }
+	}
     }/* else LoadLastProject? */
     //frame->argv0=argv[0];
 

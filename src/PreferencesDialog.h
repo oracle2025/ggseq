@@ -49,6 +49,7 @@ public:
     ~PreferencesDialog();
 
     // WDR: method declarations for PreferencesDialog
+    wxCheckBox* GetLoadLastCheckbox()  { return (wxCheckBox*) FindWindow( ID_LOAD_LAST_CHECKBOX ); }
     wxGrid* GetColourGrid()  { return (wxGrid*) FindWindow( ID_COLOUR_GRID ); }
 //    wxListBox* GetColourListbox()  { return (wxListBox*) FindWindow( ID_COLOUR_LISTBOX ); }
     wxButton* GetColourButton()  { return (wxButton*) FindWindow( ID_COLOUR_BUTTON ); }

@@ -90,7 +90,7 @@ wxWindow *MakeDirTree( wxWindow* parent, wxWindowID id )
 }
 wxWindow *MakeMiniPlayer( wxWindow* parent, wxWindowID id )
 {
-	return new MiniPlayer(parent, id, NULL);
+	return new MiniPlayer(parent, id);
 //	return new wxPanel(parent, id);
 }
                                                                                                    

@@ -74,6 +74,7 @@ SoundManager::SoundManager(TLData *TlData)//:wxEvtHandler()
 	m_tlPlaying = false;
 	m_samplePlaying=false;
 	m_position = 0;
+  g_ggseqProps.SetSoundManager( this );
 }
 SoundManager::~SoundManager()
 {

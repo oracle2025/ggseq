@@ -50,7 +50,6 @@ class GgseqDocManager
 class GgseqCommand
 {
 	public:
-		//void SetReferenceId( unsigned int referenceId );
 		void SetDocManager( GgseqDocManager *docManager );
 		virtual void Do() = 0;
 		virtual void Undo() = 0;
@@ -59,16 +58,12 @@ class GgseqCommand
 	protected:
 		TLData *m_document;
 		long m_referenceId;
-		//TLItem *m_itemReference;
 		GgseqDocManager *m_docManager;
 		bool m_error;
 };
 
 class GgseqSingleItemCommand : public GgseqCommand
 {
-//	public:
-//		virtual void Do() = 0;
-//		virtual void Undo() = 0;
 	protected:
 		wxString m_filename;
 		int64_t m_position;
@@ -84,7 +79,6 @@ class GgseqAddItemCommand : public GgseqSingleItemCommand
 		void Do();
 		void Undo();
 	private:
-//		TLItem *m_itemReference;
 		TLSample *m_sample;
 };
 
@@ -96,10 +90,6 @@ class GgseqDeleteItemCommand : public GgseqSingleItemCommand
 		void Undo();
 	private:
 		TLItem *m_item;
-/*		Do(){
-			m_filename, position, track <-item;
-			Document->Delete(item_Reference);
-		}*/
 };
 
 class GgseqMoveItemCommand : public GgseqSingleItemCommand
@@ -109,22 +99,13 @@ class GgseqMoveItemCommand : public GgseqSingleItemCommand
 		                      int64_t destPosition, unsigned int destTrackId );
 		void Do();
 		void Undo();
-/*	Do(){
-		Document->Remove(item_reference);
-		store old item position, track;
-		m_itemReference=Document->Add(sample_reference, position, track);
-	}*/
 	private:
 		TLItem *m_item;
-//		TLItem *m_itemReference;
 };
 
 class GgseqBunchOfItemsCommand : public GgseqCommand
 {
 	public:
-	/*
-	ItemList
-	 */
 	virtual ~GgseqBunchOfItemsCommand();
 	protected:
 		GgseqUndoItemList m_itemList;
@@ -178,7 +159,6 @@ class GgseqTrackCommand : public GgseqCommand
 		virtual ~GgseqTrackCommand();
 	protected:
 		GgseqUndoItemList m_itemList;/*nur die TrackID ignorieren.*/
-		//long m_referenceId;
 		int m_trackNr;
 		TLPanel *m_panel;
 };

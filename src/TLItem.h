@@ -44,6 +44,9 @@ class TLItem
 		void UnSelect();
 		bool IsSelected();
 		long GetReference();
+//    bool HandleInternal(gg_tl_dat x, float y);
+		long m_x_test;
+		long m_y_test;
 	private:
 		long m_referenceId;
 		TLSample *m_sample;

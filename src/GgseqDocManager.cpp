@@ -37,13 +37,10 @@
 
 WX_DEFINE_LIST(GgseqCommandList);
 
-//static unsigned int global_referenceCount = 0;
-
 class GgseqUndoItem
 {
 	public:
 		GgseqUndoItem(
-		//	TLItem *itemReference,
 			wxString filename,
 			int64_t position,
 			unsigned int trackId,
@@ -72,7 +69,7 @@ GgseqDocManager::GgseqDocManager( TLData *data )
 	m_referenceCount = 1;
 }
 GgseqDocManager::~GgseqDocManager()
-{/*Listen löschen ?? nur move item und add item haben referencen, und die werden woanders gelöscht.*/
+{
 	m_commandList.DeleteContents(true);
 	m_commandList.Clear();
 	m_redoList.DeleteContents(true);
@@ -89,7 +86,7 @@ void GgseqDocManager::Reset()
 }
 void GgseqDocManager::SubmitCommand( GgseqCommand *command )
 {
-	command->SetDocManager(this);/*TODO eigentlich nur für AddItem nötig.*/
+	command->SetDocManager(this);
 	command->Do();
 	if (command->GetError() ) {
 		delete command;
@@ -106,17 +103,13 @@ void GgseqDocManager::SubmitCommand( GgseqCommand *command )
 		m_redoList.DeleteContents(false);
 	}
 }
-//void GgseqCommand::SetReferenceId( unsigned int referenceId )
-//{
-//	m_referenceId = referenceId;
-//}
 void GgseqCommand::SetDocManager( GgseqDocManager *docManager )
 {
 	m_docManager = docManager;
 }
 bool GgseqCommand::GetError() { return m_error; }
 void GgseqDocManager::Undo()
-{/*-> Dingsda in die Redo liste tun:*/
+{
 	GgseqCommandList::Node *node = m_commandList.GetLast();
 	GgseqCommand *command = node->GetData();
 	command->Undo();
@@ -178,11 +171,8 @@ void GgseqAddItemCommand::Undo()
 GgseqDeleteItemCommand::GgseqDeleteItemCommand( TLData *doc, TLItem *item )
 {
 	m_document = doc;
-//	m_referenceId = referenceId;
 	m_item = item;
 	m_referenceId = item->GetReference();
-	if (!m_referenceId)
-		m_referenceId = m_docManager->GetNewRefId();
 	m_filename = item->GetSample()->GetFilename();
 	m_position = item->GetPosition();
 	m_trackId = item->GetTrack();
@@ -190,6 +180,8 @@ GgseqDeleteItemCommand::GgseqDeleteItemCommand( TLData *doc, TLItem *item )
 }
 void GgseqDeleteItemCommand::Do()
 {
+	if (!m_referenceId)
+		m_referenceId = m_docManager->GetNewRefId();
 	if (m_item) {
 		m_document->DeleteItem( m_item, m_trackId );
 		m_item = (TLItem*) 0;
@@ -200,7 +192,7 @@ void GgseqDeleteItemCommand::Do()
 }
 void GgseqDeleteItemCommand::Undo()
 {
-	/*m_item = */m_document->AddItem( m_filename, m_position, m_trackId, m_referenceId );
+	m_document->AddItem( m_filename, m_position, m_trackId, m_referenceId );
 }
 
 /* -- GgseqMoveItemCommand -- */
@@ -208,10 +200,7 @@ GgseqMoveItemCommand::GgseqMoveItemCommand( TLData *doc, TLItem *srcItem,
                                             int64_t destPosition, unsigned int destTrackId )
 {
 	m_document = doc;
-//	m_itemReference = srcItem;
 	m_referenceId = srcItem->GetReference();
-	if (!m_referenceId)
-		m_referenceId = m_docManager->GetNewRefId();
 	m_position = destPosition;
 	m_trackId = destTrackId;
 	m_item = srcItem;
@@ -219,6 +208,8 @@ GgseqMoveItemCommand::GgseqMoveItemCommand( TLData *doc, TLItem *srcItem,
 }
 void GgseqMoveItemCommand::Do()
 {
+	if (!m_referenceId)
+		m_referenceId = m_docManager->GetNewRefId();
 	TLItem *item;
 	if (m_item) {
 		item = m_item;
@@ -243,7 +234,6 @@ void GgseqMoveItemCommand::Undo()
 	TLItem *item = m_document->GetItem(m_referenceId);
 	int64_t newPositon = item->GetPosition();
 	unsigned int newTrackId = item->GetTrack();
-//	TLItem *newItem = item;
 	TLSample *sample = item->GetSample();
 	sample->Ref();
 	m_document->DeleteItem( item, newTrackId );
@@ -251,7 +241,6 @@ void GgseqMoveItemCommand::Undo()
 	m_position = newPositon;
 	m_trackId = newTrackId;
 	sample->UnRef();
-	//m_itemReference = (TLItem*) 0;
 }
 
 /* -- GgseqBunchOfItemsCommand -- */
@@ -261,24 +250,20 @@ GgseqBunchOfItemsCommand::~GgseqBunchOfItemsCommand()
 	m_itemList.Clear();
 }
 /* -- GgseqAddItemsCommand -- */
-GgseqAddItemsCommand::GgseqAddItemsCommand( TLData *doc, TLSelectionSet *selSet, TLSelectionSet **newSet, int64_t offsetPos, unsigned int trackId )/*Wird wohl immer seine ReferenceIds selbst erzeugen*/
+GgseqAddItemsCommand::GgseqAddItemsCommand( TLData *doc, TLSelectionSet *selSet, TLSelectionSet **newSet, int64_t offsetPos, unsigned int trackId )
 {
 	m_document = doc;
 	m_position = offsetPos;
 	m_trackId = trackId;
 	m_selSetPointer = newSet;
-//	m_selectionSet = selSet;
-//	m_itemList.Append();
-#if 1
 	for ( TLSelItemList::Node *node = selSet->GetFirst(); node; node = node->GetNext() ) {
-		TLSelectionItem *current = node->GetData();/*selset->AddTo gibt ein neues SelSet zurück?*/
+		TLSelectionItem *current = node->GetData();
 		m_itemList.Append(
 			new GgseqUndoItem( current->GetSample()->GetFilename(),
 				m_position + current->GetPosition() - selSet->GetX1(),
 				m_trackId + current->GetTrack() - selSet->GetTrack1() )
 		);
 	}
-#endif
 	m_error = 0;
 }
 
@@ -287,7 +272,6 @@ void GgseqAddItemsCommand::Do()
 	if (m_selSetPointer != 0) {
 		*m_selSetPointer = new TLSelectionSet();
 	}
-	//m_selectionSet = m_selectionSet->AddTo(m_document, m_position, m_trackId);
 	for ( GgseqUndoItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		GgseqUndoItem *current = node->GetData();
 		if (current->m_referenceId == 0)
@@ -298,13 +282,6 @@ void GgseqAddItemsCommand::Do()
 			current->m_trackId,
 			current->m_referenceId
 		);
-		/*current->m_itemReference = m_document->AddItem(
-			current->m_filename,
-			current->m_position,
-			current->m_trackId
-		);*/
-		//if (!m_referenceId)
-		//m_referenceId = m_docManager->GetNewRefId();
 		if ( item && m_selSetPointer ) {
 			(*m_selSetPointer)->AddSample(item->GetSample(), item);
 		}
@@ -476,17 +453,16 @@ GgseqDeleteTrackCommand::GgseqDeleteTrackCommand( TLData *doc, TLTrack *track, T
 }
 void GgseqDeleteTrackCommand::Do()
 {
-	//...
 	for ( GgseqUndoItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		GgseqUndoItem *current = node->GetData();
 		TLItem *item;
-		if (current->m_itemReference) {
+		if ( current->m_itemReference ) {
 			item = current->m_itemReference;
 			current->m_itemReference = (TLItem*)0;
-			if (!current->m_referenceId)
+			if ( !current->m_referenceId )
 				current->m_referenceId = m_docManager->GetNewRefId();
 		} else {
-			item = m_document->GetItem(current->m_referenceId);
+			item = m_document->GetItem( current->m_referenceId );
 		}
 		m_document->DeleteItem( item, m_trackNr );
 	}
@@ -496,28 +472,28 @@ void GgseqDeleteTrackCommand::Do()
 void GgseqDeleteTrackCommand::Undo()
 {
 	m_document->AddTrack(m_trackNr);
-	//...
 	for ( GgseqUndoItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		GgseqUndoItem *current = node->GetData();
 		m_document->AddItem( current->m_filename,
 			current->m_position,
 			m_trackNr,
-			current->m_referenceId );
+			current->m_referenceId
+			);
 	}
 
 }
 GgseqAddTrackCommand::GgseqAddTrackCommand( TLData *doc, int trackNr, TLPanel *panel )
 {
 	m_document = doc;
-	m_trackNr = trackNr;
-	m_panel=panel;
-	m_error = 0;
+	m_trackNr  = trackNr;
+	m_panel    = panel;
+	m_error    = 0;
 }
 void GgseqAddTrackCommand::Do()
 {
-	m_document->AddTrack(m_trackNr);
+	m_document->AddTrack( m_trackNr );
 }
 void GgseqAddTrackCommand::Undo()
 {
-	m_document->DeleteTrack(m_trackNr);
+	m_document->DeleteTrack( m_trackNr );
 }

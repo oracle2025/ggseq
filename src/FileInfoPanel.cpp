@@ -24,6 +24,7 @@
 
 #include "FileInfoPanel.h"
 #include "ggEvtHandler.h"
+#include "stuff.h"
 
 enum
 {
@@ -36,6 +37,7 @@ FileInfoPanel::FileInfoPanel(wxWindow* parent, wxWindowID id )
 	wxDefaultPosition,wxDefaultSize,
 	wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN)
 {
+	g_ggseqProps.SetFileInfoListener( this );
 	InfoPanel(this);
 }
 void FileInfoPanel::SetInfo(const wxString &filename, long frames, long channels, long sampleRate)

@@ -14,6 +14,8 @@ ggseq_SOURCES = PreferencesDialog.h\
 		ggseq_ui.cpp\
                 ggseq_ui.h\
                 ggseq_ui_wdr.cpp\
+								colour_helper.h\
+								colour_helper.cpp\
                 ggseq_ui_wdr.h\
                 ui_helper.cpp\
                 ui_helper.h\
@@ -34,6 +36,8 @@ ggseq_SOURCES = PreferencesDialog.h\
                 TLXmlLoader2.cpp\
                 tinyxmlerror.cpp\
                 TLLoadSaveManager.cpp\
+                GgseqGlobalProps.cpp\
+                GgseqGlobalProps.h\
 		TLMuteButton.cpp\
 		dial.cpp\
 		dial.h\

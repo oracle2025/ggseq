@@ -38,6 +38,8 @@ TLItem::TLItem(TLSample *sample/*, int trackNr*/ , gg_tl_dat position, long refe
 	//m_trackNr = trackNr;
 	m_referenceId = reference;
 	m_trackListener = trackListener;
+	m_x_test = 10;
+	m_y_test = 10;
 }
 TLItem::~TLItem()
 {

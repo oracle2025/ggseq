@@ -87,9 +87,9 @@ AC_PATH_PROG(OGGDEC,oggdec,no)
 dnl now how to configure it all
 dnl --------------------------------------------------------------------------
 
-CXXFLAGS="$CXXFLAGS -Wall -O2 `wx-config --cxxflags`"
-CPPFLAGS="$CPPFLAGS -Wall -O2 `wx-config --cxxflags`" 
-CFLAGS="$CFLAGS -Wall -O2 `wx-config --cxxflags`"
+CXXFLAGS="$CXXFLAGS -ggdb -Wall -O2 `wx-config --cxxflags`"
+CPPFLAGS="$CPPFLAGS -ggdb -Wall -O2 `wx-config --cxxflags`" 
+CFLAGS="$CFLAGS -ggdb -Wall -O2 `wx-config --cxxflags`"
 #CLIBS="$CLIBS `pkg-config --libs sndfile`  -lportaudio `wx-config --libs`"
 
 dnl at last now we can Build the Makefile
