@@ -88,6 +88,7 @@ class TLView
 		long m_FrameWidth;
 		long m_FrameHeight;
 		long m_TrackDrawDist;
+		wxIcon *m_gungirl;
 
 //		long m_CaretPosition;
 };

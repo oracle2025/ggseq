@@ -80,6 +80,7 @@ class TLPanel : public wxPanel
 		void SetMiniPlayer(MiniPlayerInterface *mp);
 		void SetUpdateListener(UpdateListener *updateListener);
 		wxString GetFilename();
+		void SetMasterVolume(float volume);
 	private:
 		void DrawCaret(wxDC& dc);
 		void SetRubberframePen(wxDC* dc);

@@ -1,3 +1,7 @@
+2004-01-02  Richard Spindler <oracle2025@gmx.de>
+
+ *  Added a Master Volume Control
+
 2003-12-30  Richard Spindler <oracle2025@gmx.de>
 
  *  Now using 64Bit Numbers for all Timeline related Data.

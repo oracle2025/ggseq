@@ -53,6 +53,7 @@ TLData::TLData()
 	SetPlaybackPosition(0);
 	m_length=2000000;
 	m_updateListener=NULL;
+	m_masterVolume=1.0;
 }
 
 TLData::~TLData()
@@ -364,6 +365,9 @@ unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 		/*}*/
 		node = node->GetNext();
 	}
+	for (unsigned int i=0;i<maxResultCount;i++) {
+		outBuffer[i]=outBuffer[i]*m_masterVolume;
+	}
 	m_position+=maxResultCount;
 	return maxResultCount;
 }
@@ -421,3 +425,4 @@ long TLData::GetSnapValue()
 {
 	return m_snapValue;
 }
+void TLData::SetMasterVolume(float volume) { m_masterVolume=volume;} 

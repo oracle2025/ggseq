@@ -24,6 +24,7 @@
 #include <wx/dirctrl.h>
 #include <wx/colordlg.h>
 #include <wx/statline.h>
+#include <wx/config.h>
 
 #include "TLColourManager.h"
 #include "TLSelectColourDialog.h"
@@ -131,18 +132,66 @@ void TLSelectColourDialog::OnRemoveButtonClick(wxCommandEvent& event)
 	}
 	SetButtonStates();
 }
+long GetColourValue(const wxColour &colour)
+{
+	long var = colour.Blue();
+	var=var*256;
+	var +=colour.Green();
+	var=var*256;
+	var +=colour.Red();
+	return var;
+}
 void TLSelectColourDialog::OnColourButtonClick(wxCommandEvent& event)
 {
+	wxColourData retData;
 	if (m_dirListBox->GetSelection()<0)
 		return;
-	wxColourDialog dialog(this, NULL);
+	if (1) {
+		wxConfig config(wxT("ggseq"));
+		config.SetPath(wxT("/ColourDialog"));
+		retData.SetCustomColour(0,wxColour(config.Read(wxT("colour0"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(1,wxColour(config.Read(wxT("colour1"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(2,wxColour(config.Read(wxT("colour2"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(3,wxColour(config.Read(wxT("colour3"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(4,wxColour(config.Read(wxT("colour4"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(5,wxColour(config.Read(wxT("colour5"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(6,wxColour(config.Read(wxT("colour6"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(7,wxColour(config.Read(wxT("colour7"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(8,wxColour(config.Read(wxT("colour8"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(9,wxColour(config.Read(wxT("colour9"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(10,wxColour(config.Read(wxT("colour10"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(11,wxColour(config.Read(wxT("colour11"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(12,wxColour(config.Read(wxT("colour12"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(13,wxColour(config.Read(wxT("colour13"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(14,wxColour(config.Read(wxT("colour14"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(15,wxColour(config.Read(wxT("colour15"),GetColourValue(*wxWHITE))));
+	}
+	wxColourDialog dialog(this, &retData);
 	if (dialog.ShowModal() == wxID_OK)
 	{
-		wxColourData retData = dialog.GetColourData();
+		retData = dialog.GetColourData();
 		wxColour col = retData.GetColour();
 		wxColour *col2 = (wxColour*)m_dirListBox->GetClientData(m_dirListBox->GetSelection());
 		*col2 = col;
 		m_colourButton->SetBackgroundColour(*col2);
+		wxConfig config(wxT("ggseq"));
+		config.SetPath(wxT("/ColourDialog"));
+		config.Write(wxT("colour0"),(long)GetColourValue(retData.GetCustomColour(0)));
+		config.Write(wxT("colour1"),(long)GetColourValue(retData.GetCustomColour(1)));
+		config.Write(wxT("colour2"),(long)GetColourValue(retData.GetCustomColour(2)));
+		config.Write(wxT("colour3"),(long)GetColourValue(retData.GetCustomColour(3)));
+		config.Write(wxT("colour4"),(long)GetColourValue(retData.GetCustomColour(4)));
+		config.Write(wxT("colour5"),(long)GetColourValue(retData.GetCustomColour(5)));
+		config.Write(wxT("colour6"),(long)GetColourValue(retData.GetCustomColour(6)));
+		config.Write(wxT("colour7"),(long)GetColourValue(retData.GetCustomColour(7)));
+		config.Write(wxT("colour8"),(long)GetColourValue(retData.GetCustomColour(8)));
+		config.Write(wxT("colour9"),(long)GetColourValue(retData.GetCustomColour(9)));
+		config.Write(wxT("colour10"),(long)GetColourValue(retData.GetCustomColour(10)));
+		config.Write(wxT("colour11"),(long)GetColourValue(retData.GetCustomColour(11)));
+		config.Write(wxT("colour12"),(long)GetColourValue(retData.GetCustomColour(12)));
+		config.Write(wxT("colour13"),(long)GetColourValue(retData.GetCustomColour(13)));
+		config.Write(wxT("colour14"),(long)GetColourValue(retData.GetCustomColour(14)));
+		config.Write(wxT("colour15"),(long)GetColourValue(retData.GetCustomColour(15)));
 	}
 }
 void TLSelectColourDialog::OnDirListClick(wxCommandEvent& event)

@@ -578,6 +578,7 @@ bool TLPanel::Load()
 	m_loadSaveManager->Load();
 	Refresh();
 	ResetScrollBar();
+	UpdateCaret();
 	UpdateButtons();
 	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600);
 	m_ruler->Refresh();
@@ -764,7 +765,7 @@ void TLPanel::SetColours(wxString path)
 	dlg.SetSize(wxSize(500,400));
 	dlg.Centre();
 	if (dlg.ShowModal()==wxID_OK) {
-		dlg.SetColours(m_data->GetColourManager());
+		dlg.SetColours(m_data->GetColourManager()); /*colourData speichern*/
 #ifdef __WXMSW__
 		Refresh(true);
 #else
@@ -842,3 +843,4 @@ void TLPanel::UpdateRulerTicks()
 	m_ruler->SetPosition(m_TlView->GetPosition());
 //	m_ruler->Refresh();
 }
+void TLPanel::SetMasterVolume(float volume) { m_data->SetMasterVolume(volume); }

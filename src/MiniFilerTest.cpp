@@ -82,7 +82,8 @@ enum
 	ID_SetSnap,
 	ID_A_Test,
 	ID_ScrollBar,
-	ID_Preferences
+	ID_Preferences,
+	ID_MasterVolume
 };
 
 class TestFrame1: public wxFrame
@@ -117,6 +118,8 @@ class TestFrame1: public wxFrame
 		void OnMouseMotion(wxMouseEvent& event);
 		void OnScroll(wxScrollEvent& event);
 		void LoadFile(wxString& filename);
+		void OnMasterVolume(wxScrollEvent& event);
+		void OnQuit(wxCommandEvent& event);
 	private:
 		void MakeToolBar();
 		void MakeTlPanel(wxWindow *parent);
@@ -165,6 +168,7 @@ BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
 	EVT_MENU(ID_PLAY, TestFrame1::OnPlay)
 	EVT_MENU(ID_REWIND, TestFrame1::OnRewind)
 	EVT_MENU(ID_STOP, TestFrame1::OnStop)
+	EVT_MENU(wxID_EXIT, TestFrame1::OnQuit)
 
 	EVT_LIST_BEGIN_DRAG(ID_FileList,TestFrame1::OnFLStartDrag)
 	EVT_LIST_ITEM_ACTIVATED(ID_FileList,TestFrame1::OnFLItemActivated)	
@@ -177,6 +181,7 @@ BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
 	
 	EVT_MOTION(TestFrame1::OnMouseMotion)
 	EVT_LEFT_UP(TestFrame1::OnMouseLeftUp)
+	EVT_COMMAND_SCROLL_THUMBTRACK(ID_MasterVolume, TestFrame1::OnMasterVolume)
 END_EVENT_TABLE()
 
 TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& size)
@@ -269,7 +274,9 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 	wxScrollBar *sb = new wxScrollBar(panel1,ID_ScrollBar);
 	m_tp = new TLPanel(panel1,sb);
 	m_tp->Fit();
+	
 	tlPanelSizer->Add(m_tp,1,wxEXPAND);
+	
 	tlPanelSizer->Add(sb,0,wxEXPAND);
 	panel1->SetSizer(tlPanelSizer);
 	tlPanelSizer->SetSizeHints(panel1);
@@ -277,8 +284,13 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 //	panel1->SetSizeHints(200,200);
 //	panel1->SetSize(200,200);
 	panel1->Fit();
+	
+	wxBoxSizer *volumeSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxSlider *slider = new wxSlider( SplitView2, ID_MasterVolume,0,0, 100, wxDefaultPosition,wxDefaultSize, wxSL_VERTICAL  );
+	volumeSizer->Add(panel1,1,wxEXPAND);
+	volumeSizer->Add(slider,0,wxEXPAND|wxLEFT,5);
 
-	SplitV2Sizer->Add(panel1,0,wxBOTTOM|wxEXPAND,3);
+	SplitV2Sizer->Add(volumeSizer/*panel1*/,0,wxBOTTOM|wxEXPAND,3);
 	
 //	m_tp = new TLPanel(SplitView2);/*TODO Lautstärke regler einbauen*/
 
@@ -563,6 +575,12 @@ void TestFrame1::Stop()
 void TestFrame1::LoadFile(wxString& filename)
 {
 	m_tp->Load(filename);	
+}
+void TestFrame1::OnMasterVolume(wxScrollEvent& event) { m_tp->SetMasterVolume( 1.0-((float) event.GetPosition())/100 ); }
+
+void TestFrame1::OnQuit(wxCommandEvent& event)
+{
+	Close();
 }
 
 bool DropFiles::OnDropFiles (wxCoord x, wxCoord y, const wxArrayString& filenames) {

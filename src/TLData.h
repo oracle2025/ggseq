@@ -70,6 +70,7 @@ class TLData
 		void SetUpdateListener(UpdateListener *updateListener);
 		void SetSnapValue(long snapValue);
 		long GetSnapValue();
+		void SetMasterVolume(float volume);
 	private:
 		long m_snapValue;
 		unsigned int MixChannels(float *A, float *B, float* out, unsigned int count);
@@ -84,6 +85,7 @@ class TLData
 		gg_tl_dat m_playbackPosition;
 		gg_tl_dat m_position;/*Wird während des Abspielens inkrementiert*/
 		gg_tl_dat m_length;
+		float m_masterVolume;
 		UpdateListener *m_updateListener;
 };
 

@@ -108,6 +108,7 @@ void TLLoadSaveManager::Load()
 		wxFileName::SplitPath(filename, &dir, NULL, NULL);
 		config.Write(wxT("LastLoadFolder"),dir);
 		m_data->Load(filename);
+		m_data->SetPlaybackPosition(0);
 	}
 }
 bool TLLoadSaveManager::SaveOnExit()

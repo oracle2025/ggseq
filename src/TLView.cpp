@@ -35,6 +35,7 @@
 #include "TLItem.h"
 #include "TLSample.h"
 #include "TLSelectionSet.h"
+#include "gun_girl.xpm"
 
 #define SNAP_POSITION 117600
 //OLD_SKOOL 110250
@@ -138,7 +139,7 @@ TLView::TLView(TLData *TlData)
 	m_selectionSet=new TLSelectionSet();
 	wxConfig config(wxT("ggseq"));
 	m_TlData->SetSnapValue(config.Read(wxT("SnapPosition"), SNAP_POSITION));
-	
+	m_gungirl=new wxIcon(gun_girl_xpm);	
 }
 TLView::~TLView()
 {
@@ -146,6 +147,7 @@ TLView::~TLView()
 	config.Write(wxT("SnapPosition"),m_TlData->GetSnapValue()/*m_SnapPosition*/);
 	delete m_selectionSet;
 	delete m_TlData;
+	delete m_gungirl;
 }
 void TLView::SetVisibleFrame(long width, long height, long x, long y)
 {
@@ -186,6 +188,25 @@ void TLView::Draw(wxDC& dc/*_screen*/)
 //	dc.SelectObject(wxBitmap(m_FrameWidth,m_FrameHeight));
 	dc.SetBrush(*wxLIGHT_GREY_BRUSH);
 //	dc.DrawRectangle(0,0,m_FrameWidth,m_FrameHeight);
+
+//-.-
+	dc.SetBrush(*wxGREY_BRUSH);
+	wxBrush brush1=dc.GetBrush();
+	brush1.SetColour(wxColour(166,166,166));
+	dc.SetBrush(brush1);
+	wxPen pen1=dc.GetPen();
+	pen1.SetColour(wxColour(100,100,100));
+	dc.SetPen(pen1);
+	yoffset=m_FrameY;
+	for ( TLTrackList::Node *node = m_TlData->GetFirst(); node; node = node->GetNext() ) {
+		TLTrack *track = node->GetData();
+		dc.DrawRectangle(m_FrameX,yoffset,m_FrameWidth,track->GetHeight());
+		yoffset+=track->GetHeight()+m_TrackDrawDist;
+	}
+
+//-.-
+	dc.DrawIcon(*m_gungirl,m_FrameWidth+m_FrameX-m_gungirl->GetWidth(),m_FrameHeight+m_FrameY-m_gungirl->GetHeight());
+
 	yoffset=m_FrameY;
 	for ( TLTrackList::Node *node = m_TlData->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
@@ -198,15 +219,15 @@ void TLView::Draw(wxDC& dc/*_screen*/)
 long TLView::DrawTrack(wxDC& dc, long yoffset, TLTrack* track)
 {
 	gg_tl_dat start,end;
-	dc.SetBrush(*wxGREY_BRUSH);
-	
+/*	dc.SetBrush(*wxGREY_BRUSH);
 	wxBrush brush1=dc.GetBrush();
 	brush1.SetColour(wxColour(166,166,166));
 	dc.SetBrush(brush1);
-	wxPen pen1=dc.GetPen();
 	pen1.SetColour(wxColour(100,100,100));
 	dc.SetPen(pen1);
-	dc.DrawRectangle(m_FrameX,yoffset,m_FrameWidth,track->GetHeight());
+	dc.DrawRectangle(m_FrameX,yoffset,m_FrameWidth,track->GetHeight());*/
+
+	wxPen pen1=dc.GetPen();
 	pen1.SetColour(*wxBLACK);
 	dc.SetPen(pen1);
 	dc.SetBrush(*wxRED_BRUSH);
