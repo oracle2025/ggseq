@@ -381,11 +381,11 @@ wxSizer *ImportPackDlgFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     wxBoxSizer *item11 = new wxBoxSizer( wxHORIZONTAL );
 
     wxButton *item12 = new wxButton( parent, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    item11->Add( item12, 0, wxALIGN_CENTER|wxRIGHT, 5 );
+    item11->Add( item12, 0, wxALIGN_CENTER|wxRIGHT|wxTOP|wxBOTTOM, 5 );
 
     wxButton *item13 = new wxButton( parent, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
     item13->SetDefault();
-    item11->Add( item13, 0, wxALIGN_CENTER, 5 );
+    item11->Add( item13, 0, wxALIGN_CENTER|wxALL, 5 );
 
     item0->Add( item11, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM, 5 );
 

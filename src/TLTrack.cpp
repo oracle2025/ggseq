@@ -157,6 +157,16 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 		track->LinkEndChild(item);
 		item->SetAttribute("sample",tmp2.mb_str());
 		item->SetAttribute("pos",tmp.mb_str());
+		
+/*		item->SetAttribute("envelope", wxString::Format( wxT("%d"), current->m_toggleEnvelope ).mb_str() );
+		item->SetAttribute("leftFadeLevel", wxString::Format( wxT("%d"), current-> ).mb_str() );
+		item->SetAttribute("leftFadePos", wxString::Format( wxT("%lld"), current-> ).mb_str() );
+		item->SetAttribute("middleLevel", wxString::Format( wxT("%d"), current-> ).mb_str() );
+		item->SetAttribute("rightFadeLevel", wxString::Format( wxT("%d"), current-> ).mb_str() );
+		item->SetAttribute("rightFadePos", wxString::Format( wxT("%lld"), current-> ).mb_str() );
+		item->SetAttribute("timestretch", wxString::Format( wxT("%d"), current-> ).mb_str() );
+		item->SetAttribute("leftTrim", wxString::Format( wxT("%d"), current-> ).mb_str() );
+		item->SetAttribute("rightTrim", wxString::Format( wxT("%d"), current-> ).mb_str() );*/
 	}
 
 }

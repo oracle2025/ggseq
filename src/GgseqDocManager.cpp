@@ -67,6 +67,7 @@ GgseqDocManager::GgseqDocManager( TLData *data )
 {
 	m_document = data;
 	m_referenceCount = 1;
+	g_ggseqProps.SetDocManager(this);
 }
 GgseqDocManager::~GgseqDocManager()
 {
@@ -218,16 +219,21 @@ void GgseqMoveItemCommand::Do()
 		item = m_document->GetItem(m_referenceId);
 	}
 	m_filename = item->GetSample()->GetFilename();
-	m_FadeInOut[0] = item->m_leftFadeIn;
+	for ( int i = 0; i < 4; i++ ) {
+		m_FadeInOut[i] = item->m_fades[i];
+	}
+	/*m_FadeInOut[0] = item->m_leftFadeIn;
 	m_FadeInOut[1] = item->m_rightFadeIn;
 	m_FadeInOut[2] = item->m_leftFadeOut;
-	m_FadeInOut[3] = item->m_rightFadeOut;
+	m_FadeInOut[3] = item->m_rightFadeOut;*/
+	m_toggleEnvelope = item->m_toggleEnvelope;
 	int64_t oldPositon = item->GetPosition();
 	unsigned int oldTrackId = item->GetTrack();
 	TLSample *sample = item->GetSample();
 	sample->Ref();
 	m_document->DeleteItem( item, oldTrackId );
-	m_document->AddItem( sample, m_position, m_trackId , m_referenceId, m_FadeInOut ); //TODO: 5 Values needed for Envelope!
+	m_document->AddItem( sample, m_position, m_trackId , m_referenceId, m_FadeInOut, m_toggleEnvelope );
+	
 	m_position = oldPositon;
 	m_trackId = oldTrackId;
 	sample->UnRef();
@@ -500,4 +506,86 @@ void GgseqAddTrackCommand::Do()
 void GgseqAddTrackCommand::Undo()
 {
 	m_document->DeleteTrack( m_trackNr );
+}
+
+GgseqEnvelopeItemCommand::GgseqEnvelopeItemCommand(
+		TLData *doc, TLItem *item, EnvelopePoint *envelope )
+{
+	for ( int i = 0; i < 4; i++ ) {
+		m_fades[i] = envelope[i];
+	}
+	m_item     = item;
+	m_document = doc;
+	m_error    = 0;
+	m_referenceId = item->GetReference();
+}
+GgseqEnvelopeItemCommand::~GgseqEnvelopeItemCommand()
+{
+}
+void GgseqEnvelopeItemCommand::Do()
+{
+	if (!m_referenceId) {
+		m_referenceId = m_docManager->GetNewRefId();
+		if (m_item)
+			m_document->SetItemReferenceId( m_item, m_referenceId );
+	}
+	TLItem *item;
+	if (m_item) {
+		item = m_item;
+		m_item = (TLItem*) 0;
+	} else {
+		item = m_document->GetItem( m_referenceId );
+	}
+	for ( int i = 0; i < 4; i++ ) {
+		EnvelopePoint tmp;
+		tmp = item->m_realEnvelope[i];
+		item->m_realEnvelope[i] = m_fades[i];
+		m_fades[i] = tmp;
+	}
+	item->DataEnvToGuiEnv();
+}
+void GgseqEnvelopeItemCommand::Undo()
+{
+	TLItem *item = m_document->GetItem(m_referenceId);
+	wxASSERT(item);
+	for ( int i = 0; i < 4; i++ ) {
+		EnvelopePoint tmp;
+		tmp = item->m_realEnvelope[i];
+		item->m_realEnvelope[i] = m_fades[i];
+		m_fades[i] = tmp;
+	}
+	item->DataEnvToGuiEnv();
+}
+//---
+GgseqToggleEnvelopeItemCommand::GgseqToggleEnvelopeItemCommand( TLData *doc, TLItem *item )
+{
+	m_document = doc;
+	m_item     = item;
+	m_referenceId = item->GetReference();
+	m_error = 0;
+}
+GgseqToggleEnvelopeItemCommand::~GgseqToggleEnvelopeItemCommand()
+{
+}
+void GgseqToggleEnvelopeItemCommand::Do()
+{
+	if (!m_referenceId) {
+		m_referenceId = m_docManager->GetNewRefId();
+		if (m_item)
+			m_document->SetItemReferenceId( m_item, m_referenceId );
+	}
+	TLItem *item;
+	if (m_item) {
+		item = m_item;
+		m_item = (TLItem*) 0;
+	} else {
+		item = m_document->GetItem( m_referenceId );
+	}
+	item->m_toggleEnvelope = !item->m_toggleEnvelope;
+}
+void GgseqToggleEnvelopeItemCommand::Undo()
+{
+	TLItem *item = m_document->GetItem(m_referenceId);
+	wxASSERT(item);
+	item->m_toggleEnvelope = !item->m_toggleEnvelope;
 }

@@ -19,10 +19,12 @@
 #ifndef _GGSEQ_GLOBAL_PROPS_H_
 #define _GGSEQ_GLOBAL_PROPS_H_
 
+//TODO: Singelton statt diesem hier
 class SoundManager;
 class MiniPlayerInterface;
 class FileInfoListener;
 class UpdateListener;
+class GgseqDocManager;
 class GgseqGlobalProps
 {
 	public:
@@ -34,6 +36,8 @@ class GgseqGlobalProps
 		void SetMiniPlayer( MiniPlayerInterface *miniPlayer );
 		void SetFileInfoListener( FileInfoListener *fileInfoListener );
 		FileInfoListener *GetFileInfoListener();
+		void SetDocManager( GgseqDocManager *docManager );
+		GgseqDocManager *GetDocManager();
 		/*UpdateListener *GetProgressBar();
 		void SetProgressBar( UpdateListener *pBar );*/
 		// GetTopLevelWindow();
@@ -53,6 +57,7 @@ class GgseqGlobalProps
 		MiniPlayerInterface *m_miniPlayer;
 		FileInfoListener *m_fileInfoListener;
 		UpdateListener *m_pBar;
+		GgseqDocManager *m_docManager;
 };
 extern GgseqGlobalProps g_ggseqProps;
 

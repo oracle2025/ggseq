@@ -68,7 +68,8 @@ class GgseqSingleItemCommand : public GgseqCommand
 		wxString m_filename;
 		int64_t m_position;
 		unsigned int m_trackId; /*Track ID*/
-		wxRect m_FadeInOut[4];
+		wxRect m_FadeInOut[4]; //???
+		bool m_toggleEnvelope;
 };
 
 class GgseqAddItemCommand : public GgseqSingleItemCommand
@@ -183,5 +184,36 @@ class GgseqMoveTrackCommand : public GgseqTrackCommand
 {
 };
 //TODO: Die ganzen Listen beim beenden löschen.
+
+
+class GgseqEnvelopeItemCommand : public GgseqCommand
+{
+	public:
+		GgseqEnvelopeItemCommand( TLData *doc, TLItem *item, EnvelopePoint *envelope );
+		~GgseqEnvelopeItemCommand();
+		void Do();
+		void Undo();
+	private:
+		EnvelopePoint m_fades[4];
+		TLItem *m_item;
+};
+class GgseqToggleEnvelopeItemCommand : public GgseqCommand
+{
+	public:
+		GgseqToggleEnvelopeItemCommand( TLData *doc, TLItem *item );
+		~GgseqToggleEnvelopeItemCommand();
+		void Do();
+		void Undo();
+	private:
+		TLItem *m_item;
+};
+class GgseqTrimNStretchItemCommand
+{
+};
+class GgseqVolumeTrackCommand
+{
+};
+// kein GgseqMuteTrackCommand;
+
 #endif /* _GGSEQ_DOC_MANAGER_H_ */
 

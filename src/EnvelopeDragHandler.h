@@ -24,7 +24,7 @@ class EnvelopeDragHandler : public MouseDragHandler
 {
 	public:
 		EnvelopeDragHandler (
-			wxWindow* canvas, TLView *view,
+			wxWindow* canvas, TLView *view, TLData *data,
 			TLItem *item, int x, int y, wxRect *envelopeHandle 
 			);
 		virtual void OnDrag( int x, int y );
@@ -32,15 +32,18 @@ class EnvelopeDragHandler : public MouseDragHandler
 	private:
 		wxWindow    *m_canvas;
 		TLView      *m_view;
+		TLData      *m_data;
 		TLItem      *m_item;
 		int          m_xOffset;
 		int          m_yOffset;
 		wxRect       m_itemBoundaries;
 		wxRect      *m_envelopeHandle;
+		wxRect       m_fades[4];
 	private: /* Helper Functions */
 		wxPoint      FitInside( wxPoint handlePos );
 		void         Draw( wxDC &dc );
 		void         FixEnvelopeCtrls();
+		void         GuiEnvToDataEnv( wxRect* fades, EnvelopePoint* realEnv );
 };
 
 #endif /* _ENVELOPE_DRAG_HANDLER_H_ */

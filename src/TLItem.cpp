@@ -30,6 +30,22 @@
 #include "TLSample.h"
 #include "SampleEdit.h"
 #include <iostream>
+
+/*
+typedef struct {
+	Env realEnvelope[4];
+	wxRect leftFadeIn;   //??
+	wxRect rightFadeIn;   //??
+	wxRect leftFadeOut;   //??
+	wxRect rightFadeOut;   //??
+	bool toggleEnvelope;
+	float timeStretch
+	gg_tl_dat trimStart;
+	gg_tl_dat trimEnd;
+} ItemMods;
+
+ */
+
 //TODO: trackNr überall eliminieren
 TLItem::TLItem(TLSample *sample/*, int trackNr*/ , gg_tl_dat position, long reference, GetItemTrackListener* trackListener )
 {
@@ -43,12 +59,18 @@ TLItem::TLItem(TLSample *sample/*, int trackNr*/ , gg_tl_dat position, long refe
 	m_trackListener = trackListener;
 	//m_x_test = 10;
 	//m_y_test = 10;
-	m_leftFadeIn   = wxRect( 0, 0, 7, 7 );
+/*	m_leftFadeIn   = wxRect( 0, 0, 7, 7 );
 	m_rightFadeIn  = wxRect( 10, 0, 7, 7 );
 	m_leftFadeOut  = wxRect( 20, 0, 7, 7 );
 	m_rightFadeOut = wxRect( (int)(m_sample->GetLength() / ( 117600.0 / 31.0 )-7), 0, 7, 7 );
 	m_rightFadeIn.x = m_rightFadeOut.x / 2;
-	m_leftFadeOut.x = m_rightFadeIn.x;
+	m_leftFadeOut.x = m_rightFadeIn.x;*/
+	m_fades[0]   = wxRect( 0, 0, 7, 7 );
+	m_fades[1]  = wxRect( 10, 0, 7, 7 );
+	m_fades[2]  = wxRect( 20, 0, 7, 7 );
+	m_fades[3] = wxRect( (int)(m_sample->GetLength() / ( 117600.0 / 31.0 )-7), 0, 7, 7 );
+	m_fades[1].x = m_fades[3].x / 2;
+	m_fades[2].x = m_fades[1].x;
 	GuiEnvToDataEnv();
 	m_stretchedBuffer = 0;
 
@@ -57,24 +79,36 @@ void DrawWxRect( wxDC &dc, const wxRect &rect ) // TODO make Helper Functions Fi
 {
 	dc.DrawRectangle(rect.x, rect.y, rect.width, rect.height);
 }
-void TLItem::DrawEnvelope( wxDC &dc, int xOffset, int yOffset )
+void TLItem::DrawEnvelope( wxDC &dc, int xOffset, int yOffset, wxRect *customFades )
 {
 	dc.SetDeviceOrigin( xOffset, yOffset );
-	wxPoint lines[4] = {
+	wxPoint lines[4];/* = {
 		wxPoint( m_leftFadeIn.x, m_leftFadeIn.y ),
 		wxPoint( m_rightFadeIn.x, m_rightFadeIn.y ),
 		wxPoint( m_leftFadeOut.x, m_leftFadeOut.y ),
-		wxPoint( m_rightFadeOut.x, m_rightFadeOut.y ) };
+		wxPoint( m_rightFadeOut.x, m_rightFadeOut.y ) };*/
+	wxRect *fades = ( customFades ? customFades : m_fades );
+	for ( int i = 0; i < 4; i++ ) {
+		lines[i] = wxPoint( fades[i].x, fades[i].y );
+	}
 	dc.DrawLines( 4, lines, 3, 3 );
-	DrawWxRect( dc, m_leftFadeIn );
+	for ( int i = 0; i < 4; i++ ) {
+		DrawWxRect( dc, fades[i] );
+	}
+/*	DrawWxRect( dc, m_leftFadeIn );
 	DrawWxRect( dc, m_rightFadeIn );
 	DrawWxRect( dc, m_leftFadeOut );
-	DrawWxRect( dc, m_rightFadeOut );
+	DrawWxRect( dc, m_rightFadeOut );*/
 	dc.SetDeviceOrigin( 0, 0 );
 }
 wxRect *TLItem::TouchingEnvelopeCtrl( int x, int y )
 {
-	if ( m_leftFadeIn.Inside( x, y ) ) {
+	for ( int i = 0; i < 4; i++ ) {
+		if ( m_fades[i].Inside( x, y ) ) {
+			return &m_fades[i];
+		}
+	}
+/*	if ( m_leftFadeIn.Inside( x, y ) ) {
 		return &m_leftFadeIn;
 	}
 	if ( m_rightFadeIn.Inside( x, y ) ) {
@@ -85,7 +119,7 @@ wxRect *TLItem::TouchingEnvelopeCtrl( int x, int y )
 	}
 	if ( m_rightFadeOut.Inside( x, y ) ) {
 		return &m_rightFadeOut;
-	}
+	}*/
 	return NULL;
 }
 TLItem::~TLItem()
@@ -190,7 +224,7 @@ float TLItem::GetEnvelopValue( int position )
 	if ( !m_toggleEnvelope ) {
 		return 1.0;
 	}
-	Env *envelope = m_realEnvelope;
+	EnvelopePoint *envelope = m_realEnvelope;
 	int p = 0;
 	while ( envelope[p + 1].x < position) {
 		p++;
@@ -206,15 +240,30 @@ float TLItem::GetEnvelopValue( int position )
 void TLItem::GuiEnvToDataEnv()
 {
 	m_realEnvelope[0].x = 0;
-	m_realEnvelope[0].y = float(18 - m_leftFadeIn.y) / 18.0; //Trackhöhe;
-	m_realEnvelope[1].x = int(m_rightFadeIn.x * ( 117600.0 / 31.0 ) );
-	m_realEnvelope[1].y = float(18 - m_rightFadeIn.y) / 18.0;
-	m_realEnvelope[2].x = int(m_leftFadeOut.x * ( 117600.0 / 31.0 ) );
-	m_realEnvelope[2].y = float(18 - m_leftFadeOut.y)  / 18.0;
+	m_realEnvelope[0].y = float(18 - m_fades[0].y) / 18.0; //Trackhöhe;
+	m_realEnvelope[1].x = int(m_fades[1].x * ( 117600.0 / 31.0 ) );
+	m_realEnvelope[1].y = float(18 - m_fades[1].y) / 18.0;
+	m_realEnvelope[2].x = int(m_fades[2].x * ( 117600.0 / 31.0 ) );
+	m_realEnvelope[2].y = float(18 - m_fades[2].y)  / 18.0;
 	m_realEnvelope[3].x = m_sample->GetLength();//int(m_rightFadeOut.x * ( 117600.0 / 31.0 ) );
-	m_realEnvelope[3].y = float(18 - m_rightFadeOut.y)  / 18.0;
+	m_realEnvelope[3].y = float(18 - m_fades[3].y)  / 18.0;
 }
-
+void TLItem::DataEnvToGuiEnv()
+{
+	m_fades[0].y = 18 - int( m_realEnvelope[0].y * 18.0 );
+	m_fades[1].y = 18 - int( m_realEnvelope[1].y * 18.0 );
+	m_fades[3].y = 18 - int( m_realEnvelope[3].y * 18.0 );
+	m_fades[2].y = m_fades[1].y;
+	m_fades[1].x = int( m_realEnvelope[1].x / ( 117600.0 / 31.0 ) );
+	m_fades[2].x = int( m_realEnvelope[2].x / ( 117600.0 / 31.0 ) );
+	//----
+/*	m_fades[0]   = wxRect( 0, 0, 7, 7 );
+	m_fades[1]  = wxRect( 10, 0, 7, 7 );
+	m_fades[2]  = wxRect( 20, 0, 7, 7 );
+	m_fades[3] = wxRect( (int)(m_sample->GetLength() / ( 117600.0 / 31.0 )-7), 0, 7, 7 );
+	m_fades[1].x = m_fades[3].x / 2;
+	m_fades[2].x = m_fades[1].x;*/
+}
 unsigned int TLItem::FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int count, bool mute, double volume)
 {
 	unsigned int written=0;

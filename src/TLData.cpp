@@ -118,7 +118,7 @@ void TLData::ClearSample(TLSample *sample)
 	m_sampleManager->Clear(sample);
 }
 
-TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long referenceId, wxRect* env )
+TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long referenceId, wxRect* env, bool toggleEnvelope )
 {
 	TLTrackList::Node *node =  m_trackList->Item(TrackNr);
 	if (!node)
@@ -133,11 +133,15 @@ TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long 
 	}
 	TLItem *item = tlTrack->AddItem(sample, Position, referenceId);
 	if ( env ) {
-		item->m_leftFadeIn   = env[0];
+	/*	item->m_leftFadeIn   = env[0];
 		item->m_rightFadeIn  = env[1];
 		item->m_leftFadeOut  = env[2];
-		item->m_rightFadeOut = env[3];
+		item->m_rightFadeOut = env[3];*/
+		for ( int i = 0; i < 4; i++ ) {
+			item->m_fades[i] = env[i];
+		}
 	}
+	item->m_toggleEnvelope = toggleEnvelope;
 	m_allItemsHash[referenceId]=item;
 	return item;
 }
@@ -160,6 +164,15 @@ TLItem *TLData::AddItem(wxString& filename, gg_tl_dat Position, int TrackNr, lon
 		return item;
 	}
 	return NULL;
+}
+void TLData::SetItemReferenceId( TLItem *item, long referenceId )
+{
+	if (item->GetReference()) {
+		wxLogError(wxT("Internal Error: This Item has already a referenceId"));
+		return;
+	}
+	item->SetReference(referenceId);
+	m_allItemsHash[referenceId] = item;
 }
 void TLData::SortAll()/*m_length aktualisieren*/
 {

@@ -54,3 +54,12 @@ FileInfoListener *GgseqGlobalProps::GetFileInfoListener()
 {
 	return m_fileInfoListener;
 }
+void GgseqGlobalProps::SetDocManager( GgseqDocManager *docManager )
+{
+	m_docManager = docManager;
+}
+GgseqDocManager *GgseqGlobalProps::GetDocManager()
+{
+	return m_docManager;
+}
+

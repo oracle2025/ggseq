@@ -56,7 +56,7 @@ class TLData: public LoopSetupListener, GetTrackNrListener
 		void SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2);
 
 		TLItem *AddItem( TLSample *sample,gg_tl_dat  Position,
-		                 int TrackNr, long referenceId = 0, wxRect* env = 0 );
+		                 int TrackNr, long referenceId = 0, wxRect* env = 0, bool toggleEnvelope = false );
 		TLItem *AddItem( wxString& filename, gg_tl_dat Position,
 		                 int TrackNr, long referenceId = 0 );
 		TLItem *ItemAtPos(gg_tl_dat Position, int TrackNr);
@@ -65,6 +65,7 @@ class TLData: public LoopSetupListener, GetTrackNrListener
 		void SetTrackMute(bool mute, int TrackNr);
 		void SetTrackVolume(double vol, int TrackNr);
 		int GetTrackNr(TLTrack *track);
+		void SetItemReferenceId( TLItem *item, long referenceId );
 
 		void SortAll();
 		void Clear();

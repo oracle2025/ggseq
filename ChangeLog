@@ -1,3 +1,10 @@
+2005-02-26  Richard Spindler <richard.spindler AT gmail.com>
+
+ * added Undo-Redo for Envelope Editing
+ * some fixes for configure.ac (Beware, requires soundtouch.m4 to be found by
+ aclocal when ./reconf is run)
+ * some more fixes for configure.ac regarding wxWin
+
 2005-02-23  Richard Spindler <richard.spindler AT gmail.com>
 
  * more Improvements to Sample Editor

@@ -170,13 +170,13 @@ void TLView::DrawItem(wxDC& dc, TLItem* item, long left, long delta_left, long t
 		wxFileName fn( item->GetSample()->GetFilename() );
 		long v3 = left + delta_left;
 			dc.DrawText( fn.GetName(), v3, top + 1 );
-		dc.DestroyClippingRegion();
-	}
 /* - Extras ;) -*/ 
-	dc.SetPen( *wxBLACK_PEN );
-	dc.SetBrush( *wxWHITE_BRUSH );
-	if ( item->m_toggleEnvelope ) {
-		item->DrawEnvelope( dc, left, top );
+		dc.SetPen( *wxBLACK_PEN );
+		dc.SetBrush( *wxWHITE_BRUSH );
+		if ( item->m_toggleEnvelope ) {
+			item->DrawEnvelope( dc, left + delta_left, top );
+		}
+		dc.DestroyClippingRegion();
 	}
 //	dc.DrawRectangle( left + item->m_x_test, top+item->m_y_test, 10, 10);
 }

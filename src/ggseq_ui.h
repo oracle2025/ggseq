@@ -115,7 +115,7 @@ private:
     void OnFLItemSelected(wxListEvent& event);
     void OnSelChanged(wxTreeEvent& event);
     void OnTimer(wxTimerEvent& event);
-    
+    void OnActivate( wxActivateEvent &event );
 private:
     DECLARE_EVENT_TABLE()
 };

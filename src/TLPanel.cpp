@@ -205,7 +205,7 @@ void TLPanel::OnMouseMotion( wxMouseEvent& event )
 			event.m_y - tmp_rect.y );
 	if ( envelopeHandle && item->m_toggleEnvelope ) {
 		m_dragHandler = new EnvelopeDragHandler(
-			this, m_view, item, event.m_x, event.m_y,
+			this, m_view, m_data, item, event.m_x, event.m_y,
 			envelopeHandle
 			);
 		return;
@@ -245,7 +245,8 @@ void TLPanel::OnMouseUp( wxMouseEvent& event )
 void TLPanel::OnMouseDown( wxMouseEvent& event )
 {
 	//TODO: Prüfen ob Cursor im kleinen menü-Eck ist, und ggfls. POP-Up öffnen
-	
+//TODO	if ( event.m_x < Left Border??)	
+//		return;
 	m_DragX = event.m_x;
 	m_DragY = event.m_y;
 	if( g_ggseqProps.GetMiniPlayer() )
@@ -637,7 +638,7 @@ void TLPanel::SetZoom( float zoom )
 }
 void TLPanel::OnToggleEnvelope(wxMenuEvent& event)
 {
-	m_EditItem->m_toggleEnvelope = !m_EditItem->m_toggleEnvelope;
+	m_view->m_docManager->SubmitCommand( new GgseqToggleEnvelopeItemCommand( m_data, m_EditItem ) );
 	m_EditItem = 0;
 	Refresh();
 }

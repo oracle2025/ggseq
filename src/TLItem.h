@@ -23,67 +23,62 @@
 typedef struct {
 	int x;    // Position in Samples
 	float y;  // 0.0 bis 1.0
-} Env;
+} EnvelopePoint;
+/*typedef struct {
+	wxRect m_leftFadeIn;
+	wxRect m_rightFadeIn;
+	wxRect m_leftFadeOut;
+	wxRect m_rightFadeOut;
+} itemUiStuff;*/
 #include <soundtouch/SoundTouch.h>
 class TLSample;
 class GetItemTrackListener;
-class TLItem
+class TLItem // Should not contain UI-relevant Data. ( Envelope Rects? )
 {
 	public:
-/*		TLItem( TLItem *item, gg_tl_dat position,
-			long referenceId,
-			GetItemTrackListener* trackListener
-		);*/
+	// constructors and destructors
 		TLItem( TLSample *sample,
-		//	int trackNr,
 			gg_tl_dat position,
 			long referenceId,
 			GetItemTrackListener* trackListener
 		);
 		~TLItem();
+	// method declarations
 		unsigned int FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int count, bool mute, double volume);
+		int GetTrack();
+		TLSample *GetSample();
+		long GetReference();
+		void SetReference( long referenceId ) { m_referenceId = referenceId; }
 		gg_tl_dat GetLength();
 		gg_tl_dat GetPosition();
 		gg_tl_dat GetEndPosition();
-		int GetTrack();
 		void SetPosition(gg_tl_dat position);
-		gg_tl_dat m_position; /*TODO: über friend Klassen*/
-		TLSample *GetSample();
 		void Select();
 		void UnSelect();
 		bool IsSelected();
-		long GetReference();
-//    bool HandleInternal(gg_tl_dat x, float y);
-//		long m_x_test;
-//		long m_y_test;
-		wxRect m_leftFadeIn;
-		wxRect m_rightFadeIn;
-		wxRect m_leftFadeOut;
-		wxRect m_rightFadeOut;
-		void DrawEnvelope( wxDC &dc, int xOffset, int yOffset );
+		void DataEnvToGuiEnv();
+		void Stretch( float amount, gg_tl_dat trimStart = -1, gg_tl_dat trimEnd = -1 );
+		//void SetEnvelope( EnvelopePoint *envelope );
+		void DrawEnvelope( wxDC &dc, int xOffset, int yOffset, wxRect *customFades = 0 );
 		wxRect *TouchingEnvelopeCtrl( int x, int y );
 		void GuiEnvToDataEnv();
-		void Stretch( float amount, gg_tl_dat trimStart = -1, gg_tl_dat trimEnd = -1 );
+	// member variable declarations
+		gg_tl_dat m_position; /*TODO: über friend Klassen*/
 		bool m_toggleEnvelope;
 		float *m_stretchedBuffer;
 		gg_tl_dat m_stretchedLen;
+		wxRect m_fades[4];
+		EnvelopePoint m_realEnvelope[4];
 	private:
+	// method declarations
 		float GetEnvelopValue( int position );
-		Env m_realEnvelope[4];
+	// member variable declarations
 		long m_referenceId;
 		TLSample *m_sample;
 		bool m_selected;
-		//int m_trackNr;
 		GetItemTrackListener* m_trackListener;
-		SoundTouch m_SoundTouch;
+/*		float m_timestretch;
+		gg_tl_dat m_trimStart;
+		gg_tl_dat m_trimEnd;*/
 };
-/*
-class TLStoreItem : public TLItem
-{
-	public:
-		TLSample *GetSample();
-	private:
-		TLSample *m_sample;
-};
-*/
 #endif /*_TLITEM_H_*/

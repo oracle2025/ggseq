@@ -120,6 +120,7 @@ BEGIN_EVENT_TABLE(MyFrame,wxFrame)
     EVT_MENU( ID_IMPORT_PACK, MyFrame::OnImportPack )
     EVT_MENU( ID_SAVEAS_PACK, MyFrame::OnExportPack )
     EVT_SPLITTER_SASH_POS_CHANGING( ID_TIMELINE_SPLITTER, MyFrame::OnTimelineSplitterChanging )
+    EVT_ACTIVATE(MyFrame::OnActivate)
 END_EVENT_TABLE()
 
 MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
@@ -162,8 +163,17 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     GetMenuBar()->Enable( ID_SHOW_MIXER, false );
     SetSizeHints(470,500);
     GetMainSplitter()->SetSashPosition(200);
-    GetTimelineSplitter()->SetSashPosition(200);
     GetTlPanel()->SetFocus();//Nötig, damit unter wxGTK die Cursor funktionieren.
+//    GetTimelineSplitter()->SetSashPosition(300);
+    
+    
+}
+void MyFrame::OnActivate( wxActivateEvent &event ) //Evil and Ugly Hack, but neccessary because wx is broken >:(
+{
+	static bool not_activated = true;
+	if (not_activated) {
+		GetTimelineSplitter()->SetSashPosition(290);
+	}
 }
 MyFrame::~MyFrame()
 {
