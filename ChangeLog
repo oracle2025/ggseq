@@ -1,3 +1,12 @@
+2004-01-19  Richard Spindler <oracle2025@gmx.de>
+
+ *  Removed a couple of win32 relatet IFDEFs in TLPanel.cpp
+ *  fixed Bug in SnapDialog
+
+2004-01-18  Richard Spindler <oracle2025@gmx.de>
+
+ *  The Gungirl picture looks better now
+
 2004-01-15  Richard Spindler <oracle2025@gmx.de>
 
  *  Added a Feature: use the [shift] Key to position a sample without snap
