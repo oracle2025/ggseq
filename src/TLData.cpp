@@ -304,7 +304,7 @@ void TLData::SaveWAV(wxString filename)
 	unsigned int res=FillBuffer(buffer,512);
 	/*m_length*/
 	m_updateListener->StartUpdateProcess();
-	long cnt=0;
+	gg_tl_dat cnt=0;
 	while(res>=512) {
 		sf_write_float(sndfile,buffer,512);
 		if (SF_ERR_NO_ERROR!=sf_error(sndfile))

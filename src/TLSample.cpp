@@ -32,6 +32,7 @@
 #include "UpdateListener.h"
 #include "TLView.h"
 #include <iostream>
+#include <exception>
 
 TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, UpdateListener* updateListener)/*100000 Frames als intervall*/
 {
@@ -71,7 +72,16 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 		return;
 	}
 	m_bufferLength = sfinfo.frames*2;
+	try {
+
 	m_buffer=new float[m_bufferLength];
+
+	} catch(std::exception &e) {
+		wxLogError(wxT("Out of memory!"));
+		sf_close(sndfile);
+		return;
+
+	}
 
 	int factors;
 	if (sfinfo.samplerate==44100 && sfinfo.channels==2) {
@@ -183,7 +193,7 @@ TLSample::~TLSample()
 //	std::cout << "Deleting Sample: " << (const char*)m_filename.mb_str() << std::endl;
 	if (m_buffer!=NULL)
 	{
-		delete m_buffer;
+		delete [] m_buffer;
 	}
 }
 

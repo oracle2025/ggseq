@@ -91,7 +91,8 @@ void TLSelectionSet::Clear(TLData* data)
 	m_itemList.DeleteContents(true);
 
 }
-void TLSelectionSet::DeleteFrom(TLData* data)
+
+/*void TLSelectionSet::DeleteFrom(TLData* data)
 {
 	for ( TLSelItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
 		TLSelectionItem *current = node->GetData();
@@ -114,7 +115,7 @@ TLSelectionSet *TLSelectionSet::AddTo(TLData* data, gg_tl_dat offsetPosition, in
 	}
 	selSet->CalcBounds();
 	return selSet;
-}
+}*/
 /*void TLSelectionSet::Move(TLData* data, int offsetPosition, int track)*/
 bool TLSelectionSet::IsActive()
 {

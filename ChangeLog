@@ -1,3 +1,7 @@
+2004-04-25  Richard Spindler <oracle2025@gmx.de>
+
+ * big samples won't crash the Program anymore
+
 2004-04-22  Richard Spindler <oracle2025@gmx.de>
 
  * ha, Undo-Redo finally done :)

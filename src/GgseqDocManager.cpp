@@ -168,8 +168,6 @@ void GgseqAddItemCommand::Do()
 }
 void GgseqAddItemCommand::Undo()
 {
-		std::cout << "AddItem::Undo " << m_referenceId << std::endl;
-
 	TLItem *item = m_document->GetItem(m_referenceId);
 	m_document->DeleteItem( item , m_trackId );
 	m_sample = (TLSample*) 0;
@@ -208,7 +206,6 @@ void GgseqDeleteItemCommand::Undo()
 GgseqMoveItemCommand::GgseqMoveItemCommand( TLData *doc, TLItem *srcItem,
                                             int64_t destPosition, unsigned int destTrackId )
 {
-puts("GgseqMoveItemCommand");
 	m_document = doc;
 //	m_itemReference = srcItem;
 	m_referenceId = srcItem->GetReference();
@@ -356,7 +353,6 @@ void GgseqMoveItemsCommand::Do()
 		} else {
 			item = m_document->GetItem(current->m_referenceId);
 		}
-		std::cout << "MoveItems::Do " << current->m_referenceId << std::endl;
 		int64_t oldPosition = item->GetPosition();
 		unsigned int oldTrackId = item->GetTrack();
 		TLSample *sample = item->GetSample();
