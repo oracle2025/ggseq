@@ -17,6 +17,14 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include "GgseqGlobalProps.h"
+#include "stuff.h"
+class wxDC;
+class wxString;
+class wxCoord;
+class wxRect;
+class wxColour;
+class wxIcon;
+#include "TLView.h"
  
 GgseqGlobalProps g_ggseqProps;
 
@@ -28,7 +36,7 @@ GgseqGlobalProps::GgseqGlobalProps()
 }
 float GgseqGlobalProps::GetZoom()
 {
-	return 0.0;
+	return m_view->GetRealZoom();
 }
 SoundManager *GgseqGlobalProps::GetSoundManager()
 {
@@ -62,4 +70,7 @@ GgseqDocManager *GgseqGlobalProps::GetDocManager()
 {
 	return m_docManager;
 }
-
+void GgseqGlobalProps::SetView( TLView *view )
+{
+	m_view = view;
+}

@@ -1,3 +1,7 @@
+2005-03-06  Richard Spindler <richard.spindler AT gmail.com>
+
+ * Changed lots of internal stuff, to fix the Trimmer, Envelope, etc..
+
 2005-02-28  Richard Spindler <richard.spindler AT gmail.com>
 
  * hopefully fixed SoundTouch Test in configure.ac

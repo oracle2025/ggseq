@@ -10,6 +10,7 @@
 #define ID_BIG_SCROLLBAR 20001
 #define ID_SCROLLBAR2 20002
 #define TOP_OFFSET_TRACKS 3
+#define HARD_ZOOM ( 117600.0 / 31.0 )
 
 typedef long long gg_tl_dat;
 

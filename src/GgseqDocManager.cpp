@@ -109,6 +109,22 @@ void GgseqCommand::SetDocManager( GgseqDocManager *docManager )
 	m_docManager = docManager;
 }
 bool GgseqCommand::GetError() { return m_error; }
+TLItem *GgseqCommand::GetItem()
+{
+	if (!m_referenceId) {
+		m_referenceId = m_docManager->GetNewRefId();
+		if (m_item)
+			m_document->SetItemReferenceId( m_item, m_referenceId );
+	}
+	TLItem *item;
+	if (m_item) {
+		item = m_item;
+		m_item = (TLItem*) 0;
+	} else {
+		item = m_document->GetItem( m_referenceId );
+	}
+	return item;
+}
 void GgseqDocManager::Undo()
 {
 	GgseqCommandList::Node *node = m_commandList.GetLast();
@@ -219,9 +235,10 @@ void GgseqMoveItemCommand::Do()
 		item = m_document->GetItem(m_referenceId);
 	}
 	m_filename = item->GetSample()->GetFilename();
-	for ( int i = 0; i < 4; i++ ) {
-		m_FadeInOut[i] = item->m_fades[i];
-	}
+	item->GetEnvelopeData(m_envelopeData);
+/*	for ( int i = 0; i < 4; i++ ) {
+		m_FadeInOut[i] = item->m_guiEnvData[i];
+	}*/
 	/*m_FadeInOut[0] = item->m_leftFadeIn;
 	m_FadeInOut[1] = item->m_rightFadeIn;
 	m_FadeInOut[2] = item->m_leftFadeOut;
@@ -232,7 +249,7 @@ void GgseqMoveItemCommand::Do()
 	TLSample *sample = item->GetSample();
 	sample->Ref();
 	m_document->DeleteItem( item, oldTrackId );
-	m_document->AddItem( sample, m_position, m_trackId , m_referenceId, m_FadeInOut, m_toggleEnvelope );
+	m_document->AddItem( sample, m_position, m_trackId , m_referenceId, &m_envelopeData, m_toggleEnvelope );
 	
 	m_position = oldPositon;
 	m_trackId = oldTrackId;
@@ -247,7 +264,7 @@ void GgseqMoveItemCommand::Undo()
 	TLSample *sample = item->GetSample();
 	sample->Ref();
 	m_document->DeleteItem( item, newTrackId );
-	m_document->AddItem( sample, m_position, m_trackId, m_referenceId, m_FadeInOut );
+	m_document->AddItem( sample, m_position, m_trackId, m_referenceId, &m_envelopeData );
 	m_position = newPositon;
 	m_trackId = newTrackId;
 	sample->UnRef();
@@ -509,11 +526,12 @@ void GgseqAddTrackCommand::Undo()
 }
 
 GgseqEnvelopeItemCommand::GgseqEnvelopeItemCommand(
-		TLData *doc, TLItem *item, EnvelopePoint *envelope )
+		TLData *doc, TLItem *item, const NativeEnvData &envelope )
 {
-	for ( int i = 0; i < 4; i++ ) {
+/*	for ( int i = 0; i < 4; i++ ) {
 		m_fades[i] = envelope[i];
-	}
+	}*/
+	m_nativeEnvelope = envelope;
 	m_item     = item;
 	m_document = doc;
 	m_error    = 0;
@@ -524,7 +542,7 @@ GgseqEnvelopeItemCommand::~GgseqEnvelopeItemCommand()
 }
 void GgseqEnvelopeItemCommand::Do()
 {
-	if (!m_referenceId) {
+/*	if (!m_referenceId) {
 		m_referenceId = m_docManager->GetNewRefId();
 		if (m_item)
 			m_document->SetItemReferenceId( m_item, m_referenceId );
@@ -535,41 +553,42 @@ void GgseqEnvelopeItemCommand::Do()
 		m_item = (TLItem*) 0;
 	} else {
 		item = m_document->GetItem( m_referenceId );
-	}
-	for ( int i = 0; i < 4; i++ ) {
+	}*/
+	TLItem *item = GetItem();
+/*	for ( int i = 0; i < 4; i++ ) {//TODO: auch swap Funktion verwenden
 		EnvelopePoint tmp;
-		tmp = item->m_realEnvelope[i];
-		item->m_realEnvelope[i] = m_fades[i];
+		tmp = item->m_sampleEnvData[i];
+		item->m_sampleEnvData[i] = m_fades[i];
 		m_fades[i] = tmp;
-	}
-	item->DataEnvToGuiEnv();
+	}*/
+	NativeEnvData tmp;
+	item->GetEnvelopeData( tmp );
+	item->SetEnvelopeData( m_nativeEnvelope );
+	m_nativeEnvelope = tmp;
 }
 void GgseqEnvelopeItemCommand::Undo()
 {
 	TLItem *item = m_document->GetItem(m_referenceId);
 	wxASSERT(item);
-	for ( int i = 0; i < 4; i++ ) {
-		EnvelopePoint tmp;
-		tmp = item->m_realEnvelope[i];
-		item->m_realEnvelope[i] = m_fades[i];
-		m_fades[i] = tmp;
-	}
-	item->DataEnvToGuiEnv();
+	NativeEnvData tmp;
+	item->GetEnvelopeData( tmp );
+	item->SetEnvelopeData( m_nativeEnvelope );
+	m_nativeEnvelope = tmp;
 }
 //---
 GgseqToggleEnvelopeItemCommand::GgseqToggleEnvelopeItemCommand( TLData *doc, TLItem *item )
 {
-	m_document = doc;
-	m_item     = item;
+	m_document    = doc;
+	m_item        = item;
 	m_referenceId = item->GetReference();
-	m_error = 0;
+	m_error       = 0;
 }
 GgseqToggleEnvelopeItemCommand::~GgseqToggleEnvelopeItemCommand()
 {
 }
 void GgseqToggleEnvelopeItemCommand::Do()
 {
-	if (!m_referenceId) {
+/*	if (!m_referenceId) {
 		m_referenceId = m_docManager->GetNewRefId();
 		if (m_item)
 			m_document->SetItemReferenceId( m_item, m_referenceId );
@@ -580,7 +599,8 @@ void GgseqToggleEnvelopeItemCommand::Do()
 		m_item = (TLItem*) 0;
 	} else {
 		item = m_document->GetItem( m_referenceId );
-	}
+	}*/
+	TLItem *item = GetItem();
 	item->m_toggleEnvelope = !item->m_toggleEnvelope;
 }
 void GgseqToggleEnvelopeItemCommand::Undo()
@@ -588,4 +608,64 @@ void GgseqToggleEnvelopeItemCommand::Undo()
 	TLItem *item = m_document->GetItem(m_referenceId);
 	wxASSERT(item);
 	item->m_toggleEnvelope = !item->m_toggleEnvelope;
+}
+//---
+GgseqTrimNStretchItemCommand::GgseqTrimNStretchItemCommand(
+		TLData *doc, TLItem *item,
+		gg_tl_dat leftTrim,
+		gg_tl_dat rightTrim, float timestretch )
+{
+	m_document    = doc;
+	m_item        = item;
+	m_leftTrim    = leftTrim;
+	m_rightTrim   = rightTrim;
+	m_timestretch = timestretch;
+	m_error       = 0;
+	
+}
+GgseqTrimNStretchItemCommand::~GgseqTrimNStretchItemCommand()
+{
+}
+/*void swap_l( gg_tl_dat &a, gg_tl_dat &b )
+{
+	gg_tl_dat c = a;
+	a = b;
+	b = c;
+}
+void swap_f( float &a, float &b )
+{
+	float c = a;
+	a = b;
+	b = c;
+}*/
+void GgseqTrimNStretchItemCommand::Do()
+{
+	TLItem *item  = GetItem();
+	gg_tl_dat tmp_leftTrim    = item->GetLeftTrim();
+	gg_tl_dat tmp_rightTrim   = item->GetRightTrim();
+	float tmp_timestretch = item->GetTimestretch();
+	item->SetTrimNStretch( m_leftTrim, m_rightTrim, m_timestretch );
+	m_leftTrim    = tmp_leftTrim;
+	m_rightTrim   = tmp_rightTrim;
+	m_timestretch = tmp_timestretch;
+	/*swap_l( item->m_leftTrim, m_leftTrim );
+	swap_l( item->m_rightTrim, m_rightTrim );
+	swap_f( item->m_timestretch, m_timestretch );*/
+//	item->UpdateBuffer();
+}
+void GgseqTrimNStretchItemCommand::Undo()
+{
+	TLItem *item = m_document->GetItem(m_referenceId);
+	wxASSERT(item);
+	gg_tl_dat tmp_leftTrim    = item->GetLeftTrim();
+	gg_tl_dat tmp_rightTrim   = item->GetRightTrim();
+	float tmp_timestretch = item->GetTimestretch();
+	item->SetTrimNStretch( m_leftTrim, m_rightTrim, m_timestretch );
+	m_leftTrim    = tmp_leftTrim;
+	m_rightTrim   = tmp_rightTrim;
+	m_timestretch = tmp_timestretch;
+/*	swap_l( item->m_leftTrim, m_leftTrim );
+	swap_l( item->m_rightTrim, m_rightTrim );
+	swap_f( item->m_timestretch, m_timestretch );*/
+//	item->UpdateBuffer();
 }

@@ -35,7 +35,11 @@ class WaveEditor : public wxPanel
 {
 	public:
 		// constructors and destructors
-		WaveEditor( wxWindow* parent, TLItem *item, wxWindowID id = -1 );
+		WaveEditor( wxWindow* parent,
+				float *buffer, gg_tl_dat len,
+				gg_tl_dat leftTrim,
+				gg_tl_dat rightTrim,
+				wxWindowID id = -1 );
 		virtual ~WaveEditor();
 		// method declarations
 		void GetTrims( gg_tl_dat &start, gg_tl_dat &end );
@@ -47,7 +51,8 @@ class WaveEditor : public wxPanel
 		gg_tl_dat  m_rightTrim;
 	private:
 		// member variable declarations
-		TLItem    *m_item;
+		float     *m_buffer;
+		gg_tl_dat  m_len;
 		wxRect     m_marker[2];
 		int        m_dragOffset;
 		wxRect    *m_dragMarker;

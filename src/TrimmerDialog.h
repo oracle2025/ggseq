@@ -41,23 +41,27 @@ class TrimmerDialog: public wxDialog
 {
 public:
     // constructors and destructors
-    TrimmerDialog( wxWindow *parent, TLItem *item /*, wxWindowID id, const wxString &title,
-        const wxPoint& pos = wxDefaultPosition,
-        const wxSize& size = wxDefaultSize,
-        long style = wxDEFAULT_DIALOG_STYLE */);
+    TrimmerDialog( wxWindow *parent,
+		    float *buffer, gg_tl_dat len,
+		    gg_tl_dat leftTrim,
+		    gg_tl_dat rightTrim, 
+		    float timestretch );
     virtual ~TrimmerDialog();
     
     // WDR: method declarations for TrimmerDialog
     wxToggleButton* GetLoopButton()  { return (wxToggleButton*) FindWindow( ID_LOOP_BUTTON ); }
     WaveEditor* GetWaveEditor()  { return (WaveEditor*) FindWindow( ID_WAVE_EDITOR ); }
     wxTextCtrl* GetTimestrechTextctrl()  { return (wxTextCtrl*) FindWindow( ID_TIMESTRECH_TEXTCTRL ); }
+    gg_tl_dat GetLeftTrim();
+    gg_tl_dat GetRightTrim();
+    float GetTimestretch();
     
 private:
     // WDR: member variable declarations for TrimmerDialog
-    TLItem *m_item;
-//    bool m_playing;
-    wxTimer *m_timer;
-    double m_amount;
+    float    *m_buffer;
+    gg_tl_dat m_len;
+    wxTimer  *m_timer;
+    double    m_timestretch;
     
 private:
     // WDR: handler declarations for TrimmerDialog

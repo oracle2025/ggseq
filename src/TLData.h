@@ -19,6 +19,7 @@
 
 #ifndef _TLDATA_H_
 #define _TLDATA_H_
+#include "TLItem.h"
 
 class TLItem;
 class TLSample;
@@ -56,7 +57,7 @@ class TLData: public LoopSetupListener, GetTrackNrListener
 		void SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2);
 
 		TLItem *AddItem( TLSample *sample,gg_tl_dat  Position,
-		                 int TrackNr, long referenceId = 0, wxRect* env = 0, bool toggleEnvelope = false );
+		                 int TrackNr, long referenceId = 0, const NativeEnvData* env = 0, bool toggleEnvelope = false );
 		TLItem *AddItem( wxString& filename, gg_tl_dat Position,
 		                 int TrackNr, long referenceId = 0 );
 		TLItem *ItemAtPos(gg_tl_dat Position, int TrackNr);

@@ -271,19 +271,19 @@ void MyFrame::OnImportPack( wxCommandEvent &event )
 void MyFrame::OnZoom150( wxCommandEvent &event )
 {
     GetTlPanel()->SetZoom( 1.5 );
-    Refresh();
+    GetTlPanel()->Refresh();
 }
 
 void MyFrame::OnZoom100( wxCommandEvent &event )
 {
     GetTlPanel()->SetZoom( 1.0 );
-    Refresh();
+    GetTlPanel()->Refresh();
 }
 
 void MyFrame::OnZoom50( wxCommandEvent &event )
 {
     GetTlPanel()->SetZoom( 0.5 );
-    Refresh();
+    GetTlPanel()->Refresh();
 }
 
 void MyFrame::OnDeleteTrack( wxCommandEvent &event )

@@ -50,14 +50,19 @@ BEGIN_EVENT_TABLE(WaveEditor, wxPanel)
 END_EVENT_TABLE()
 
 
-WaveEditor::WaveEditor( wxWindow* parent, TLItem *item, wxWindowID id )
+WaveEditor::WaveEditor( wxWindow* parent,
+		float *buffer, gg_tl_dat len,
+		gg_tl_dat leftTrim,
+		gg_tl_dat rightTrim,
+		wxWindowID id )
 	:wxPanel(parent, id, wxDefaultPosition, wxDefaultSize, wxCLIP_CHILDREN)
 {
-	m_item = item;
-	m_marker[0] = wxRect( -5, 0, 10, 5 );
-	m_marker[1] = wxRect( GetClientSize().GetWidth() - 5, 0, 10, 5 );
-	m_leftTrim = 0;
-	m_rightTrim = m_item->GetLength() / 2;
+	m_buffer = buffer;
+	m_len = len;
+	m_leftTrim = leftTrim;
+	m_rightTrim = rightTrim;
+	m_marker[0] = wxRect( TrimToMark( leftTrim ), 0, 10, 5 );
+	m_marker[1] = wxRect( TrimToMark( rightTrim ), 0, 10, 5 );
 	m_dragOffset = 0;
 	m_dragMarker = 0;
 	m_caretVisible = false;
@@ -101,11 +106,11 @@ void WaveEditor::UpdateCaret(float timestretch)
 }
 gg_tl_dat WaveEditor::MarkToTrim( int x )
 {
-	return ( gg_tl_dat(x+5) * (m_item->GetLength() / 2) ) / GetClientSize().GetWidth();
+	return ( gg_tl_dat(x+5) * (m_len / 2) ) / GetClientSize().GetWidth();
 }
 int WaveEditor::TrimToMark( gg_tl_dat x )
 {
-	return ( ( x * GetClientSize().GetWidth() ) / (m_item->GetLength() / 2) ) - 5; 
+	return ( ( x * GetClientSize().GetWidth() ) / (m_len / 2) ) - 5; 
 }
 float get_average( float* buffer, unsigned int len )
 {
@@ -119,17 +124,11 @@ int resize( int oldX, int oldWidth, int newWidth )
 {
 	return ( ( (oldX + 5) * newWidth ) / oldWidth ) -5;
 }
-/*void WaveEditor::OnSize( wxSizeEvent& event )
-{
-	//m_marker[0].x = resize( m_marker[0].x, m_oldWidth, event.GetSize().GetWidth() );
-	//m_marker[1].x = resize( m_marker[1].x, m_oldWidth, event.GetSize().GetWidth() );
-	//m_oldWidth = event.GetSize().GetWidth();
-}*/
 void WaveEditor::OnPaint( wxPaintEvent& event )
 {
 	int width, height;
-	float *buffer;
-	gg_tl_dat len;
+	//float *buffer;
+	//gg_tl_dat len;
 	wxPoint marker[3];
 	marker[0] = wxPoint( 0, 0 );
 	marker[1] = wxPoint( 10, 0 );
@@ -137,17 +136,17 @@ void WaveEditor::OnPaint( wxPaintEvent& event )
 	// Paint a WaveForm here
 	wxBufferedPaintDC dc( this );
 	GetClientSize( &width, &height );
-	buffer = m_item->GetSample()->GetBuffer();
-	len = m_item->GetLength();
+	//buffer = m_item->GetBuffer();
+	//len = m_item->GetBufferLen();
 	
 	// DrawBackground
 	dc.SetBrush( wxBrush( GetBackgroundColour(), wxSOLID ) );
 	dc.SetPen( *wxTRANSPARENT_PEN );
 	dc.DrawRectangle( 0, 0, width, height );
 	dc.SetPen( *wxBLACK_PEN );
-	int inc = len / ( width + 4 );
+	int inc = m_len / ( width + 4 );
 	for ( int i=0; i < width; i ++ ) {
-		int h = ( get_average( &buffer[i * inc], inc * 4 ) * float( height  ) * 2 );
+		int h = ( get_average( &m_buffer[i * inc], inc * 4 ) * float( height  ) * 2 );
 		dc.DrawLine( i, ( height / 2 ) - h, i, ( height / 2 ) + h );
 	}
 	dc.DrawLine( 0, height / 2, width, height / 2 );
@@ -218,5 +217,4 @@ void WaveEditor::GetTrims( gg_tl_dat &start, gg_tl_dat &end )
 {
 	
 }
-		
 

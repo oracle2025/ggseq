@@ -31,8 +31,8 @@
 #include "stuff.h"
 #include "TLTrack.h"
 #include "TLView.h"
-#include "TLData.h"
 #include "TLItem.h"
+#include "TLData.h"
 #include "TLSample.h"
 #include "TLSelectionSet.h"
 #include "GgseqDocManager.h"
@@ -51,10 +51,10 @@
 #define VIEW_LEFT_BORDER  57
 #define VIEW_RIGHT_BORDER  5
 #define VIEW_TOP_BORDER    3
-#define HARD_ZOOM ( 117600.0 / 31.0 )
 
 TLView::TLView(TLData *TlData)
 {
+	g_ggseqProps.SetView( this );
 	m_TlData          = TlData;
 	m_TrackDrawDist   = 5;
 	m_YscrollPosition = 0;
@@ -301,7 +301,7 @@ wxRect TLView::GetItemBoundaries(TLItem *item)
   	static int x, y, width, height;
 	x      = FromTLtoScreenX( item->GetPosition() );
   	y      = item->GetTrack() * 30 + TOP_OFFSET_TRACKS - GetYScrollPosition();
-	width  = (int)( item->GetLength() / GetRealZoom() );
+	width  = (int)( item->GetLen() / GetRealZoom() );
 	height = 25;
 	return wxRect( x, y, width, height );
 }
@@ -461,7 +461,7 @@ void TLView::DrawSelection( wxDC *dc )
 		TLItem *current = node->GetData()->GetItem();
 		dc->DrawRectangle( (int) ( ( current->GetPosition() - m_selectionSet->GetX1() ) /  GetRealZoom() ),
 		  ( current->GetTrack() - m_selectionSet->GetTrack1() ) * 30,
-		  (int)( current->GetLength() /  GetRealZoom() ), 25);
+		  (int)( current->GetLen() /  GetRealZoom() ), 25);
 	}
 }
 void TLView::EndSelectionDrag(int x, int y, bool copy, long x_offset)

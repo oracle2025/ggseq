@@ -187,8 +187,9 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 				}
 				gg_tl_dat pos = strtoll(buffer,NULL,10);
 				TLSample *sample=m_sampleManager->GetSample(id);
-				if (sample)
+				if (sample) {
 					m_data->AddItem(sample,pos,trackNr);
+				}
 				element_item=element_item->NextSiblingElement("item");
 			}
 		}

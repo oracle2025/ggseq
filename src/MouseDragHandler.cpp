@@ -64,7 +64,8 @@ wxDragImage *SampleDragHandler::GenerateDragImg( TLItem *item, int width )
 	wxBitmap bmp1( width, 25 );
 	wxMemoryDC dc;
 	dc.SelectObject( bmp1 );
-	item->GetSample()->Draw( dc, m_view->GetRealZoom() );
+	item->Draw( dc, m_view->GetRealZoom() );
+	//item->GetSample()->Draw( dc, m_view->GetRealZoom() );
 	return new wxDragImage( bmp1 );
 }
 void SampleDragHandler::ToggleFrame( wxDC& dc )

@@ -35,17 +35,18 @@
 EnvelopeDragHandler::EnvelopeDragHandler( wxWindow* canvas, TLView *view, TLData *data,
 	TLItem *item, int x, int y, wxRect *envelopeHandle )
 {//TODO Get all Envelope Data, Generate new Envelope Data, and submit everything back
-	m_envelopeHandle = 0;
+	/*m_envelopeHandle = 0;
 	for ( int i = 0; i < 4; i++ ) {
-		m_fades[i] = item->m_fades[i];
-		if ( envelopeHandle == (&(item->m_fades[i])) ) {
+		m_fades[i] = item->m_guiEnvData[i];
+		if ( envelopeHandle == (&(item->m_guiEnvData[i])) ) {
 			m_envelopeHandle = &m_fades[i];
 		}
 	}
 	if (!m_envelopeHandle) {
 		wxLogError(wxT("Error "));
 		return;
-	}
+	}*/
+	m_envelopeHandle = envelopeHandle;
 	wxASSERT(m_envelopeHandle)
 	m_canvas = canvas;
 	m_data = data;
@@ -70,7 +71,7 @@ void EnvelopeDragHandler::OnDrag( int x, int y )
 
 	Draw( dc );
 }
-void EnvelopeDragHandler::GuiEnvToDataEnv( wxRect* fades, EnvelopePoint* realEnv )
+/*void EnvelopeDragHandler::GuiEnvToDataEnv( wxRect* fades, EnvelopePoint* realEnv )
 {
 	realEnv[0].x = 0;
 	realEnv[0].y = float(18 - fades[0].y) / 18.0; //Trackhöhe;
@@ -80,19 +81,17 @@ void EnvelopeDragHandler::GuiEnvToDataEnv( wxRect* fades, EnvelopePoint* realEnv
 	realEnv[2].y = float(18 - fades[2].y)  / 18.0;
 	realEnv[3].x = m_item->GetLength();//int(m_rightFadeOut.x * ( 117600.0 / 31.0 ) );
 	realEnv[3].y = float(18 - fades[3].y)  / 18.0;
-}
+}*/
 void EnvelopeDragHandler::OnDrop( int x, int y, bool copy )
 {
-	EnvelopePoint realFades[4];
-//	m_item->GuiEnvToDataEnv();
-	GuiEnvToDataEnv( m_fades, realFades );
+	NativeEnvData nativeEnvelope;
+	m_item->GetNewEnvelopeData( nativeEnvelope, m_envelopeHandle );
+//	GetEnvFromRects( nativeEnvelope, m_fades, m_item->GetLength());
 	m_canvas->ReleaseMouse();
-	//TODO Calculate Real Envelope Data
-	//GuiEnvToDataEnv();
 	g_ggseqProps.GetDocManager()->SubmitCommand(
 			new GgseqEnvelopeItemCommand(
 				m_data, m_item,
-				realFades
+				nativeEnvelope
 				)
 			);
 
@@ -111,7 +110,8 @@ wxPoint EnvelopeDragHandler::FitInside( wxPoint handlePos )
 }
 void EnvelopeDragHandler::FixEnvelopeCtrls()//TODO: Clean up the Mess
 {
-	if ( m_envelopeHandle == (&(m_fades[0])) ) {
+	m_item->DragEnvelopeHandle( m_envelopeHandle );
+/*	if ( m_envelopeHandle == (&(m_fades[0])) ) {
 		m_envelopeHandle->x = 0;
 	}
 	if ( m_envelopeHandle == (&(m_fades[3])) ) {
@@ -128,19 +128,21 @@ void EnvelopeDragHandler::FixEnvelopeCtrls()//TODO: Clean up the Mess
 		if (m_fades[2].x < m_fades[1].x ) {
 			m_fades[1].x = m_fades[2].x;
 		}
-	}
+	}*/
 }
 void EnvelopeDragHandler::Draw( wxDC &dc )
 {
-
-	m_view->Draw3dRect(
+	dc.SetDeviceOrigin( m_itemBoundaries.x, m_itemBoundaries.y );
+	m_item->Draw( dc, g_ggseqProps.GetZoom() );
+	dc.SetDeviceOrigin( 0, 0 );
+	
+/*	m_view->Draw3dRect(
 		&dc, m_itemBoundaries.x, m_itemBoundaries.y,
 		m_itemBoundaries.width, m_itemBoundaries.height,
 		m_item->GetSample()->GetColour()
 		);
 	
 	dc.SetPen( *wxBLACK_PEN );
-	dc.SetBrush( *wxWHITE_BRUSH );
-//	dc.DrawRectangle( m_itemBoundaries.x + m_item->m_x_test, m_itemBoundaries.y + m_item->m_y_test, 10, 10);
-	m_item->DrawEnvelope( dc, m_itemBoundaries.x, m_itemBoundaries.y, m_fades );
+	dc.SetBrush( *wxWHITE_BRUSH );*/
+	m_item->DrawEnvelope( dc, m_itemBoundaries.x, m_itemBoundaries.y, false );
 }

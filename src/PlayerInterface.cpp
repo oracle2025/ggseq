@@ -23,6 +23,7 @@
 #endif
 
 #include "stuff.h"
+#include "TLItem.h"
 #include "TLData.h"
 #include "TLSample.h"
 #include "UpdateListener.h"
@@ -126,6 +127,13 @@ LoopPlayer::LoopPlayer( float* sample, gg_tl_dat len )
 	m_loopSample = sample;
 	m_loopLen = len;
 	m_loopPos = 0;
+}
+LoopPlayer::~LoopPlayer()
+{
+	if ( m_loopSample ) {
+		delete [] m_loopSample;
+		m_loopSample = 0;
+	}
 }
 int LoopPlayer::FillBuffer( float *buffer, unsigned long frames )
 {

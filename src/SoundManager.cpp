@@ -25,9 +25,9 @@
 
 #include <portaudio.h>
 #include "stuff.h"
+#include "TLItem.h"
 #include "TLData.h"
 #include "TLTrack.h"
-#include "TLItem.h"
 #include "TLSample.h"
 #include "SoundManager.h"
 #include "UpdateListener.h"

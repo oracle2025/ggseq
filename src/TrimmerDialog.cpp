@@ -37,6 +37,7 @@
 #include "PlayerInterface.h"
 #include "SoundManager.h"
 #include "dial.h"
+#include "SampleEdit.h"
 
 float calc( int x )
 {
@@ -58,19 +59,25 @@ BEGIN_EVENT_TABLE(TrimmerDialog,wxDialog)
     EVT_TIMER(-1,TrimmerDialog::OnTimer)
 END_EVENT_TABLE()
 
-TrimmerDialog::TrimmerDialog( wxWindow *parent, TLItem *item /*, wxWindowID id, const wxString &title,
-    const wxPoint &position, const wxSize& size, long style*/ ) :
+TrimmerDialog::TrimmerDialog( wxWindow *parent,
+		    float *buffer, gg_tl_dat len,
+		    gg_tl_dat leftTrim,
+		    gg_tl_dat rightTrim, 
+		    float timestretch ) :
     wxDialog( parent, -1, wxT("Trimmer"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER )
 {
-    m_timer = new wxTimer(this);
-    m_item = item;
-    //m_playing = 0;
-    /*wxWindow *w = */new WaveEditor( this, item, ID_WAVE_EDITOR );
-    new wxDial( this, ID_TIMESTRETCH_DIAL, 50, 0, 100); // 0 -> 100 : 0.5 -> 1.5
-    //new wxDial( this, ID_VOLUME_DIAL, 0, -50, 50);
+    m_timer       = new wxTimer(this);
+    m_buffer      = buffer;
+    m_len         = len;
+    m_timestretch = timestretch;
+    new WaveEditor( this, buffer, len, leftTrim, rightTrim, ID_WAVE_EDITOR );
+    new wxDial( this, ID_TIMESTRETCH_DIAL, 50, 0, 100);
     
     // WDR: dialog function TrimmerDialogFunc for TrimmerDialog
     TrimmerDialogFunc2( this, TRUE ); 
+    GetTimestrechTextctrl()->SetValue(
+			wxString::Format( wxT("%.2f"), m_timestretch )
+		);
 }
 
 TrimmerDialog::~TrimmerDialog()
@@ -84,14 +91,11 @@ void TrimmerDialog::OnTimer(wxTimerEvent &event)
 {
     if (g_ggseqProps.GetSoundManager()->Done()) {
         g_ggseqProps.GetSoundManager()->Stop();
-//        m_playing = false;
 	GetLoopButton()->SetValue( false );
         GetWaveEditor()->HideCaret();
         m_timer->Stop();
     } else {
-        //m_slider->SetValue(m_soundManager->GetPosition());
-        //SetPosition(g_ggseqProps.GetSoundManager()->GetPosition());
-        GetWaveEditor()->UpdateCaret(m_amount);
+        GetWaveEditor()->UpdateCaret(m_timestretch);
     }
 }
 
@@ -101,44 +105,51 @@ void TrimmerDialog::OnVolume( wxScrollEvent &event )
 
 void TrimmerDialog::OnTimestretch( wxScrollEvent &event )
 {
-    if ( GetLoopButton()->GetValue() /*m_playing*/ ) {
-        m_timer->Stop();
-        g_ggseqProps.GetSoundManager()->Stop();
-//        m_playing = false;
-	GetLoopButton()->SetValue( false );
-    }
-    GetTimestrechTextctrl()->SetValue(
-        wxString::Format( wxT("%.2f"), calc( event.GetPosition() ) )
-        );
+	if ( GetLoopButton()->GetValue() ) {
+		m_timer->Stop();
+		g_ggseqProps.GetSoundManager()->Stop();
+		GetLoopButton()->SetValue( false );
+	}
+	m_timestretch = calc( event.GetPosition() );
+	GetTimestrechTextctrl()->SetValue(
+			wxString::Format( wxT("%.2f"), m_timestretch )
+		);
 }
 
 void TrimmerDialog::OnLoopButton( wxCommandEvent &event )
 {
-    //double amount;
-    if ( !GetTimestrechTextctrl()->GetValue().ToDouble( &m_amount ) )
-        return;
-    WaveEditor *we = GetWaveEditor();
-    m_item->Stretch( m_amount , we->m_leftTrim, we->m_rightTrim );
-    if ( !GetLoopButton()->GetValue()/*m_playing*/ ) {
-        g_ggseqProps.GetSoundManager()->Stop();
-    m_timer->Stop();
-    we->HideCaret();
-    } else {
-//      wxLogError(wxT("playsnd"));
-/*      g_ggseqProps.GetSoundManager()->Loop(
-                m_item->m_stretchedBuffer,
-                m_item->m_stretchedLen );*/
-    
-        g_ggseqProps.GetSoundManager()->Play(
-                new LoopPlayer( m_item->m_stretchedBuffer,
-                    m_item->m_stretchedLen )
-                );
-    m_timer->Start(100);
-    we->ShowCaret();
-    }
-    //m_playing = !m_playing;
+	WaveEditor *we = GetWaveEditor();
+	if ( !GetLoopButton()->GetValue()/*m_playing*/ ) {
+		g_ggseqProps.GetSoundManager()->Stop();
+		m_timer->Stop();
+		we->HideCaret();
+	} else {
+		SampleEdit pSampleEdit( m_buffer, m_len );
+		pSampleEdit.SetTempo( m_timestretch );
+		pSampleEdit.SetTrims( we->m_leftTrim, we->m_rightTrim );
+		int stretchedLen;
+		float *stretchedBuffer = pSampleEdit.Convert( stretchedLen );
+		g_ggseqProps.GetSoundManager()->Play(
+			new LoopPlayer( stretchedBuffer,
+				stretchedLen )
+			);
+		m_timer->Start(100);
+		we->ShowCaret();
+	}
 }
 
 
 
+gg_tl_dat TrimmerDialog::GetLeftTrim()
+{
+	return GetWaveEditor()->m_leftTrim;
+}
+gg_tl_dat TrimmerDialog::GetRightTrim()
+{
+	return GetWaveEditor()->m_rightTrim;
+}
+float TrimmerDialog::GetTimestretch()
+{
+	return m_timestretch;
+}
 

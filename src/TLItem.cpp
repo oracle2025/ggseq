@@ -21,6 +21,10 @@
 #ifndef WX_PRECOMP
     #include "wx/wx.h"
 #endif
+
+#include <wx/filename.h>
+
+#include <math.h>
 #include <sndfile.h>
 #include <soundtouch/SoundTouch.h>
 
@@ -29,69 +33,92 @@
 #include "TLTrack.h"
 #include "TLSample.h"
 #include "SampleEdit.h"
+#include "TLView.h"
 #include <iostream>
 
-/*
-typedef struct {
-	Env realEnvelope[4];
-	wxRect leftFadeIn;   //??
-	wxRect rightFadeIn;   //??
-	wxRect leftFadeOut;   //??
-	wxRect rightFadeOut;   //??
-	bool toggleEnvelope;
-	float timeStretch
-	gg_tl_dat trimStart;
-	gg_tl_dat trimEnd;
-} ItemMods;
 
- */
+
+////#define ZOOM_FACTOR;
+void GetRectsFromEnv( const NativeEnvData& e, gg_tl_dat SampleLength, wxRect *result )
+{
+	float yVariation = float ( TRACK_HEIGHT - RECT_LENGTH );
+	float xVariation = float ( SampleLength / g_ggseqProps.GetZoom() ) - RECT_LENGTH;
+	result[0] = wxRect( 0, (int)roundf(yVariation - e.leftFadeLevel * yVariation), RECT_LENGTH, RECT_LENGTH );
+	result[1] = wxRect( (int)roundf(e.leftFadePos * xVariation), (int)roundf(yVariation - e.middleLevel * yVariation), RECT_LENGTH, RECT_LENGTH );
+	result[2] = wxRect( (int)roundf(e.rightFadePos * xVariation), (int)roundf(yVariation - e.middleLevel * yVariation), RECT_LENGTH, RECT_LENGTH );
+	result[3] = wxRect( int(xVariation), (int)roundf(yVariation - e.rightFadeLevel * yVariation), RECT_LENGTH, RECT_LENGTH );
+}
+void GetEnvFromRects( NativeEnvData& e, const wxRect* rect, gg_tl_dat SampleLength )
+{
+	float yVariation   = float (TRACK_HEIGHT - RECT_LENGTH);
+	float xVariation   = float ( SampleLength / g_ggseqProps.GetZoom() ) - RECT_LENGTH;
+	e.leftFadeLevel  = (yVariation - rect[0].y) / yVariation;
+	e.leftFadePos    = rect[1].x / xVariation;
+	e.middleLevel    = (yVariation - rect[1].y) / yVariation;
+	e.rightFadeLevel = (yVariation - rect[3].y) / yVariation;
+	e.rightFadePos   = rect[2].x / xVariation;
+}
+void GetSampleEnvelope( EnvelopePoint *result, const NativeEnvData& e, gg_tl_dat SampleLength )
+{
+	result[0].x = 0;
+	result[0].y = e.leftFadeLevel;
+	result[1].x = e.leftFadePos * SampleLength;
+	result[1].y = e.middleLevel;
+	result[2].x = e.rightFadePos * SampleLength;
+	result[2].y = e.middleLevel;
+	result[3].x = SampleLength;
+	result[3].y = e.rightFadeLevel;
+}
 
 //TODO: trackNr überall eliminieren
-TLItem::TLItem(TLSample *sample/*, int trackNr*/ , gg_tl_dat position, long reference, GetItemTrackListener* trackListener )
+TLItem::TLItem(TLSample *sample , gg_tl_dat position, long reference, GetItemTrackListener* trackListener )
 {
 	m_sample=sample;
 	m_position=position;
 	m_sample->Ref();
 	m_selected=false;
 	m_toggleEnvelope = false;
-	//m_trackNr = trackNr;
 	m_referenceId = reference;
 	m_trackListener = trackListener;
-	//m_x_test = 10;
-	//m_y_test = 10;
-/*	m_leftFadeIn   = wxRect( 0, 0, 7, 7 );
-	m_rightFadeIn  = wxRect( 10, 0, 7, 7 );
-	m_leftFadeOut  = wxRect( 20, 0, 7, 7 );
-	m_rightFadeOut = wxRect( (int)(m_sample->GetLength() / ( 117600.0 / 31.0 )-7), 0, 7, 7 );
-	m_rightFadeIn.x = m_rightFadeOut.x / 2;
-	m_leftFadeOut.x = m_rightFadeIn.x;*/
-	m_fades[0]   = wxRect( 0, 0, 7, 7 );
-	m_fades[1]  = wxRect( 10, 0, 7, 7 );
-	m_fades[2]  = wxRect( 20, 0, 7, 7 );
-	m_fades[3] = wxRect( (int)(m_sample->GetLength() / ( 117600.0 / 31.0 )-7), 0, 7, 7 );
-	m_fades[1].x = m_fades[3].x / 2;
-	m_fades[2].x = m_fades[1].x;
-	GuiEnvToDataEnv();
+	m_nativeEnvData.leftFadeLevel  = 1.0;
+	m_nativeEnvData.leftFadePos    = 0.5;
+	m_nativeEnvData.middleLevel    = 1.0;
+	m_nativeEnvData.rightFadeLevel = 1.0;
+	m_nativeEnvData.rightFadePos   = 0.5;
+	
 	m_stretchedBuffer = 0;
+	m_stretchedLen = 0;
+	m_timestretch = 1.0;
+	m_leftTrim = 0;
+	m_rightTrim = m_sample->GetLength() / 2;
+	GetRectsFromEnv( m_nativeEnvData, GetLen(), m_guiEnvData );
+	GetSampleEnvelope( m_sampleEnvData, m_nativeEnvData, GetLen() );
 
 }
 void DrawWxRect( wxDC &dc, const wxRect &rect ) // TODO make Helper Functions File
 {
 	dc.DrawRectangle(rect.x, rect.y, rect.width, rect.height);
 }
-void TLItem::DrawEnvelope( wxDC &dc, int xOffset, int yOffset, wxRect *customFades )
+void TLItem::DrawEnvelope( wxDC &dc, int xOffset,
+		int yOffset,bool updateEnv,
+		wxRect *customFades,
+		float zoom )
 {
+	if (updateEnv) {
+		GetRectsFromEnv( m_nativeEnvData, GetLen(), m_guiEnvData );
+	}
 	dc.SetDeviceOrigin( xOffset, yOffset );
 	wxPoint lines[4];/* = {
 		wxPoint( m_leftFadeIn.x, m_leftFadeIn.y ),
 		wxPoint( m_rightFadeIn.x, m_rightFadeIn.y ),
 		wxPoint( m_leftFadeOut.x, m_leftFadeOut.y ),
 		wxPoint( m_rightFadeOut.x, m_rightFadeOut.y ) };*/
-	wxRect *fades = ( customFades ? customFades : m_fades );
+	wxRect *fades = ( customFades ? customFades : m_guiEnvData );
 	for ( int i = 0; i < 4; i++ ) {
 		lines[i] = wxPoint( fades[i].x, fades[i].y );
 	}
 	dc.DrawLines( 4, lines, 3, 3 );
+	dc.SetBrush(*wxWHITE_BRUSH);
 	for ( int i = 0; i < 4; i++ ) {
 		DrawWxRect( dc, fades[i] );
 	}
@@ -101,11 +128,11 @@ void TLItem::DrawEnvelope( wxDC &dc, int xOffset, int yOffset, wxRect *customFad
 	DrawWxRect( dc, m_rightFadeOut );*/
 	dc.SetDeviceOrigin( 0, 0 );
 }
-wxRect *TLItem::TouchingEnvelopeCtrl( int x, int y )
+wxRect *TLItem::GetEnvelopeHandle( int x, int y, float zoom )
 {
 	for ( int i = 0; i < 4; i++ ) {
-		if ( m_fades[i].Inside( x, y ) ) {
-			return &m_fades[i];
+		if ( m_guiEnvData[i].Inside( x, y ) ) {
+			return &m_guiEnvData[i];
 		}
 	}
 /*	if ( m_leftFadeIn.Inside( x, y ) ) {
@@ -204,19 +231,6 @@ typdef struct {
 	float y;  // 0.0 bis 1.0
 } Env;
 
-void TLItem::GuiEnvToDataEnv()
-{
-	m_realEnvelope[0].x = 0;
-	m_realEnvelope[0].y = float(m_leftFadeIn.y) / 18.0; //Trackhöhe;
-	m_realEnvelope[1].x = m_rightFadeIn.x * ( 117600.0 / 31.0 );
-	m_realEnvelope[1].y = float(m_rightFadeIn.y) / 18.0;
-	m_realEnvelope[2].x = m_leftFadeOut.x * ( 117600.0 / 31.0 );
-	m_realEnvelope[2].y = float(m_leftFadeOut.y)  / 18.0;
-	m_realEnvelope[3].x = m_rightFadeOut.x * ( 117600.0 / 31.0 );
-	m_realEnvelope[3].y = float(m_rightFadeOut.y)  / 18.0;
-}
-
-Env envelope[LEN_ENVELOPE];
 */
 #define LEN_ENVELOPE 4
 float TLItem::GetEnvelopValue( int position )
@@ -224,7 +238,7 @@ float TLItem::GetEnvelopValue( int position )
 	if ( !m_toggleEnvelope ) {
 		return 1.0;
 	}
-	EnvelopePoint *envelope = m_realEnvelope;
+	EnvelopePoint *envelope = m_sampleEnvData;
 	int p = 0;
 	while ( envelope[p + 1].x < position) {
 		p++;
@@ -239,37 +253,19 @@ float TLItem::GetEnvelopValue( int position )
 }
 void TLItem::GuiEnvToDataEnv()
 {
-	m_realEnvelope[0].x = 0;
-	m_realEnvelope[0].y = float(18 - m_fades[0].y) / 18.0; //Trackhöhe;
-	m_realEnvelope[1].x = int(m_fades[1].x * ( 117600.0 / 31.0 ) );
-	m_realEnvelope[1].y = float(18 - m_fades[1].y) / 18.0;
-	m_realEnvelope[2].x = int(m_fades[2].x * ( 117600.0 / 31.0 ) );
-	m_realEnvelope[2].y = float(18 - m_fades[2].y)  / 18.0;
-	m_realEnvelope[3].x = m_sample->GetLength();//int(m_rightFadeOut.x * ( 117600.0 / 31.0 ) );
-	m_realEnvelope[3].y = float(18 - m_fades[3].y)  / 18.0;
-}
-void TLItem::DataEnvToGuiEnv()
-{
-	m_fades[0].y = 18 - int( m_realEnvelope[0].y * 18.0 );
-	m_fades[1].y = 18 - int( m_realEnvelope[1].y * 18.0 );
-	m_fades[3].y = 18 - int( m_realEnvelope[3].y * 18.0 );
-	m_fades[2].y = m_fades[1].y;
-	m_fades[1].x = int( m_realEnvelope[1].x / ( 117600.0 / 31.0 ) );
-	m_fades[2].x = int( m_realEnvelope[2].x / ( 117600.0 / 31.0 ) );
-	//----
-/*	m_fades[0]   = wxRect( 0, 0, 7, 7 );
-	m_fades[1]  = wxRect( 10, 0, 7, 7 );
-	m_fades[2]  = wxRect( 20, 0, 7, 7 );
-	m_fades[3] = wxRect( (int)(m_sample->GetLength() / ( 117600.0 / 31.0 )-7), 0, 7, 7 );
-	m_fades[1].x = m_fades[3].x / 2;
-	m_fades[2].x = m_fades[1].x;*/
+	GetEnvFromRects( m_nativeEnvData, m_guiEnvData, GetLen() );
 }
 unsigned int TLItem::FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int count, bool mute, double volume)
 {
 	unsigned int written=0;
-	float *buffer = m_sample->GetBuffer();
+	float *buffer;
+	if (m_stretchedBuffer) {
+		buffer = m_stretchedBuffer;
+	} else {
+		buffer = m_sample->GetBuffer();
+	}
 	//float env[count];
-	if (m_position+GetLength()<pos)
+	if (m_position+GetLen()<pos)
 	{
 		return 0;
 	}
@@ -298,7 +294,7 @@ unsigned int TLItem::FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int co
 	 * size
 	 * Rest mit 1 auffüllen
 	 */
-	while(written<count && playingOffset<GetLength())
+	while(written<count && playingOffset<GetLen())
 	{
 		if (mute) {
 			outBuffer[written]=0.0;
@@ -313,9 +309,13 @@ unsigned int TLItem::FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int co
 	return written;
 
 }
-gg_tl_dat TLItem::GetLength()
+gg_tl_dat TLItem::GetLen()
 {
-	return m_sample->GetLength();
+	if (m_stretchedBuffer) {
+		return m_stretchedLen;
+	} else {
+		return m_sample->GetLength();
+	}
 }
 int TLItem::GetTrack()
 {
@@ -327,7 +327,7 @@ gg_tl_dat TLItem::GetPosition()
 }
 gg_tl_dat TLItem::GetEndPosition()
 {
-	return m_position+m_sample->GetLength();
+	return m_position+GetLen();
 }
 void TLItem::SetPosition(gg_tl_dat position)
 {
@@ -353,12 +353,106 @@ bool TLItem::IsSelected()
 	return m_selected;
 }
 long TLItem::GetReference() { return m_referenceId; }
-void TLItem::Stretch( float amount, gg_tl_dat trimStart, gg_tl_dat trimEnd )
+
+void TLItem::SetTrimNStretch( gg_tl_dat leftTrim,
+		gg_tl_dat rightTrim, float timestretch )
+//Stretch( float amount, gg_tl_dat trimStart, gg_tl_dat trimEnd )
 {
+	m_leftTrim = leftTrim;
+	m_rightTrim = rightTrim;
+	m_timestretch = timestretch;
 	SampleEdit pSampleEdit( m_sample->GetBuffer(), m_sample->GetLength() );
-	pSampleEdit.SetTempo( amount );
-	pSampleEdit.SetTrims( trimStart, trimEnd );
+	pSampleEdit.SetTempo( timestretch );
+	pSampleEdit.SetTrims( leftTrim, rightTrim );
 	int len;
 	m_stretchedBuffer = pSampleEdit.Convert( len );
 	m_stretchedLen = len;
+	GetRectsFromEnv( m_nativeEnvData, GetLen(), m_guiEnvData );
+	GetSampleEnvelope( m_sampleEnvData, m_nativeEnvData, GetLen() );
+}
+void TLItem::GetEnvelopeData( NativeEnvData &env )
+{
+	env = m_nativeEnvData;
+}
+void TLItem::GetNewEnvelopeData( NativeEnvData &env,
+		wxRect *handle )
+{
+	env = m_nativeEnvData;
+	float yVariation   = float (TRACK_HEIGHT - RECT_LENGTH);
+	float xVariation   = float ( GetLen() / g_ggseqProps.GetZoom() ) - RECT_LENGTH;
+	if ( handle == (&(m_guiEnvData[0])) ) {
+		env.leftFadeLevel  = (yVariation - handle->y) / yVariation;
+	}
+	else if ( handle == (&(m_guiEnvData[1])) ) {
+		env.leftFadePos    = handle->x / xVariation;
+		env.middleLevel    = (yVariation - handle->y) / yVariation;
+		env.rightFadePos   = m_guiEnvData[2].x / xVariation;
+	}
+	else if ( handle == (&(m_guiEnvData[2])) ) {
+		env.middleLevel    = (yVariation - handle->y) / yVariation;
+		env.rightFadePos   = handle->x / xVariation;
+		env.leftFadePos    = m_guiEnvData[1].x / xVariation;
+	}
+	else if ( handle == (&(m_guiEnvData[3])) ) {
+		env.rightFadeLevel = (yVariation - handle->y) / yVariation;
+	}
+}
+float *TLItem::GetTrimNStretchBuffer()
+{
+	return m_stretchedBuffer;
+}
+gg_tl_dat TLItem::GetLeftTrim()
+{
+	return m_leftTrim;
+}
+gg_tl_dat TLItem::GetRightTrim()
+{
+	return m_rightTrim;
+}
+float TLItem::GetTimestretch()
+{
+	return m_timestretch;
+}
+void TLItem::Draw( wxDC& dc, float zoom )
+{
+	wxBrush b1 = dc.GetBrush();
+	int width = GetLen()/ zoom;//3793;
+	TLView::Draw3dRect( &dc,0,0,width,25,m_sample->GetColour() );
+	dc.SetPen( *wxBLACK_PEN );
+	dc.SetClippingRegion( 0, 0, width, 25 );
+	dc.SetFont( *wxSMALL_FONT );
+	wxFileName fn( m_sample->GetFilename() );
+	dc.DrawText( fn.GetName(), 0, 1 );
+	dc.DestroyClippingRegion();
+}
+void TLItem::DragEnvelopeHandle( wxRect *handle )
+{
+	if ( handle == (&(m_guiEnvData[0])) ) {
+		handle->x = 0;
+	}
+	if ( handle == (&(m_guiEnvData[3])) ) {
+		handle->x = GetLen() / g_ggseqProps.GetZoom() - 7;
+	}
+	if ( handle == (&(m_guiEnvData[1])) ) {
+		m_guiEnvData[2].y = handle->y;
+		if (m_guiEnvData[2].x < m_guiEnvData[1].x ) {
+			m_guiEnvData[2].x = m_guiEnvData[1].x;
+		}
+	}
+	if ( handle == (&(m_guiEnvData[2])) ) {
+		m_guiEnvData[1].y = handle->y;
+		if (m_guiEnvData[2].x < m_guiEnvData[1].x ) {
+			m_guiEnvData[1].x = m_guiEnvData[2].x;
+		}
+	}
+}
+float *TLItem::GetBuffer() { return m_sample->GetBuffer(); }
+gg_tl_dat TLItem::GetBufferLen() { return m_sample->GetLength(); }
+float *TLItem::GetStretchedBuffer() { return m_stretchedBuffer; }
+
+void TLItem::SetEnvelopeData( const NativeEnvData &env )
+{
+	m_nativeEnvData = env;
+	GetRectsFromEnv( m_nativeEnvData, GetLen(), m_guiEnvData );
+	GetSampleEnvelope( m_sampleEnvData, m_nativeEnvData, GetLen() );
 }

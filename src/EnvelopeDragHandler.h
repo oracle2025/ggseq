@@ -38,7 +38,7 @@ class EnvelopeDragHandler : public MouseDragHandler
 		int          m_yOffset;
 		wxRect       m_itemBoundaries;
 		wxRect      *m_envelopeHandle;
-		wxRect       m_fades[4];
+//		wxRect       m_fades[4];
 	private: /* Helper Functions */
 		wxPoint      FitInside( wxPoint handlePos );
 		void         Draw( wxDC &dc );

@@ -94,7 +94,7 @@ void TLTrack::SortItems()
 	TLItemList::Node *node= m_itemList->GetLast();
 	if (node) {
 		TLItem *item=node->GetData();
-		m_length=item->GetLength()+item->GetPosition();
+		m_length=item->GetLen()+item->GetPosition();
 	}
 }
 gg_tl_dat TLTrack::GetLength()
@@ -159,12 +159,12 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 		item->SetAttribute("pos",tmp.mb_str());
 		
 /*		item->SetAttribute("envelope", wxString::Format( wxT("%d"), current->m_toggleEnvelope ).mb_str() );
-		item->SetAttribute("leftFadeLevel", wxString::Format( wxT("%d"), current-> ).mb_str() );
-		item->SetAttribute("leftFadePos", wxString::Format( wxT("%lld"), current-> ).mb_str() );
-		item->SetAttribute("middleLevel", wxString::Format( wxT("%d"), current-> ).mb_str() );
-		item->SetAttribute("rightFadeLevel", wxString::Format( wxT("%d"), current-> ).mb_str() );
-		item->SetAttribute("rightFadePos", wxString::Format( wxT("%lld"), current-> ).mb_str() );
-		item->SetAttribute("timestretch", wxString::Format( wxT("%d"), current-> ).mb_str() );
+		item->SetAttribute("leftFadeLevel", wxString::Format( wxT("%.30e"), current->m_nativeEnvData.leftFadeLevel ).mb_str() );
+		item->SetAttribute("leftFadePos", wxString::Format( wxT("%.30e"), current->m_nativeEnvData.leftFadePos ).mb_str() );
+		item->SetAttribute("middleLevel", wxString::Format( wxT("%.30e"), current->m_nativeEnvData.middleLevel ).mb_str() );
+		item->SetAttribute("rightFadeLevel", wxString::Format( wxT("%.30e"), current->m_nativeEnvData.rightFadeLevel ).mb_str() );
+		item->SetAttribute("rightFadePos", wxString::Format( wxT("%.30e"), current->m_nativeEnvData.rightFadePos ).mb_str() );*/
+/*		item->SetAttribute("timestretch", wxString::Format( wxT("%d"), current-> ).mb_str() );
 		item->SetAttribute("leftTrim", wxString::Format( wxT("%d"), current-> ).mb_str() );
 		item->SetAttribute("rightTrim", wxString::Format( wxT("%d"), current-> ).mb_str() );*/
 	}

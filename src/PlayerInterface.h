@@ -79,6 +79,7 @@ class LoopPlayer : public PlayerInterface
 	public:
 		// constructors and destructors
 		LoopPlayer( float* sample, gg_tl_dat len );
+		~LoopPlayer();
 
 		// method declarations
 		int FillBuffer( float *buffer, unsigned long frames );

@@ -56,10 +56,12 @@ class GgseqCommand
 		virtual ~GgseqCommand() {};
 		bool GetError();
 	protected:
+		TLItem *GetItem();
 		TLData *m_document;
 		long m_referenceId;
 		GgseqDocManager *m_docManager;
 		bool m_error;
+		TLItem *m_item;
 };
 
 class GgseqSingleItemCommand : public GgseqCommand
@@ -68,7 +70,8 @@ class GgseqSingleItemCommand : public GgseqCommand
 		wxString m_filename;
 		int64_t m_position;
 		unsigned int m_trackId; /*Track ID*/
-		wxRect m_FadeInOut[4]; //???
+		//wxRect m_FadeInOut[4]; //???
+		NativeEnvData m_envelopeData;
 		bool m_toggleEnvelope;
 };
 
@@ -90,8 +93,8 @@ class GgseqDeleteItemCommand : public GgseqSingleItemCommand
 		GgseqDeleteItemCommand( TLData *doc, TLItem *item );
 		void Do();
 		void Undo();
-	private:
-		TLItem *m_item;
+/*	private:
+		TLItem *m_item;*/
 };
 
 class GgseqMoveItemCommand : public GgseqSingleItemCommand
@@ -101,8 +104,8 @@ class GgseqMoveItemCommand : public GgseqSingleItemCommand
 		                      int64_t destPosition, unsigned int destTrackId );
 		void Do();
 		void Undo();
-	private:
-		TLItem *m_item;
+/*	private:
+		TLItem *m_item;*/
 };
 
 class GgseqBunchOfItemsCommand : public GgseqCommand
@@ -189,13 +192,16 @@ class GgseqMoveTrackCommand : public GgseqTrackCommand
 class GgseqEnvelopeItemCommand : public GgseqCommand
 {
 	public:
-		GgseqEnvelopeItemCommand( TLData *doc, TLItem *item, EnvelopePoint *envelope );
+		GgseqEnvelopeItemCommand( TLData *doc,
+				TLItem *item,
+				const NativeEnvData &envelope );
 		~GgseqEnvelopeItemCommand();
 		void Do();
 		void Undo();
 	private:
-		EnvelopePoint m_fades[4];
-		TLItem *m_item;
+		//EnvelopePoint m_fades[4];
+		NativeEnvData m_nativeEnvelope;
+//		TLItem *m_item;
 };
 class GgseqToggleEnvelopeItemCommand : public GgseqCommand
 {
@@ -205,10 +211,23 @@ class GgseqToggleEnvelopeItemCommand : public GgseqCommand
 		void Do();
 		void Undo();
 	private:
-		TLItem *m_item;
+//		TLItem *m_item;
 };
-class GgseqTrimNStretchItemCommand
+class GgseqTrimNStretchItemCommand : public GgseqCommand
 {
+	public:
+		GgseqTrimNStretchItemCommand(
+				TLData *doc, TLItem *item,
+				gg_tl_dat leftTrim,
+				gg_tl_dat rightTrim, float timestretch );
+		~GgseqTrimNStretchItemCommand();
+		void Do();
+		void Undo();
+	private:
+//		TLItem    *m_item;
+		gg_tl_dat  m_leftTrim;
+		gg_tl_dat  m_rightTrim;
+		float      m_timestretch;
 };
 class GgseqVolumeTrackCommand
 {

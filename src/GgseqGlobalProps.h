@@ -25,6 +25,7 @@ class MiniPlayerInterface;
 class FileInfoListener;
 class UpdateListener;
 class GgseqDocManager;
+class TLView;
 class GgseqGlobalProps
 {
 	public:
@@ -37,6 +38,7 @@ class GgseqGlobalProps
 		void SetFileInfoListener( FileInfoListener *fileInfoListener );
 		FileInfoListener *GetFileInfoListener();
 		void SetDocManager( GgseqDocManager *docManager );
+		void SetView( TLView *view );
 		GgseqDocManager *GetDocManager();
 		/*UpdateListener *GetProgressBar();
 		void SetProgressBar( UpdateListener *pBar );*/
@@ -58,6 +60,7 @@ class GgseqGlobalProps
 		FileInfoListener *m_fileInfoListener;
 		UpdateListener *m_pBar;
 		GgseqDocManager *m_docManager;
+		TLView *m_view;
 };
 extern GgseqGlobalProps g_ggseqProps;
 

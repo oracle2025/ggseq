@@ -201,7 +201,7 @@ void TLPanel::OnMouseMotion( wxMouseEvent& event )
 		return;
 	}
 	wxRect tmp_rect = m_view->GetItemBoundaries( item );
-	wxRect *envelopeHandle = item->TouchingEnvelopeCtrl( event.m_x - tmp_rect.x,
+	wxRect *envelopeHandle = item->GetEnvelopeHandle( event.m_x - tmp_rect.x,
 			event.m_y - tmp_rect.y );
 	if ( envelopeHandle && item->m_toggleEnvelope ) {
 		m_dragHandler = new EnvelopeDragHandler(
@@ -646,11 +646,23 @@ void TLPanel::OnEdit(wxMenuEvent& event)
 {
 	//Open super funky Sample-Editor Window
 	//m_EditItem;
-	TrimmerDialog dlg( this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(), m_EditItem );
+	TrimmerDialog dlg( this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),
+			m_EditItem->GetBuffer(),
+			m_EditItem->GetBufferLen(),
+			m_EditItem->GetLeftTrim(),
+			m_EditItem->GetRightTrim(),
+			m_EditItem->GetTimestretch() );
 	dlg.Centre();
 	if (dlg.ShowModal()==wxID_OK) {
-		
+		m_view->m_docManager->SubmitCommand(
+				new GgseqTrimNStretchItemCommand(
+					m_data, m_EditItem,
+					dlg.GetLeftTrim(),
+					dlg.GetRightTrim(),
+					dlg.GetTimestretch() )
+				);
 	}
-
 	m_EditItem = 0;
+	Refresh();
+
 }
