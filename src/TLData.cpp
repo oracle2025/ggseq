@@ -40,6 +40,7 @@
 #include "TLItem.h"
 #include "TLSample.h"
 #include "TLSampleManager.h"
+#include "GgseqDocManager.h"
 
 #include <wx/listimpl.cpp>
 WX_DEFINE_LIST(TLTrackList);
@@ -57,8 +58,9 @@ TLData::TLData()
 	m_updateListener=NULL;
 	m_masterVolume=1.0;
 	m_loop_enabled=false;
+	m_docManager = 0;
 }
-
+void TLData::SetDocManager(GgseqDocManager *docManager) { m_docManager = docManager; }
 TLData::~TLData()
 {
 	m_trackList.DeleteContents(true);
@@ -214,6 +216,7 @@ void TLData::loadXML(wxString filename)
 }
 void TLData::Clear()
 {
+	m_docManager->Reset();
 	for ( TLTrackList::Node *node = m_trackList.GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
 		current->Clear();

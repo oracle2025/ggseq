@@ -77,6 +77,15 @@ GgseqDocManager::~GgseqDocManager()
 	m_redoList.DeleteContents(true);
 	m_redoList.Clear();
 }
+void GgseqDocManager::Reset()
+{
+	m_commandList.DeleteContents(true);
+	m_commandList.Clear();
+	m_commandList.DeleteContents(false);
+	m_redoList.DeleteContents(true);
+	m_redoList.Clear();
+	m_redoList.DeleteContents(false);
+}
 void GgseqDocManager::SubmitCommand( GgseqCommand *command )
 {
 	command->SetDocManager(this);/*TODO eigentlich nur für AddItem nötig.*/

@@ -23,6 +23,7 @@
 
 class GgseqCommand;
 class GgseqUndoItem;
+class TLSelectionSet;
 WX_DECLARE_LIST(GgseqCommand, GgseqCommandList);
 WX_DECLARE_LIST(GgseqUndoItem, GgseqUndoItemList);
 
@@ -37,6 +38,7 @@ class GgseqDocManager
 		bool CanUndo();
 		bool CanRedo();
 		long GetNewRefId();
+		void Reset();
 	private:
 		TLData *m_document;
 		GgseqCommandList m_commandList;

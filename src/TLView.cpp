@@ -145,6 +145,7 @@ TLView::TLView(TLData *TlData)
 	m_gungirl=new wxIcon(gun_girl_xpm);	
 	m_SnapSuspended=false;
 	m_docManager = new GgseqDocManager( m_TlData );
+	m_TlData->SetDocManager(m_docManager);
 }
 void TLView::SuspendSnap() { m_SnapSuspended=true; }
 void TLView::ResumeSnap() { m_SnapSuspended=false; }

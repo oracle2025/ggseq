@@ -26,6 +26,7 @@ class TLTrack;
 class TLSampleManager;
 class TLColourManager;
 class UpdateListener;
+class GgseqDocManager;
 WX_DECLARE_LIST(TLTrack, TLTrackList);
 WX_DECLARE_HASH_MAP( unsigned int, TLItem*, wxIntegerHash, wxIntegerEqual, TLItemHash );
 
@@ -79,6 +80,7 @@ class TLData: public LoopSetupListener
 		void SetMasterVolume(float volume);
 		gg_tl_dat m_position;/*Wird während des Abspielens inkrementiert*/
 		TLItem* GetItem(long referenceId);
+		void SetDocManager(GgseqDocManager *docManager);
 	private:
 		gg_tl_dat m_loopPos1;
 		gg_tl_dat m_loopPos2;
@@ -98,6 +100,7 @@ class TLData: public LoopSetupListener
 		float m_masterVolume;
 		UpdateListener *m_updateListener;
 		TLItemHash m_allItemsHash;
+		GgseqDocManager *m_docManager;
 };
 
 #endif /*_TLDATA_H_*/
