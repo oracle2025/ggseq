@@ -1,3 +1,13 @@
+2004-11-24  Richard Spindler <richard.spindler AT gmail.com>
+
+ * Did the same as yesterday to Rubber Frame Selection
+ * Changed Email Address in Changeloh ;)
+
+2004-11-23  Richard Spindler <oracle2025@gmx.de>
+
+ * Moved all SelectionDrag stuff into a module using the same interface as the
+ Sample Dragging
+
 2004-11-01  Richard Spindler <oracle2025@gmx.de>
 
  * Modularized SampleDragging, Yeah, lets just modularize the other operations

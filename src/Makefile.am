@@ -14,6 +14,10 @@ ggseq_SOURCES = PreferencesDialog.h\
 		ggseq_ui.cpp\
 		MouseDragHandler.cpp\
 		MouseDragHandler.h\
+		SelectionDragHandler.cpp\
+		SelectionDragHandler.h\
+		RubberDragHandler.h\
+		RubberDragHandler.cpp\
                 ggseq_ui.h\
                 ggseq_ui_wdr.cpp\
 								colour_helper.h\

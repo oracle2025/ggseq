@@ -19,6 +19,9 @@
 #ifndef _MOUSE_DRAG_HANDLER_H_
 #define _MOUSE_DRAG_HANDLER_H_
 
+class TLItem;
+class wxDragImage;
+
 
 class MouseDragHandler
 {

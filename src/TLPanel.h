@@ -84,14 +84,11 @@ class TLPanel : public wxPanel
 		void DeleteControls(TLTrack *track);
 	private:
 		void DrawCaret(wxDC& dc);
-		void SetRubberframePen(wxDC* dc);
-		void StartRubberFrame(int x, int y);
-		void UpdateRubberFrame(int x, int y);
-		void EndRubberFrame(int x, int y);
-		void StartSelectionDrag(int x, int y, int width, int height);
-		void UpdateSelectionDrag(int x, int y);
+//		void SetRubberframePen(wxDC* dc);
+//		void StartRubberFrame(int x, int y);
+//		void UpdateRubberFrame(int x, int y);
+//		void EndRubberFrame(int x, int y);
 		void UpdateRulerTicks();
-		void EndSelectionDrag(int x, int y, bool copyOnDrag);
 		TLView *m_TlView;
 		BigScrollBar *m_scrollBar;
 		wxScrollBar *m_scrollBar2;
@@ -103,9 +100,7 @@ class TLPanel : public wxPanel
 #else
 		wxDragImage *m_dragImage;
 #endif
-		bool m_sampleDrag;
-		bool m_rubberDrag;
-		bool m_selectionDrag;
+//		bool m_rubberDrag;
 
 		int m_SampleDragItemWidth;
 
@@ -118,9 +113,9 @@ class TLPanel : public wxPanel
 		wxRect m_selectionFrame;
 		wxRect m_sampleFrame;
 		wxRect m_rubberFrame;
-		bool m_frameVisible;
-		void ShowFrame(wxRect& rect, wxDC* dc);
-		void HideFrame(wxRect& rect, wxDC* dc);
+//		bool m_frameVisible;
+//		void ShowFrame(wxRect& rect, wxDC* dc);
+//		void HideFrame(wxRect& rect, wxDC* dc);
 		void UpdateButtons();
 		Ruler *m_ruler;
 		int m_CaretPosition;

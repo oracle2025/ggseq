@@ -118,7 +118,7 @@ void SampleDragHandler::OnDrop( int x, int y, bool copy )
 #endif
   m_view->DoDrop( x - m_xOffset, y, m_item, m_xOffset, copy );
   //m_canvas->ResetScrollBar();// Could also be done in panel??
-  m_canvas->Refresh();
+  //m_canvas->Refresh();
 }
 
 

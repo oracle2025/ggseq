@@ -56,6 +56,8 @@
 #include "GgseqDocManager.h"
 #include "PreferencesDialog.h"
 #include "MouseDragHandler.h"
+#include "SelectionDragHandler.h"
+#include "RubberDragHandler.h"
 
 #define LEFT_OFFSET_TRACKS 52
 
@@ -104,10 +106,8 @@ TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar, Ruler *ruler, wxScro
 	m_TlView->SetSize( GetSize().GetWidth(), GetSize().GetHeight() );
 	m_CaretPosition = 0;
 	m_CaretVisible  = true;
-	m_sampleDrag    = false;
-	m_rubberDrag    = false;
-	m_selectionDrag = false;
-	m_frameVisible  = false;
+	//m_rubberDrag    = false;
+	//m_frameVisible  = false;
 	UpdateButtons();
 	SetSizeHints( 100, 200 );
 	m_ruler->SetListener( m_data );
@@ -168,27 +168,24 @@ void TLPanel::OnMouseMotion( wxMouseEvent& event )
     m_dragHandler->OnDrag( event.m_x, event.m_y );
     return;
   }
-	if ( m_rubberDrag ) {
+/*	if ( m_rubberDrag ) { //TODO: DELME
 		UpdateRubberFrame( event.m_x, event.m_y );
 		return;
-	}
-	if ( m_selectionDrag ) {
-		UpdateSelectionDrag( event.m_x, event.m_y );
-		return;
-	}
+	}*/
   /*Here STARTS the Handling of the Different Operations*/
 	if ( ! ( event.m_leftDown || event.m_rightDown ) )
 		return;
 	int c;
 	int d;
 	if ( m_TlView->IsSelectionAt( event.m_x, event.m_y, x_offset, y_offset, c, d ) ) {
-		StartSelectionDrag( event.m_x, event.m_y, c, d );
+		m_dragHandler = new SelectionDragHandler( this, m_TlView, c, d, event.m_x, event.m_y, x_offset, y_offset );
 		return;
 	}
 	TLItem *srcItem = m_TlView->GetDragItem( m_DragX, m_DragY );
 	if ( !srcItem ) {
 		if ( event.m_leftDown )
-			StartRubberFrame( event.m_x, event.m_y );
+			m_dragHandler = new RubberDragHandler( this, m_TlView, m_DragX, m_DragY, event.m_x, event.m_y );
+			//StartRubberFrame( event.m_x, event.m_y );
 		return;
 	} else {
 		/*item->top item->bottom item->left item->right*/
@@ -211,21 +208,18 @@ void TLPanel::OnMouseUp( wxMouseEvent& event )
 	else
 		m_TlView->ResumeSnap();
 
-	if ( m_rubberDrag ) {
+/*	if ( m_rubberDrag ) {
 		EndRubberFrame( event.m_x, event.m_y );
 		return;
-	}
+	}*/
   if ( m_dragHandler ) {
     m_dragHandler->OnDrop( event.m_x, event.m_y, event.RightUp() );
     delete m_dragHandler;
     m_dragHandler = NULL;
     ResetScrollBar();
+    Refresh();
     return;
   }
-	if ( m_selectionDrag ) {
-		EndSelectionDrag( event.m_x, event.m_y, event.RightUp() );
-		return;
-	}
 	if ( event.LeftUp() ) {
 		m_TlView->ClearSelection();
 		m_TlView->SelectTrack( event.m_y );
@@ -260,6 +254,7 @@ void TLPanel::OnDoubleClick( wxMouseEvent& event )
 		}
 	}
 }
+/*
 void TLPanel::StartRubberFrame( int x, int y )
 {
 	CaptureMouse();
@@ -309,77 +304,6 @@ void TLPanel::SetRubberframePen( wxDC* dc )
 	dc->SetBrush( *wxTRANSPARENT_BRUSH );
 	dc->SetPen( wxPen( *wxBLACK, 1, wxSHORT_DASH ) );
 }
-void TLPanel::StartSelectionDrag( int x, int y, int width, int height )
-{
-	int x_ = x-x_offset;
-	int y_ = y;
-	m_selectionDrag = true;
-	wxBitmap bitmap( width, height );
-	wxMemoryDC *dc = new wxMemoryDC();
-	dc->SelectObject( bitmap );
-	wxPen pen( *wxBLACK, 1, wxLONG_DASH );
-	dc->SetPen( pen );
-	dc->SetBrush( *wxGREEN_BRUSH );
-	dc->DrawRectangle( 0, 0, width, height );
-	wxBrush ab;
-	ab.SetStyle( wxTRANSPARENT );
-	dc->SetBrush( ab );
-	pen.SetColour( *wxWHITE );
-	pen.SetWidth( 3 );
-	pen.SetStyle( wxSOLID );
-	dc->SetPen( pen );
-	m_TlView->DrawSelection( dc );
-	pen.SetWidth( 1 );
-	pen.SetColour( *wxBLACK );
-	pen.SetStyle( wxLONG_DASH );
-	dc->SetPen( pen );
-	m_TlView->DrawSelection( dc );
-	delete dc;
-	wxMask *mask = new wxMask( bitmap, *wxGREEN );
-	bitmap.SetMask( mask );
-#ifdef __WXMSW__ 
-	m_dragImage = new wxGenericDragImage( bitmap );
-#else
-	m_dragImage = new wxDragImage( bitmap );
-#endif
-	m_dragImage->BeginDrag( wxPoint( 0, 0 ), this );
-	m_selectionFrame = wxRect( x_, y_, width, height );
-	int trackNr = m_TlView->GetTrackByY( y_ );
-	if ( trackNr >= 0 ) {
-		m_selectionFrame.y = trackNr * 30 + TOP_OFFSET_TRACKS - m_TlView->GetYScrollPosition(); //TODO
-	} else {
-		return;
-	}
-	m_selectionFrame.x = m_TlView->GetScreenSnapPosition( x_ );
-	m_dragImage->Move( wxPoint( m_selectionFrame.x, m_selectionFrame.y ) );
-	m_dragImage->Show();
-}
-void TLPanel::UpdateSelectionDrag( int x, int y )
-{
-	int x_ = x-x_offset;
-	int y_ = y;
-	int trackNr = m_TlView->GetTrackByY( y_ );
-	if ( trackNr < 0 ) {
-		m_dragImage->Hide();
-		return;
-	}
-	m_dragImage->Show();
-	m_selectionFrame.y = trackNr * 30 + TOP_OFFSET_TRACKS - m_TlView->GetYScrollPosition(); //TODO
-	m_selectionFrame.x = m_TlView->GetScreenSnapPosition( x_ );
-	m_dragImage->Move( wxPoint( m_selectionFrame.x, m_selectionFrame.y ) );
-}
-void TLPanel::EndSelectionDrag( int x, int y, bool copyOnDrag )
-{
-	int x_ = x - x_offset;
-	int y_ = y;
-	m_selectionDrag = false;
-	m_dragImage->Hide();
-	m_dragImage->EndDrag();
-	delete m_dragImage;
-	m_TlView->EndSelectionDrag( x_, y_, copyOnDrag, x_offset );
-	ResetScrollBar();
-	Refresh();
-}
 void TLPanel::ShowFrame( wxRect& rect, wxDC* dc )
 {
 	dc->DrawRectangle( rect.x, rect.y, rect.width, rect.height);
@@ -391,7 +315,7 @@ void TLPanel::HideFrame( wxRect& rect, wxDC* dc )
 		dc->DrawRectangle( rect.x, rect.y, rect.width, rect.height );
 	}
 	m_frameVisible = false;
-}
+}*/
 void TLPanel::OnScroll2( wxScrollEvent& event )
 {
 	m_TlView->SetYScrollPosition( event.GetPosition() );
