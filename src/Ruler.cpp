@@ -25,6 +25,8 @@
 #include "stuff.h"
 #include "Ruler.h"
 
+#define LEFT_OFFSET 55
+
 BEGIN_EVENT_TABLE(Ruler, wxPanel)
 	EVT_PAINT(Ruler::OnPaint)
 #ifdef __WXMSW__
@@ -72,9 +74,9 @@ void Ruler::OnPaint(wxPaintEvent& event)
 	long offs=m_position%m_snap;
 	wxString index_str;
 	dc.SetFont(*wxNORMAL_FONT);
-	for (int i=0;m_snap*i-offs<GetSize().GetWidth();i++) {
+	for (int i=0;m_snap*i-offs+LEFT_OFFSET<GetSize().GetWidth();i++) {
 		index_str << index;
-		dc.DrawText(index_str,m_snap*i-offs-3,-2);
+		dc.DrawText(index_str,m_snap*i-offs-3+LEFT_OFFSET,-2);
 		index_str = wxT("");
 		index++;
 	}
@@ -84,7 +86,7 @@ void Ruler::OnLeftDown(wxMouseEvent& event)
 	m_pos1=event.GetX()+m_position;
 	CaptureMouse();
 }
-void Ruler::GetLoop(int* pos1, int* pos2)
+void Ruler::GetLoop(gg_tl_dat* pos1, gg_tl_dat* pos2)
 {
 	*pos1=m_pos1;
 	*pos2=m_pos2;
@@ -93,8 +95,12 @@ void Ruler::OnLeftUp(wxMouseEvent& event)
 {
 	ReleaseMouse();
 	m_pos2=event.GetX()+m_position;
+	if (m_pos1<LEFT_OFFSET)
+		m_pos1=LEFT_OFFSET;
+	if (m_pos2<LEFT_OFFSET)
+		m_pos2=LEFT_OFFSET;
 	if (m_listener)
-		m_listener->SetLoopSnaps((m_pos1*117600)/31, (m_pos2*117600)/31);
+		m_listener->SetLoopSnaps(((m_pos1-LEFT_OFFSET)*117600)/31, ((m_pos2-LEFT_OFFSET)*117600)/31);//TODO: Zoomstufen berücksichtigen.
 	Refresh();
 }
 void Ruler::OnMouseMotion(wxMouseEvent& event)

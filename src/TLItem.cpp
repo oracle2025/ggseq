@@ -25,17 +25,19 @@
 
 #include "stuff.h"
 #include "TLItem.h"
+#include "TLTrack.h"
 #include "TLSample.h"
 #include <iostream>
-
-TLItem::TLItem(TLSample *sample, int trackNr, gg_tl_dat position, long reference )
+//TODO: trackNr überall eliminieren
+TLItem::TLItem(TLSample *sample/*, int trackNr*/ , gg_tl_dat position, long reference, GetItemTrackListener* trackListener )
 {
 	m_sample=sample;
 	m_position=position;
 	m_sample->Ref();
 	m_selected=false;
-	m_trackNr = trackNr;
+	//m_trackNr = trackNr;
 	m_referenceId = reference;
+	m_trackListener = trackListener;
 }
 TLItem::~TLItem()
 {
@@ -80,7 +82,7 @@ gg_tl_dat TLItem::GetLength()
 }
 int TLItem::GetTrack()
 {
-	return m_trackNr;
+	return m_trackListener->GetTrackNr();//m_trackNr;
 }
 gg_tl_dat TLItem::GetPosition()
 {

@@ -1,3 +1,11 @@
+2004-06-05  Richard Spindler <oracle2025@gmx.de>
+
+ * More the 8 Tracks implemented
+
+2004-05-18  Richard Spindler <oracle2025@gmx.de>
+
+ * GUI converted to a wxDesigner based Layout
+
 2004-04-25  Richard Spindler <oracle2025@gmx.de>
 
  * big samples won't crash the Program anymore

@@ -37,11 +37,13 @@ class MiniPlayerInterface;
 class Ruler; 
 class UpdateListener;
 class BigScrollBar;
+class TLTrack;
 
 class TLPanel : public wxPanel
 {
 	public:
-		TLPanel(wxWindow* parent, BigScrollBar *scrollbar );
+		TLPanel(wxWindow* parent, BigScrollBar *scrollbar,
+			Ruler *ruler, wxScrollBar *scrollbar2, wxWindowID id = -1 );
 
 		/*,wxWindowID id = -1,const wxPoint& pos = wxDefaultPosition,const wxSize& size = wxDefaultSize,long style = wxTAB_TRAVERSAL,const wxString& name = wxT("panel")*/
 		~TLPanel();
@@ -54,7 +56,7 @@ class TLPanel : public wxPanel
 		void OnMouseMotion(wxMouseEvent& event);
 		void OnDoubleClick(wxMouseEvent& event);
 		void OnScroll(wxScrollEvent& event);
-
+		void OnScroll2(wxScrollEvent& event);
 		void ResetScrollBar();
 		void DropFileAt(int x, int y, wxString filename);
 
@@ -70,8 +72,7 @@ class TLPanel : public wxPanel
 		void StopAll();
 		void WavExport();
 		bool UpdateCaret();
-		void SetColours(wxString path);		
-		void SetSnap();
+		void SetPrefs();
 		SoundManager *GetSoundManager();
 		void SetMiniPlayer(MiniPlayerInterface *mp);
 		void SetUpdateListener(UpdateListener *updateListener);
@@ -79,6 +80,11 @@ class TLPanel : public wxPanel
 		void SetMasterVolume(float volume);
 		void Undo();
 		void Redo();
+		void AddTrack();
+		void DeleteTrack();
+
+		void AddControls(TLTrack *track);
+		void DeleteControls(TLTrack *track);
 	private:
 		void DrawCaret(wxDC& dc);
 		void SetRubberframePen(wxDC* dc);
@@ -94,6 +100,7 @@ class TLPanel : public wxPanel
 		void EndSelectionDrag(int x, int y, bool copyOnDrag);
 		TLView *m_TlView;
 		BigScrollBar *m_scrollBar;
+		wxScrollBar *m_scrollBar2;
 		TLData *m_data;
 		TLLoadSaveManager *m_loadSaveManager;
 		SoundManager *m_soundManager;
@@ -104,8 +111,6 @@ class TLPanel : public wxPanel
 #else
 		wxDragImage *m_dragImage;
 #endif
-		TLMuteButton *m_buttons[8];
-		TLTrackVolumeDial *m_dials[8];
 		bool m_sampleDrag;
 		bool m_rubberDrag;
 		bool m_selectionDrag;
@@ -130,8 +135,7 @@ class TLPanel : public wxPanel
 		Ruler *m_ruler;
 		int m_CaretPosition;
 		bool m_CaretVisible;
-		int FromTLtoSB(gg_tl_dat x);
-		gg_tl_dat FromSBtoTL(int x);
+		bool m_DeleteFromGUI;
 		DECLARE_EVENT_TABLE()
 };
 

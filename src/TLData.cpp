@@ -35,8 +35,8 @@
 #include "tinyxml.h"
 
 #include "Ruler.h"
-#include "TLData.h"
 #include "TLTrack.h"
+#include "TLData.h"
 #include "TLItem.h"
 #include "TLSample.h"
 #include "TLSampleManager.h"
@@ -50,6 +50,7 @@ WX_DEFINE_LIST(TLTrackList);
 TLData::TLData()
 {
 	m_sampleManager=new TLSampleManager();
+	m_trackList = new TLTrackList();
 	m_blocked=false;
 	m_changed=false;
 	m_filename=wxT("");
@@ -59,17 +60,20 @@ TLData::TLData()
 	m_masterVolume=1.0;
 	m_loop_enabled=false;
 	m_docManager = 0;
+	m_trackReferenceCounter = 1;
+	m_trackList->DeleteContents(true);
+	m_panel = 0;
 }
 void TLData::SetDocManager(GgseqDocManager *docManager) { m_docManager = docManager; }
 TLData::~TLData()
 {
-	m_trackList.DeleteContents(true);
-	m_trackList.Clear();
+	m_trackList->Clear();
+	delete m_trackList;
 	delete m_sampleManager;
 }
 int TLData::GetTrackCount()
 {
-	return m_trackList.GetCount();
+	return m_trackList->GetCount();
 }
 void TLData::SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2)
 {
@@ -81,12 +85,12 @@ void TLData::SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2)
 }
 TLTrackList::Node *TLData::GetFirst()
 {
-	return m_trackList.GetFirst();
+	return m_trackList->GetFirst();
 }
 
 TLItem *TLData::ItemAtPos(gg_tl_dat Position, int TrackNr)
 {
-	TLTrack *tlTrack = m_trackList.Item(TrackNr)->GetData();
+	TLTrack *tlTrack = m_trackList->Item(TrackNr)->GetData();
 	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::ItemAtPos!" );
 	if (!tlTrack)
 		return (TLItem*)NULL;
@@ -95,7 +99,7 @@ TLItem *TLData::ItemAtPos(gg_tl_dat Position, int TrackNr)
 
 void TLData::DeleteItem( TLItem *item, int TrackNr/*, long referenceId */)
 {
-	TLTrack *tlTrack = m_trackList.Item(TrackNr)->GetData();
+	TLTrack *tlTrack = m_trackList->Item(TrackNr)->GetData();
 	long referenceId = item->GetReference();
 	TLSample *sample=item->GetSample();
 	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::DeleteItem!" );
@@ -113,7 +117,7 @@ void TLData::ClearSample(TLSample *sample)
 
 TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long referenceId )
 {
-	TLTrackList::Node *node =  m_trackList.Item(TrackNr);
+	TLTrackList::Node *node =  m_trackList->Item(TrackNr);
 	if (!node)
 		return NULL;
 	TLTrack *tlTrack = node->GetData();
@@ -130,7 +134,7 @@ TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long 
 }
 TLItem *TLData::AddItem(wxString& filename, gg_tl_dat Position, int TrackNr, long referenceId )
 {
-	TLTrack *tlTrack = m_trackList.Item(TrackNr)->GetData();
+	TLTrack *tlTrack = m_trackList->Item(TrackNr)->GetData();
 	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::AddItem!" );
 	if (!tlTrack)
 		return NULL;
@@ -151,7 +155,7 @@ TLItem *TLData::AddItem(wxString& filename, gg_tl_dat Position, int TrackNr, lon
 void TLData::SortAll()/*m_length aktualisieren*/
 {
 	m_length=0;
-	for ( TLTrackList::Node *node = m_trackList.GetFirst(); node; node = node->GetNext() ) {
+	for ( TLTrackList::Node *node = m_trackList->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
 		current->SortItems();
 		if (current->GetLength()>m_length) { m_length=current->GetLength(); }
@@ -159,13 +163,34 @@ void TLData::SortAll()/*m_length aktualisieren*/
 	ResetOffsets();
 }
 
-void TLData::AddTrack()
+void TLData::AddTrack( /*long referenceId,*/ int trackPos )
 {
-	m_trackList.Append(new TLTrack(m_trackList.GetCount()));
+	/*if (referenceId<=0) {
+		referenceId = m_trackReferenceCounter;
+		m_trackReferenceCounter++;
+	}*/
+	TLTrack *track = new TLTrack(/*m_trackList->GetCount(),*/ this, m_panel);
+	if ( trackPos < 0 ) {
+		m_trackList->Append(track);
+	} else {
+		m_trackList->Insert(trackPos, track);
+	}
 }
+void TLData::DeleteTrack(int TrackNr)
+{
+//	TLTrack *track = m_trackList
+	if (TrackNr<0)
+		TrackNr = m_trackList->GetCount()-1;
+	TLTrackList::Node *node = m_trackList->Item( TrackNr );
+	m_trackList->DeleteNode( node );
+}
+/*int TLData::GetTrackNrFromRef( long referenceId )
+{
+	m_trackList->Find(referenceId)->IndexOf();
+}*/
 void TLData::ResetOffsets()
 {
-	for ( TLTrackList::Node *node = m_trackList.GetFirst(); node; node = node->GetNext() ) {
+	for ( TLTrackList::Node *node = m_trackList->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
 		current->ResetOffsets();
 	}
@@ -209,19 +234,26 @@ void TLData::loadXML(wxString filename)
 	m_filename=filename;
 /*	SimpleUpdateListener listener;*/
 	m_updateListener->StartUpdateProcess();
-	loader.LoadFile(filename,m_updateListener/*&listener*/);
+	loader.LoadFile(filename,m_updateListener/*&listener*/ );
 	m_updateListener->EndUpdateProcess();
 	m_changed=false;
 
 }
-void TLData::Clear()
+void TLData::Clear() //TODO: auch wieder 8 Tracks herstellen.
 {
 	m_docManager->Reset();
-	for ( TLTrackList::Node *node = m_trackList.GetFirst(); node; node = node->GetNext() ) {
+	for ( TLTrackList::Node *node = m_trackList->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
 		current->Clear();
 	}
 	m_sampleManager->ClearAll();
+	while(GetTrackCount()>8) {
+		DeleteTrack(0);
+	}
+	while(GetTrackCount()<8) {
+		AddTrack(-1);
+	}
+
 	m_changed=false;
 	m_filename=wxT("");
 }
@@ -243,9 +275,9 @@ bool TLData::printXML(wxString filename)
 
 	TiXmlElement *tracks = new TiXmlElement("tracks");
 	el->LinkEndChild(tracks);
-	tracks->SetAttribute("count",8);
+	tracks->SetAttribute("count",GetTrackCount());
 
-	for ( TLTrackList::Node *node = m_trackList.GetFirst(); node; node = node->GetNext() ) {
+	for ( TLTrackList::Node *node = m_trackList->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
 		current->addXmlData(tracks);
 	}
@@ -379,18 +411,12 @@ unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 	float buffer2[count];
 	unsigned int maxResultCount=0;
 	unsigned int rv;
-	TLTrackList::Node *node = m_trackList.GetFirst();
-/*	while(node->GetData()->IsMuted()) {
-		node = node->GetNext();
-	}*/
+	TLTrackList::Node *node = m_trackList->GetFirst();
 	if (!node)
 		return 0;
 	rv=node->GetData()->FillBuffer(buffer1,count,m_position);/*first Track*/
 	maxResultCount=rv;
 	node = node->GetNext();
-/*	while(node->GetData()->IsMuted()) {
-		node = node->GetNext();
-	}*/
 	if (!node) { /*Only one Track*/
 		for (unsigned int i=0; i<count; i++)
 			outBuffer[i]=buffer1[i];
@@ -421,12 +447,18 @@ unsigned int TLData::FillBuffer(float* outBuffer, unsigned int count)
 unsigned int TLData::MixChannels(float *A, float *B, float* out, unsigned int count)/*Mix function for (-1)-(1) float audio*/
 {
 	unsigned int i;
-	for ( i=0; i < count;i++){
-		if (A[i]<0 && B[i]<0) {
-			out[i]=(A[i]+1)*(B[i]+1)-1;
+	float *p_output = out;
+	float *p_A = A;
+	float *p_B = B;
+	for ( i=count; i > 0;i--){
+		if (*p_A<0 && *p_B<0) {
+			*p_output =(*p_A+1)*(*p_B+1)-1;
 		} else {
-			out[i]=2*(A[i]+B[i]+2)-(A[i]+1)*(B[i]+1)-3;
+			*p_output =2*(*p_A+*p_B+2)-(*p_A+1)*(*p_B+1)-3;
 		}
+		p_output++;
+		p_A++;
+		p_B++;
 
 	}
 	return count;
@@ -437,7 +469,7 @@ TLColourManager *TLData::GetColourManager()
 }
 void TLData::SetTrackMute(bool mute, int TrackNr)
 {
-	TLTrackList::Node *node =  m_trackList.Item(TrackNr);
+	TLTrackList::Node *node =  m_trackList->Item(TrackNr);
 	if (!node)
 		return;
 	TLTrack *tlTrack = node->GetData();
@@ -450,7 +482,7 @@ void TLData::SetTrackMute(bool mute, int TrackNr)
 }
 void TLData::SetTrackVolume(double vol, int TrackNr)
 {
-	TLTrackList::Node *node =  m_trackList.Item(TrackNr);
+	TLTrackList::Node *node =  m_trackList->Item(TrackNr);
 	if (!node)
 		return;
 	TLTrack *tlTrack = node->GetData();
@@ -477,4 +509,20 @@ TLItem* TLData::GetItem(long referenceId)
 {
 	return m_allItemsHash[referenceId];
 }
+void TLData::SelectTrack( int TrackNr )
+{
+	for ( TLTrackList::Node *node = m_trackList->GetFirst(); node; node = node->GetNext() ) {
+		TLTrack *current = node->GetData();
+		current->SetSelected(false);
+	}
 
+	TLTrackList::Node *node =  m_trackList->Item(TrackNr);
+	if (!node)
+		return;
+	TLTrack *tlTrack = node->GetData();
+	tlTrack->SetSelected(true);
+}
+int TLData::GetTrackNr(TLTrack *track)
+{
+	return m_trackList->IndexOf(track);
+}

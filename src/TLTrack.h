@@ -26,15 +26,28 @@ class TiXmlElement;
 
 WX_DECLARE_LIST(TLItem, TLItemList);
 
-class TLTrack
+class TLMuteButton;
+class TLTrackVolumeDial;
+class GetTrackNrListener;
+class GetItemTrackListener
 {
 	public:
-		TLTrack(int trackNr);
+		virtual ~GetItemTrackListener(){};
+		virtual int GetTrackNr()=0;
+};
+
+class TLPanel;
+
+class TLTrack : public GetItemTrackListener
+{
+	public:
+		TLTrack( GetTrackNrListener *trackListener, TLPanel* panel );
 		~TLTrack();
 
 		TLItemList::Node *GetFirst();
 		TLItem *ItemAtPos(gg_tl_dat Position);
 		TLItem *AddItem(TLSample *sample, gg_tl_dat position, long referenceId );
+		int GetTrackNr();
 		void DeleteItem(TLItem *item/*, long referenceId*/);
 
 		int GetHeight();
@@ -49,14 +62,22 @@ class TLTrack
 		double GetVolume();
 		bool IsMuted();
 		void addXmlData(TiXmlElement *tracks);
+		bool GetSelected() {return m_selected;};
+		void SetSelected(bool selected) {m_selected = selected;};
+		TLMuteButton *m_muteButton;
+		TLTrackVolumeDial *m_volumeDial;
 	private:
+		TLPanel *m_panel;
+		GetTrackNrListener *m_trackListener;
 		TLItemList *m_itemList;// = TLItemList(wxKEY_INTEGER);
 		int m_height;
-		int m_trackNr;
+		//int m_trackNr;
 		bool m_mute;
+		bool m_selected;
 		double m_volume;
 		gg_tl_dat m_length;
 		TLItemList::Node *m_currentNode;
+		//long m_referenceId;
 };
 
 #endif /*_TLTRACK_H_*/

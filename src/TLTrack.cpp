@@ -26,6 +26,8 @@
 #include "TLTrack.h"
 #include "TLItem.h"
 #include "TLSample.h"
+#include "TLData.h"
+#include "TLPanel.h"
 
 /*XML*/
 #include "tinyxml.h"
@@ -33,18 +35,27 @@
 #include <wx/listimpl.cpp>
 WX_DEFINE_LIST(TLItemList);
 
-TLTrack::TLTrack(int trackNr)
+TLTrack::TLTrack(/*int trackNr,*/ GetTrackNrListener *trackListener, TLPanel* panel)
 {
 	m_itemList = new TLItemList(wxKEY_INTEGER);
 	m_height=25;
-	m_trackNr=trackNr;
+//	m_trackNr=trackNr;
 	m_itemList->DeleteContents(true);
 	m_volume=1.0;
 	m_mute=false;
 	m_length=0;
+	m_selected = 0;
+	m_trackListener = trackListener;
+	m_panel = panel;
+	m_panel->AddControls(this);
+}
+int TLTrack::GetTrackNr()
+{
+	return m_trackListener->GetTrackNr(this);
 }
 TLTrack::~TLTrack()
 {
+	m_panel->DeleteControls(this);
 	m_itemList->Clear();
 	delete m_itemList;
 	m_itemList = (TLItemList*) 0;
@@ -70,7 +81,7 @@ void TLTrack::DeleteItem(TLItem *item /*, long referenceId*/)
 }
 TLItem *TLTrack::AddItem(TLSample *sample, gg_tl_dat position, long referenceId )
 {
-	TLItem *tmp = new TLItem(sample,m_trackNr,position, referenceId);
+	TLItem *tmp = new TLItem(sample,/*m_trackNr,*/position, referenceId, this);
 	m_itemList->Append(referenceId, tmp);
 	return tmp;
 }
@@ -170,4 +181,5 @@ double TLTrack::GetVolume()
 {
 	return m_volume;
 }
+//long TLTrack::GetReference() { return m_referenceId; }
 

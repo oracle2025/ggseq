@@ -9,7 +9,14 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 bin_PROGRAMS = ggseq
-ggseq_SOURCES = MiniFilerTest.cpp\
+ggseq_SOURCES = PreferencesDialog.h\
+                PreferencesDialog.cpp\
+		ggseq_ui.cpp\
+                ggseq_ui.h\
+                ggseq_ui_wdr.cpp\
+                ggseq_ui_wdr.h\
+                ui_helper.cpp\
+                ui_helper.h\
                 tinyxmlparser.cpp\
                 TLMiniFiler2.cpp\
                 TLSelectionSet.cpp\
@@ -27,8 +34,6 @@ ggseq_SOURCES = MiniFilerTest.cpp\
                 TLXmlLoader2.cpp\
                 tinyxmlerror.cpp\
                 TLLoadSaveManager.cpp\
-                TLSelectColourDialog.cpp\
-		TLSetSnapDialog.cpp\
 		TLMuteButton.cpp\
 		dial.cpp\
 		dial.h\
@@ -66,13 +71,12 @@ ggseq_SOURCES = MiniFilerTest.cpp\
                 TLPanel.h\
                 TLSample.h\
                 TLSampleManager.h\
-                TLSelectColourDialog.h\
                 TLSelectionSet.h\
                 TLTrack.h\
                 TLView.h\
                 TLXmlLoader2.h\
-		TLSetSnapDialog.h\
 		TLMuteButton.h
+                #MiniFilerTest.cpp
 
 ggseq_LDFLAGS = $(CLIBS) @SNDFILE_LIBS@ @SAMPLERATE_LIBS@ -lportaudio `wx-config --libs`
 #ggseq_LDFLAGS = $(CLIBS)  `wx-config --libs`

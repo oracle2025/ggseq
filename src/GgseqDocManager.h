@@ -26,6 +26,7 @@ class GgseqUndoItem;
 class TLSelectionSet;
 WX_DECLARE_LIST(GgseqCommand, GgseqCommandList);
 WX_DECLARE_LIST(GgseqUndoItem, GgseqUndoItemList);
+class TLPanel;
 
 class GgseqDocManager
 {
@@ -120,9 +121,11 @@ class GgseqMoveItemCommand : public GgseqSingleItemCommand
 
 class GgseqBunchOfItemsCommand : public GgseqCommand
 {
+	public:
 	/*
 	ItemList
 	 */
+	virtual ~GgseqBunchOfItemsCommand();
 	protected:
 		GgseqUndoItemList m_itemList;
 };
@@ -169,5 +172,35 @@ class GgseqDeleteItemsCommand : public GgseqBunchOfItemsCommand
 		void Undo();
 };
 
+class GgseqTrackCommand : public GgseqCommand
+{
+	public:
+		virtual ~GgseqTrackCommand();
+	protected:
+		GgseqUndoItemList m_itemList;/*nur die TrackID ignorieren.*/
+		//long m_referenceId;
+		int m_trackNr;
+		TLPanel *m_panel;
+};
+
+class GgseqDeleteTrackCommand : public GgseqTrackCommand
+{
+	public:
+		GgseqDeleteTrackCommand( TLData *doc, TLTrack *track, TLPanel *panel );
+		void Do();
+		void Undo();
+};
+class TLPanel;
+class GgseqAddTrackCommand : public GgseqTrackCommand
+{
+	public:
+		GgseqAddTrackCommand( TLData *doc, int trackNr=-1, TLPanel *panel=0 );
+		void Do();
+		void Undo();
+};
+class GgseqMoveTrackCommand : public GgseqTrackCommand
+{
+};
+//TODO: Die ganzen Listen beim beenden löschen.
 #endif /* _GGSEQ_DOC_MANAGER_H_ */
 

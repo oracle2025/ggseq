@@ -25,7 +25,6 @@ class TLItem;
 class TLSample;
 class TLTrack;
 class TLSelectionSet;
-//class DnDData;
 class GgseqDocManager;
 
 class TLView
@@ -54,7 +53,8 @@ class TLView
 		void ClearSelection();
 
 		TLItem *GetDragItem(long x, long y);
-		void DoDrop(long x, long y, TLItem *item, long srcTrack, long x_offset, bool copy=false);
+		void DoDrop( long x, long y, TLItem *item,
+			long srcTrack, long x_offset, bool copy=false);
 
 		void SetPlaybackPosition(long Position);
 		long GetCaretPosition();
@@ -64,24 +64,28 @@ class TLView
 		long FromTLtoScreenX(gg_tl_dat x);
 		TLSample *GetSample(long position, long trackNr);
 		long GetScreenSnapPosition(long position);
-		
-		bool IsSelectionAt(int x, int y, int& x_offset, int& y_offset, int& width, int& height);
+		bool IsSelectionAt(int x, int y, int& x_offset,
+			int& y_offset, int& width, int& height);
 		void DrawSelection(wxDC *dc);
-		static void Draw3dRect(wxDC *dc, wxCoord x, wxCoord y, wxCoord width, wxCoord height, wxColour colour);
+		static void Draw3dRect(wxDC *dc, wxCoord x,
+			wxCoord y, wxCoord width, wxCoord height, wxColour colour);
 		void EndSelectionDrag(int x, int y, bool copy, long x_offset);
 		void SetSnapValue(long snapValue);
 		long GetSnapValue();
-
 		static wxColour GetDarkColour(wxColour colour);
 		static wxColour GetLightColour(wxColour colour);
 		void SuspendSnap();
 		void ResumeSnap();
 		void Undo();
 		void Redo();
-	private:
+		void SelectTrack(long y);
+		void SetYScrollPosition( long position ){m_YscrollPosition=position;};
+		long GetYScrollPosition() {return m_YscrollPosition;};
+		void UpdateDialsAndButtons();
 		GgseqDocManager *m_docManager;
+	private:
+		long m_YscrollPosition;
 		gg_tl_dat GetSnap(gg_tl_dat x);
-		void SnapItem(TLItem *item);/*kommt evtl. nach TLData*/
 		long DrawTrack(wxDC& dc_screen, long yoffset, TLTrack* track);
 		bool m_SnapSuspended;
 		TLData *m_TlData;
@@ -89,15 +93,12 @@ class TLView
 		gg_tl_dat m_LengthVisible;
 		gg_tl_dat m_PositionVisible;
 		float m_Faktor;
-//		gg_tl_dat m_Length;
 		long m_FrameX;
 		long m_FrameY;
 		long m_FrameWidth;
 		long m_FrameHeight;
 		long m_TrackDrawDist;
 		wxIcon *m_gungirl;
-
-//		long m_CaretPosition;
 };
 
 #endif /*_TLVIEW_H_*/

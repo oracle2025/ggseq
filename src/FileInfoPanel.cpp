@@ -31,7 +31,10 @@ enum
 	ID_TEXTCTRL
 };
 
-FileInfoPanel::FileInfoPanel(wxWindow* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN)
+FileInfoPanel::FileInfoPanel(wxWindow* parent, wxWindowID id )
+	: wxPanel(parent, id,
+	wxDefaultPosition,wxDefaultSize,
+	wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN)
 {
 	InfoPanel(this);
 }

@@ -27,6 +27,7 @@
 
 #include "stuff.h"
 #include "TLData.h"
+#include "TLTrack.h"
 #include "TLItem.h"
 #include "TLSample.h"
 #include "TLSelectionSet.h"
@@ -252,6 +253,13 @@ void GgseqMoveItemCommand::Undo()
 	sample->UnRef();
 	//m_itemReference = (TLItem*) 0;
 }
+
+/* -- GgseqBunchOfItemsCommand -- */
+GgseqBunchOfItemsCommand::~GgseqBunchOfItemsCommand()
+{
+	m_itemList.DeleteContents(true);
+	m_itemList.Clear();
+}
 /* -- GgseqAddItemsCommand -- */
 GgseqAddItemsCommand::GgseqAddItemsCommand( TLData *doc, TLSelectionSet *selSet, TLSelectionSet **newSet, int64_t offsetPos, unsigned int trackId )/*Wird wohl immer seine ReferenceIds selbst erzeugen*/
 {
@@ -441,4 +449,75 @@ void GgseqDeleteItemsCommand::Undo()
 	}
 
 }
+/* -- GgseqTrackCommand -- */
+GgseqTrackCommand::~GgseqTrackCommand()
+{
+	m_itemList.DeleteContents(true);
+	m_itemList.Clear();
+}
+/* -- GgseqDeleteTrackCommand -- */
+GgseqDeleteTrackCommand::GgseqDeleteTrackCommand( TLData *doc, TLTrack *track, TLPanel *panel )//TODO Panel entfernen
+{
+	m_error = 0;
+	m_document = doc;
+	m_trackNr = track->GetTrackNr();
+	m_panel = panel;
+	for ( TLItemList::Node *node = track->GetFirst(); node; node = node->GetNext() ) {
+		TLItem *current = node->GetData();
+		m_itemList.Append(
+			new GgseqUndoItem( current->GetSample()->GetFilename(),
+				current->GetPosition(),
+				m_trackNr,
+				current->GetReference(), current)
+		);
+	}
+	m_error = 0;
 
+}
+void GgseqDeleteTrackCommand::Do()
+{
+	//...
+	for ( GgseqUndoItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
+		GgseqUndoItem *current = node->GetData();
+		TLItem *item;
+		if (current->m_itemReference) {
+			item = current->m_itemReference;
+			current->m_itemReference = (TLItem*)0;
+			if (!current->m_referenceId)
+				current->m_referenceId = m_docManager->GetNewRefId();
+		} else {
+			item = m_document->GetItem(current->m_referenceId);
+		}
+		m_document->DeleteItem( item, m_trackNr );
+	}
+
+	m_document->DeleteTrack(m_trackNr);
+}
+void GgseqDeleteTrackCommand::Undo()
+{
+	m_document->AddTrack(m_trackNr);
+	//...
+	for ( GgseqUndoItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
+		GgseqUndoItem *current = node->GetData();
+		m_document->AddItem( current->m_filename,
+			current->m_position,
+			m_trackNr,
+			current->m_referenceId );
+	}
+
+}
+GgseqAddTrackCommand::GgseqAddTrackCommand( TLData *doc, int trackNr, TLPanel *panel )
+{
+	m_document = doc;
+	m_trackNr = trackNr;
+	m_panel=panel;
+	m_error = 0;
+}
+void GgseqAddTrackCommand::Do()
+{
+	m_document->AddTrack(m_trackNr);
+}
+void GgseqAddTrackCommand::Undo()
+{
+	m_document->DeleteTrack(m_trackNr);
+}

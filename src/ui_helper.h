@@ -1,4 +1,4 @@
-/* DisableListener.cpp
+/* ui_helper.h
  *
  *  Copyright (C) 2003 Richard Spindler <oracle2025@gmx.de>
  *
@@ -16,31 +16,14 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#include "wx/wxprec.h"
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
 
-#include "DisableListener.h"
+#ifndef _UI_HELPER_H_
+#define _UI_HELPER_H_
 
-DoubleDisabler::DoubleDisabler(wxWindow* window1, wxWindow* window2)
-{
-	m_window1=window1;
-	m_window2=window2;
-}
-void DoubleDisabler::DisableAll()
-{
-	m_window1->Enable(false);
-	m_window2->Enable(false);
-}
-void DoubleDisabler::EnableAll()
-{
-	m_window1->Enable(true);
-	m_window2->Enable(true);
-	m_window1->SetFocus();
-}
+wxWindow *MakeTlPanel( wxWindow* parent, wxWindowID id );
+wxWindow *MakeSidePanel( wxWindow* parent, wxWindowID id, wxBoxSizer *sizer );
+wxWindow *MakeFileList( wxWindow* parent, wxWindowID id );
+wxWindow *MakeDirTree( wxWindow* parent, wxWindowID id );
+wxWindow *MakeMiniPlayer( wxWindow* parent, wxWindowID id );
 
-
-
-
-
+#endif /* _UI_HELPER_H_ */

@@ -29,7 +29,7 @@ class FileInfoListener
 class FileInfoPanel : public wxPanel, public FileInfoListener
 {
 	public:
-		FileInfoPanel(wxWindow* parent);
+		FileInfoPanel( wxWindow* parent, wxWindowID id );
 		~FileInfoPanel();
 		void SetInfo(const wxString &filename, long frames, long channels, long sampleRate);
 	private:

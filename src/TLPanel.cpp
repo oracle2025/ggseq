@@ -43,8 +43,6 @@
 #include "TLLoadSaveManager.h"
 #include "SoundManager.h"
 #include "TLData.h"
-#include "TLSelectColourDialog.h"
-#include "TLSetSnapDialog.h"
 #include "TLMuteButton.h"
 #include "mute_off.xpm"
 #include "dial.h"
@@ -53,9 +51,11 @@
 #include "MiniPlayer.h"
 #include "Ruler.h"
 #include "BigScrollBar.h"
+#include "GgseqDocManager.h"
+#include "PreferencesDialog.h"
 
 #define LEFT_OFFSET_TRACKS 52
-#define TOP_OFFSET_TRACKS 22
+#define TOP_OFFSET_TRACKS 3 //22
 
 enum
 {
@@ -75,58 +75,38 @@ BEGIN_EVENT_TABLE(TLPanel, wxPanel)
 	EVT_ERASE_BACKGROUND(TLPanel::OnEraseBackground)
 END_EVENT_TABLE()
 
-TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar/*, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name*/)
-//:wxPanel(parent, id, pos, size, style|wxCLIP_CHILDREN/*|wxSUNKEN_BORDER*/ , name)
-:wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxCLIP_CHILDREN)
+TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar, Ruler *ruler, wxScrollBar *scrollbar2, wxWindowID id)
+:wxPanel(parent, id, wxDefaultPosition, wxDefaultSize, wxCLIP_CHILDREN)
 {
-
+	m_TlView=0;
 	m_data = new TLData();
-	m_data->AddTrack();
-	m_data->AddTrack();
-	m_data->AddTrack();
-	m_data->AddTrack();
-	m_data->AddTrack();
-	m_data->AddTrack();
-	m_data->AddTrack();
-	m_data->AddTrack();
-
+	m_data->SetPanel(this);
 	m_TlView = new TLView(m_data);
+	m_data->AddTrack( -1 );
+	m_data->AddTrack( -1 );
+	m_data->AddTrack( -1 );
+	m_data->AddTrack( -1 );
+	m_data->AddTrack( -1 );
+	m_data->AddTrack( -1 );
+	m_data->AddTrack( -1 );
+	m_data->AddTrack( -1 );
+
 	m_TlView->SetVisibleFrame(100,100);
 	m_TlView->SetVisibleLength(1420000);
 	m_TlView->SetPosition(0);
+	m_TlView->UpdateDialsAndButtons();
 
 	m_loadSaveManager = new TLLoadSaveManager(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),m_data);
 	m_soundManager = new SoundManager(m_data);
 
 
-	m_scrollBar = scrollbar;//new wxScrollBar(this,ID_ScrollBar,wxPoint(0,0),wxSize(GetSize().GetWidth(),0));	
-
-	int i=0;
-	for ( TLTrackList::Node *node = m_data->GetFirst(); node; node = node->GetNext() ) {
-		TLTrack *current = node->GetData();
-#ifdef __WXMSW__
-		/*TLMuteButton *button =*/m_buttons[i] = new TLMuteButton( this, -1,current,wxT("M"), wxPoint(5,TOP_OFFSET_TRACKS+i*30),wxSize(25,25));
-#else
-		/*TLMuteButton *button =*/m_buttons[i] = new TLMuteButton( this, -1,current,mute_off_xpm, wxPoint(5,TOP_OFFSET_TRACKS+i*30),wxSize(25,25));
-#endif
-		
-		m_dials[i] = new TLTrackVolumeDial(this, -1, current,wxPoint(31,TOP_OFFSET_TRACKS+i*30),wxSize(25,25));
-		i++;
-	}
-#ifdef __WXMSW__
-	m_ruler = new Ruler(this,-1,wxPoint(LEFT_OFFSET_TRACKS,2),wxSize(GetSize().GetWidth()-5-LEFT_OFFSET_TRACKS,15));
-#else
-	m_ruler = new Ruler(this,-1,wxPoint(LEFT_OFFSET_TRACKS,2),wxSize(GetSize().GetWidth()-5-LEFT_OFFSET_TRACKS,15),wxRAISED_BORDER);
-#endif
-	
+	m_scrollBar = scrollbar;
+	m_scrollBar2 = scrollbar2;
+	m_ruler = ruler;
 	m_ruler->SetSnap((m_TlView->GetSnapValue()/*m_SnapPosition*/ *31)/117600);
+		//TODO: Nicht Hardcoden
 	
 	
-//	m_data->GetTrackCount
-
-//	m_scrollBar->SetSize(0,GetSize().GetHeight()-20,GetSize().GetWidth(),20);
-
-//	m_scrollBar->SetScrollbar(0,m_TlView->GetScrollBarThumbSize() ,m_TlView->GetScrollBarRange() , m_TlView->GetScrollBarThumbSize());
 	ResetScrollBar();
 
 	m_TlView->SetVisibleFrame(GetSize().GetWidth(),GetSize().GetHeight());
@@ -140,6 +120,24 @@ TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar/*, wxWindowID id, con
 	m_miniPlayer=NULL;
 	SetSizeHints(100, 200);
 	m_ruler->SetListener(m_data);
+	m_DeleteFromGUI=0;
+}
+void TLPanel::AddControls(TLTrack *track)
+{
+#ifdef __WXMSW__
+	track->m_muteButton = new TLMuteButton( this, -1, track, wxT("M"), wxDefaultPosition, wxSize(25,25) );
+#else
+	track->m_muteButton = new TLMuteButton( this, -1, track, mute_off_xpm, wxDefaultPosition, wxSize(25,25) );
+#endif
+	track->m_volumeDial = new TLTrackVolumeDial(this, -1, track, wxDefaultPosition, wxSize(25,25) );
+}
+void TLPanel::DeleteControls(TLTrack *track)
+{
+	if (m_DeleteFromGUI) {
+		track->m_muteButton->Destroy();
+		track->m_volumeDial->Destroy();
+		m_TlView->UpdateDialsAndButtons();
+	}
 }
 TLPanel::~TLPanel()
 {
@@ -164,8 +162,6 @@ void TLPanel::OnEraseBackground(wxPaintEvent& event)
 void TLPanel::OnSize(wxSizeEvent& event)
 {
 	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
-	m_ruler->SetSize(5+LEFT_OFFSET_TRACKS,2,GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,15);
-
 	ResetScrollBar();
 }
 void TLPanel::OnMouseMotion(wxMouseEvent& event)
@@ -225,6 +221,8 @@ void TLPanel::OnMouseUp(wxMouseEvent& event)
 	}
 	if (event.LeftUp()) {
 		m_TlView->ClearSelection();
+		m_TlView->SelectTrack(event.m_y);
+		
 		Refresh();
 		m_TlView->SetPlaybackPosition(event.m_x);
 		wxClientDC dc(this);
@@ -247,7 +245,6 @@ void TLPanel::OnDoubleClick(wxMouseEvent& event)
 	int trackNr = m_TlView->GetTrackByY(event.m_y);
 	if (trackNr<0)
 		return;
-//	wxString tmp = m_TlView->GetSampleFilename(event.m_x, trackNr);
 	TLSample *sample = m_TlView->GetSample(event.m_x, trackNr);
 	if (sample !=NULL) {
 		if (m_miniPlayer) {
@@ -255,12 +252,6 @@ void TLPanel::OnDoubleClick(wxMouseEvent& event)
 			m_miniPlayer->Play();
 		}
 	}
-//	if (tmp!=wxT("")) {
-//		if (m_miniPlayer) {
-//			m_miniPlayer->SetFilename(tmp);
-//			m_miniPlayer->Play();
-//		}
-//	}
 }
 void TLPanel::StartRubberFrame(int x, int y)
 {
@@ -268,10 +259,7 @@ void TLPanel::StartRubberFrame(int x, int y)
 	m_TlView->ClearSelection();
 	Refresh();
 	m_rubberDrag=true;
-//	wxClientDC dc(this);
-//	SetRubberframePen(&dc);
 	m_rubberFrame=wxRect(m_DragX,m_DragY,x-m_DragX,y-m_DragY);
-//	ShowFrame(m_rubberFrame,&dc);
 }
 void TLPanel::UpdateRubberFrame(int x, int y)
 {
@@ -320,9 +308,10 @@ void TLPanel::StartSampleDrag(int x, int y, int srcTrackNr, TLItem* srcItem)
 	m_DragItem = srcItem;
 
 	x_offset = m_DragX-m_TlView->FromTLtoScreenX(m_DragItem->GetPosition());
-	y_offset = m_DragY-m_SampleDragSrcTrackNr*30-/*5*/TOP_OFFSET_TRACKS;
+	y_offset = m_DragY-m_SampleDragSrcTrackNr*30-/*5*/TOP_OFFSET_TRACKS + m_TlView->GetYScrollPosition();
 
 	m_SampleDragItemWidth = m_DragItem->GetSample()->GetLength()/3793;
+		//TODO: das soll keine Konstante sein.
 	wxBitmap bmp1(m_SampleDragItemWidth,25);
 	wxMemoryDC dc;
 	dc.SelectObject(bmp1);
@@ -360,11 +349,11 @@ void TLPanel::UpdateSampleDrag(int x, int y)
 		return;
 	}
 	region=wxRegion(0,0,GetSize().GetWidth(),GetSize().GetHeight());
-	region.Subtract(wxRect(new_x,new_y,m_SampleDragItemWidth,25));
+	region.Subtract(wxRect(new_x,new_y,m_SampleDragItemWidth,25)); //TODO
 	dc.SetClippingRegion(region);
 	new_x=m_TlView->GetScreenSnapPosition(new_x);
-	new_y=trackNr*30+/*5*/TOP_OFFSET_TRACKS;
-	m_sampleFrame=wxRect(new_x,new_y,m_SampleDragItemWidth,25);
+	new_y=trackNr*30+/*5*/TOP_OFFSET_TRACKS - m_TlView->GetYScrollPosition(); //TODO
+	m_sampleFrame=wxRect(new_x,new_y,m_SampleDragItemWidth,25); //TODO
 	ShowFrame(m_sampleFrame,&dc);
 	dc.DestroyClippingRegion();
 	return;
@@ -378,8 +367,6 @@ void TLPanel::EndSampleDrag(int x, int y, bool copyOnDrag)
 	wxClientDC dc(this);
 	SetRubberframePen(&dc);
 	HideFrame(m_sampleFrame,&dc);
-//	if (x-x_offset<0 || y<0 || x-x_offset>GetSize().GetWidth() || y>GetSize().GetHeight())
-//		return;
 	m_TlView->DoDrop(x-x_offset, y, m_DragItem, m_SampleDragSrcTrackNr,x_offset,copyOnDrag);
 	ResetScrollBar();
 	Refresh();
@@ -388,9 +375,6 @@ void TLPanel::StartSelectionDrag(int x, int y, int width, int height)
 {
 	int x_ = x-x_offset;
 	int y_ = y;
-//	CaptureMouse();
-//	wxClientDC dc(this);
-//	SetRubberframePen(&dc);
 	m_selectionDrag=true;
 	wxBitmap bitmap(width,height);
 	wxMemoryDC *dc = new wxMemoryDC();
@@ -428,7 +412,7 @@ void TLPanel::StartSelectionDrag(int x, int y, int width, int height)
 	m_selectionFrame=wxRect(x_,y_,width,height);
 	int trackNr = m_TlView->GetTrackByY(y_);
 	if (trackNr>=0) {
-		m_selectionFrame.y=trackNr*30+TOP_OFFSET_TRACKS;
+		m_selectionFrame.y=trackNr*30+TOP_OFFSET_TRACKS-m_TlView->GetYScrollPosition(); //TODO
 	} else {
 		return;
 	}
@@ -436,43 +420,32 @@ void TLPanel::StartSelectionDrag(int x, int y, int width, int height)
 
 	m_dragImage->Move(wxPoint(m_selectionFrame.x,m_selectionFrame.y));
 	m_dragImage->Show();
-//	ShowFrame(m_selectionFrame,&dc);
 }
 void TLPanel::UpdateSelectionDrag(int x, int y)
 {
 	int x_ = x-x_offset;
 	int y_ = y;
-/*	wxClientDC dc(this);
-	SetRubberframePen(&dc);
-	HideFrame(m_selectionFrame,&dc);*/
 	int trackNr = m_TlView->GetTrackByY(y_);
 	if (trackNr<0) {
 		m_dragImage->Hide();
 		return;
 	}
 	m_dragImage->Show();
-	m_selectionFrame.y=trackNr*30+TOP_OFFSET_TRACKS;
+	m_selectionFrame.y=trackNr*30+TOP_OFFSET_TRACKS-m_TlView->GetYScrollPosition(); //TODO
 	m_selectionFrame.x=m_TlView->GetScreenSnapPosition(x_);
 	m_dragImage->Move(wxPoint(m_selectionFrame.x,m_selectionFrame.y));
-//	ShowFrame(m_selectionFrame,&dc);
 }
 void TLPanel::EndSelectionDrag(int x, int y, bool copyOnDrag)
 {
 	int x_ = x-x_offset;
 	int y_ = y;
-//	ReleaseMouse();
 	m_selectionDrag=false;
 	m_dragImage->Hide();
 	m_dragImage->EndDrag();
 	delete m_dragImage;
 
-//	if (m_selectionFrame.x<0 || y<0 || m_selectionFrame.x>GetSize().GetWidth() || y>GetSize().GetHeight())
-//		return;
 
 	m_TlView->EndSelectionDrag(x_, y_, copyOnDrag, x_offset);
-/*	wxClientDC dc(this);
-	SetRubberframePen(&dc);
-	HideFrame(m_selectionFrame,&dc);*/
 	ResetScrollBar();
 	Refresh();
 }
@@ -487,6 +460,14 @@ void TLPanel::HideFrame(wxRect& rect, wxDC* dc)
 		dc->DrawRectangle(rect.x,rect.y,rect.width,rect.height);
 	}
 	m_frameVisible = false;
+}
+void TLPanel::OnScroll2(wxScrollEvent& event)
+{
+	m_TlView->SetYScrollPosition(event.GetPosition());
+	this->Freeze();
+	m_TlView->UpdateDialsAndButtons();
+	Refresh();
+	this->Thaw();
 }
 void TLPanel::OnScroll(wxScrollEvent& event)
 {
@@ -506,8 +487,22 @@ void TLPanel::DrawCaret(wxDC& dc)
 
 void TLPanel::ResetScrollBar()
 {
-	/*int ts = FromTLtoSB(m_TlView->GetScrollBarThumbSize());*/
 	m_scrollBar->SetBigScrollBar(m_TlView->GetPosition(),m_TlView->GetScrollBarThumbSize(),m_TlView->GetScrollBarRange());
+	int width, height;
+	GetSize(&width, &height);
+	m_scrollBar2->SetScrollbar(m_scrollBar2->GetThumbPosition(), height, TOP_OFFSET_TRACKS+30* m_data->GetTrackCount(),height);
+	if (m_scrollBar2->GetThumbPosition()>m_scrollBar2->GetRange()-m_scrollBar2->GetThumbSize()) {
+		m_scrollBar2->SetThumbPosition(m_scrollBar2->GetRange()-m_scrollBar2->GetThumbSize());
+		if (m_scrollBar2->GetThumbSize()>m_scrollBar2->GetRange()) {
+			m_scrollBar2->SetThumbPosition(0);
+		}
+		m_TlView->SetYScrollPosition(m_scrollBar2->GetThumbPosition());
+		this->Freeze();
+		m_TlView->UpdateDialsAndButtons();
+		Refresh();
+		this->Thaw();
+	}
+
 }
 bool TLPanel::New()
 {
@@ -525,7 +520,7 @@ bool TLPanel::Load()
 	ResetScrollBar();
 	UpdateCaret();
 	UpdateButtons();
-	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600);
+	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600); //TODO
 	m_ruler->Refresh();
 	return true;
 }
@@ -551,7 +546,7 @@ bool TLPanel::Load(wxString& filename)
 	Refresh();
 	ResetScrollBar();
 	UpdateButtons();
-	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600);
+	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600); //TODO
 	m_ruler->Refresh();
 	return true;
 
@@ -618,18 +613,6 @@ void TLPanel::WavExport()
 		m_data->SaveWAV(filename);
 	}
 
-/*	wxFileDialog dlg1(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(), wxT("Save WAV-File as"),lastFolder,wxT(""),wxT("WAV files (*.wav)|*.wav"),wxSAVE);
-	if (dlg1.ShowModal()==wxID_OK) {
-		wxString filename = dlg1.GetDirectory() +wxT("/")+ dlg1.GetFilename();
-		if (wxFileExists(filename)) {
-			wxMessageDialog msg_dlg(m_parent,wxT("File exists!\nOverride?"), wxT("Override File?"), wxYES_NO |wxICON_QUESTION );
-			if (msg_dlg.ShowModal()==wxID_NO)
-				return;
-		}
-		config.Write(wxT("LastExportFolder"),dlg1.GetDirectory());
-		m_data->SaveWAV(filename);
-	}
-*/
 }
 bool TLPanel::UpdateCaret()
 {
@@ -641,11 +624,9 @@ bool TLPanel::UpdateCaret()
 		DrawCaret(dc);
 		return false;
 	}
-//	SetCaretPosition(m_soundManager->GetPlaybackPosition());
 	DrawCaret(dc);
 	gg_tl_dat pos=m_soundManager->GetPosition();
 	gg_tl_dat pos2=(pos/117600)*31;
-//	int sbPos=FromTLtoSB((pos/117600)*31);
 	if (pos2<m_scrollBar->GetBigThumbPosition()) {
 		m_scrollBar->SetBigThumbPosition(pos2);
 		m_TlView->SetPosition(m_scrollBar->GetBigThumbPosition());
@@ -662,26 +643,6 @@ bool TLPanel::UpdateCaret()
 	}
 	m_CaretPosition = m_TlView->GetCaretPosition(pos);
 
-/*	int ScreenWidth=GetSize().GetWidth();
-	int DataLength=m_scrollBar->GetThumbSize();
-	int ScrollPosition=m_scrollBar->GetThumbPosition();
-	int PositionOnScreen = ((Position-ScrollPosition)*ScreenWidth)/DataLength;
-	if (PositionOnScreen>ScreenWidth) {
-		if (Position<m_scrollBar->GetRange())
-			m_scrollBar->SetThumbPosition(Position);
-		else
-			m_scrollBar->SetThumbPosition(m_scrollBar->GetRange());
-		m_TlView->SetPosition(m_scrollBar->GetThumbPosition());
-		Refresh(false);
-		ScrollPosition=m_scrollBar->GetThumbPosition();
-		PositionOnScreen = ((Position-ScrollPosition)*ScreenWidth)/DataLength;
-	}
-	wxClientDC dc(this);
-	if (m_CaretVisible) {
-		DrawCaret(dc);
-		m_CaretPosition=PositionOnScreen;
-		DrawCaret(dc);
-	}*/
 	
 	DrawCaret(dc);
 	return true;
@@ -693,27 +654,24 @@ wxString TLPanel::GetFilename()
 		return wxT("Unnamed");
 	return m_data->GetFilename();
 }
-void TLPanel::SetColours(wxString path)
+void TLPanel::SetPrefs()
 {
-	TLSelectColourDialog dlg(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),-1,m_data->GetColourManager(),wxT("Setup Colours for Folders"));
-	dlg.SetPath(path);
-	dlg.SetSize(wxSize(500,400));
-	dlg.Centre();
-	if (dlg.ShowModal()==wxID_OK) {
-		dlg.SetColours(m_data->GetColourManager()); /*colourData speichern*/
+	PreferencesDialog prefs(
+		this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),
+		-1,m_TlView->GetSnapValue()/2,
+		m_data->GetColourManager(), wxT("Preferences")
+	);
+	prefs.Centre();
+	if (prefs.ShowModal()==wxID_OK) {
+		m_TlView->SetSnapValue(prefs.GetFrameSnap()*2);
+		prefs.SaveColours(m_data->GetColourManager());
 		Refresh();
-	}
-}
-void TLPanel::SetSnap()
-{
-	TLSetSnapDialog dlg(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),-1,m_TlView->GetSnapValue()/2,wxT("Set Sample Snapping Position"));
-	dlg.Centre();
-	if (dlg.ShowModal()==wxID_OK) {
-		m_TlView->SetSnapValue(dlg.m_frameSnapValue*2);
 	}
 	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600);
 	m_ruler->Refresh();
 	m_scrollBar->Enable(); /*TODO: Evil Hack*/
+
+
 }
 
 void TLPanel::DropFileAt(int x, int y, wxString filename)
@@ -737,8 +695,8 @@ void TLPanel::UpdateButtons()
 	int i=0;
 	for ( TLTrackList::Node *node = m_data->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
-		m_buttons[i]->SetMute(current->IsMuted());
-		m_dials[i]->SetValue((int)(current->GetVolume()*100));
+		/*m_buttons[i]*/current->m_muteButton->SetMute(current->IsMuted());
+		/*m_dials[i]*/current->m_volumeDial->SetValue((int)(current->GetVolume()*100));
 		i++;
 	}
 
@@ -746,14 +704,6 @@ void TLPanel::UpdateButtons()
 void TLPanel::SetUpdateListener(UpdateListener *updateListener)
 {
 	m_data->SetUpdateListener(updateListener);
-}
-int TLPanel::FromTLtoSB(gg_tl_dat x)
-{
-	return (int)((x*100000)/m_TlView->GetScrollBarRange());
-}
-gg_tl_dat TLPanel::FromSBtoTL(int x)
-{
-	return (( (gg_tl_dat)x *m_TlView->GetScrollBarRange())/100000);
 }
 void TLPanel::UpdateRulerTicks()
 {
@@ -763,12 +713,45 @@ void TLPanel::SetMasterVolume(float volume) { m_data->SetMasterVolume(volume); }
 
 void TLPanel::Undo()
 {
+	m_DeleteFromGUI=1;
 	m_TlView->Undo();
+	m_DeleteFromGUI=0;
+	m_TlView->UpdateDialsAndButtons();
+	ResetScrollBar();
 	Refresh();
 }
 void TLPanel::Redo()
 {
+	m_DeleteFromGUI=1;
 	m_TlView->Redo();
+	m_DeleteFromGUI=0;
+	m_TlView->UpdateDialsAndButtons();
+	ResetScrollBar();
 	Refresh();
+}
+void TLPanel::AddTrack()
+{
+	m_TlView->m_docManager->SubmitCommand( new GgseqAddTrackCommand( m_data, -1, this ) );
+	m_TlView->UpdateDialsAndButtons();
+	ResetScrollBar();
+	Refresh();
+}
+void TLPanel::DeleteTrack()
+{
+	TLTrack *track=0;
+	for ( TLTrackList::Node *node = m_data->GetFirst(); node; node = node->GetNext() ) {
+		TLTrack *current = node->GetData();
+		if (current->GetSelected())
+			track=current;
+	}
+	if (track==0)
+		return;
+	m_DeleteFromGUI=1;
+	m_TlView->m_docManager->SubmitCommand(new GgseqDeleteTrackCommand( m_data, track, this ) );
+	m_DeleteFromGUI=0;
+	ResetScrollBar();
+	Refresh();
+
+
 }
 

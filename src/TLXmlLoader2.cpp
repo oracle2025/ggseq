@@ -138,6 +138,17 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 		Error(filename);
 		return;
 	}
+	int trackCnt=1;
+	if (node->ToElement()->Attribute("count",&trackCnt)==NULL) {
+		Error(filename);
+		return;
+	}
+	while(m_data->GetTrackCount()>trackCnt) {
+		m_data->DeleteTrack(0);
+	}
+	while(m_data->GetTrackCount()<trackCnt) {
+		m_data->AddTrack(-1);
+	}
 	node = node->FirstChild("track");
 	if (node==NULL) {
 		Error(filename);

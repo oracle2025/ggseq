@@ -42,14 +42,14 @@ class Ruler: public wxPanel
 		void OnLeftDown(wxMouseEvent& event);
 		void OnLeftUp(wxMouseEvent& event);
 		void OnMouseMotion(wxMouseEvent& event);
-		void GetLoop(int* pos1, int* pos2);
+		void GetLoop(gg_tl_dat* pos1, gg_tl_dat* pos2);
 		void SetListener(LoopSetupListener *listener);
 	private:
 		long m_snap;
 		long m_zoomFactor;
 		gg_tl_dat m_position;
-		long m_pos1;
-		long m_pos2;
+		gg_tl_dat m_pos1;
+		gg_tl_dat m_pos2;
 		LoopSetupListener *m_listener;
 		DECLARE_EVENT_TABLE()
 };

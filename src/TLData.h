@@ -29,18 +29,31 @@ class UpdateListener;
 class GgseqDocManager;
 WX_DECLARE_LIST(TLTrack, TLTrackList);
 WX_DECLARE_HASH_MAP( unsigned int, TLItem*, wxIntegerHash, wxIntegerEqual, TLItemHash );
+WX_DECLARE_HASH_MAP( unsigned int, TLTrack*, wxIntegerHash, wxIntegerEqual, TLTrackHash );
 
 #include "Ruler.h"
+class GetTrackNrListener
+{
+	public:
+		virtual int GetTrackNr(TLTrack *track)=0;
+};
 
+class TLPanel;
 
-class TLData: public LoopSetupListener
+class TLData: public LoopSetupListener, GetTrackNrListener
 {
 	public:
 		TLData();
 		~TLData();
 		TLTrackList::Node *GetFirst(); /*Soll weg*/
 		int GetTrackCount();
-		void AddTrack();
+		void AddTrack( /*long referenceId = 0,*/ int trackPos = -1 );
+		/*void AddTrack( long referenceId = 0, int trackPos)*/
+		void DeleteTrack(int TrackNr /* , long referenceId*/);
+		void MoveTrack(int TrackNr, int newTrackPos);
+		
+		void SelectTrack( int TrackNr );
+
 		void SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2);
 
 		TLItem *AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long referenceId = 0 );
@@ -50,6 +63,7 @@ class TLData: public LoopSetupListener
 		void DeleteItem(TLItem *item, int TrackNr/*, long referenceId*/ );
 		void SetTrackMute(bool mute, int TrackNr);
 		void SetTrackVolume(double vol, int TrackNr);
+		int GetTrackNr(TLTrack *track);
 
 		void SortAll();
 		void Clear();
@@ -81,16 +95,19 @@ class TLData: public LoopSetupListener
 		gg_tl_dat m_position;/*Wird während des Abspielens inkrementiert*/
 		TLItem* GetItem(long referenceId);
 		void SetDocManager(GgseqDocManager *docManager);
+		void SetPanel( TLPanel *panel ) { m_panel = panel; }
+		//void GetTrackNrFromRef( long referenceId );
 	private:
 		gg_tl_dat m_loopPos1;
 		gg_tl_dat m_loopPos2;
 		bool m_loop_enabled;
 		long m_snapValue;
+		long m_trackReferenceCounter;
 		unsigned int MixChannels(float *A, float *B, float* out, unsigned int count);
 		bool printXML(wxString filename);
 		void loadXML(wxString filename);
 		void ResetOffsets();
-		TLTrackList m_trackList;
+		TLTrackList *m_trackList;
 		TLSampleManager *m_sampleManager;
 		wxString m_filename;
 		bool m_changed;
@@ -100,7 +117,9 @@ class TLData: public LoopSetupListener
 		float m_masterVolume;
 		UpdateListener *m_updateListener;
 		TLItemHash m_allItemsHash;
+		TLTrackHash m_trackHash;
 		GgseqDocManager *m_docManager;
+		TLPanel *m_panel;
 };
 
 #endif /*_TLDATA_H_*/

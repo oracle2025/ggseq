@@ -211,7 +211,10 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	m_help = new wxHtmlHelpController(wxHF_FLAT_TOOLBAR | wxHF_CONTENTS | wxHF_INDEX | wxHF_SEARCH | wxHF_BOOKMARKS | wxHF_PRINT );
 //	m_noBgHandler=new NoBgEvtHandler();
 	MakeToolBar();
-	wxPanel *panel1=new wxPanel(this,-1,wxDefaultPosition,wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN); /*Für richtige Hintergrundfarbe in osx und win32*/
+	wxPanel *panel1=new wxPanel(this,-1,wxDefaultPosition,
+		wxDefaultSize,
+		wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
+		/*Für richtige Hintergrundfarbe in osx und win32*/
 	wxBoxSizer *panelSizer = new wxBoxSizer( wxHORIZONTAL );
 
 //	wxAcceleratorEntry entries[2];
@@ -345,11 +348,9 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 	wxPanel *panel1 = new wxPanel(SplitView2,-1,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
 
 	wxBoxSizer * tlPanelSizer = new wxBoxSizer(wxVERTICAL);
-//	wxScrollBar *sb = new wxScrollBar(panel1,ID_ScrollBar);
 	BigScrollBar *sb =  new BigScrollBar(panel1,ID_ScrollBar);
 #ifdef __WXMSW__
 	sb->SetSize(0,0,10,wxSystemSettings::GetMetric(wxSYS_HTHUMB_X));
-	//sb->PushEventHandler(new NoBgEvtHandler());
 	sb->PushEventHandler(new ttEvtHandler());
 #endif
 	m_tp = new TLPanel(panel1,sb);

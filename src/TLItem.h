@@ -21,13 +21,15 @@
 #define _TLITEM_H_
 
 class TLSample;
+class GetItemTrackListener;
 class TLItem
 {
 	public:
 		TLItem( TLSample *sample,
-			int trackNr,
+		//	int trackNr,
 			gg_tl_dat position,
-			long referenceId
+			long referenceId,
+			GetItemTrackListener* trackListener
 		);
 		~TLItem();
 		unsigned int FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int count, bool mute, double volume);
@@ -46,7 +48,8 @@ class TLItem
 		long m_referenceId;
 		TLSample *m_sample;
 		bool m_selected;
-		int m_trackNr;
+		//int m_trackNr;
+		GetItemTrackListener* m_trackListener;
 };
 
 #endif /*_TLITEM_H_*/
