@@ -105,7 +105,7 @@ dnl checking for needed features
 # AC_CHECK_HEADER(soundtouch/SoundTouch.h,,
 #  AC_MSG_ERROR([*** soundtouch/SoundTouch.h is needed - //sky.prohosting.com/oparviai/soundtouch/***]))
 
-AM_PATH_SOUNDTOUCH()
+AM_PATH_SOUNDTOUCH(,, AC_MSG_ERROR([*** SoundTouch not found - this program requires the SoundTouch SoundTouch Audio Processing Library http://www.iki.fi/oparviai/soundtouch ***]))
 
 CPPFLAGS="$CPPFLAGS $SOUNDTOUCH_CXXFLAGS"
 

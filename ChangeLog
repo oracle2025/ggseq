@@ -1,3 +1,7 @@
+2005-02-28  Richard Spindler <richard.spindler AT gmail.com>
+
+ * hopefully fixed SoundTouch Test in configure.ac
+
 2005-02-26  Richard Spindler <richard.spindler AT gmail.com>
 
  * added Undo-Redo for Envelope Editing
