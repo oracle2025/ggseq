@@ -73,10 +73,13 @@ class TLView
 
 		static wxColour GetDarkColour(wxColour colour);
 		static wxColour GetLightColour(wxColour colour);
-		
+		void SuspendSnap();
+		void ResumeSnap();
 	private:
+		gg_tl_dat GetSnap(gg_tl_dat x);
 		void SnapItem(TLItem *item);/*kommt evtl. nach TLData*/
 		long DrawTrack(wxDC& dc_screen, long yoffset, TLTrack* track);
+		bool m_SnapSuspended;
 		TLData *m_TlData;
 		TLSelectionSet *m_selectionSet;
 		gg_tl_dat m_LengthVisible;

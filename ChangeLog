@@ -1,4 +1,8 @@
-2004-01-16  Richard Spindler <oracle2025@gmx.de>
+2004-01-15  Richard Spindler <oracle2025@gmx.de>
+
+ *  Added a Feature: use the [shift] Key to position a sample without snap
+
+2004-01-15  Richard Spindler <oracle2025@gmx.de>
 
  *  Fixed a couple of win32 issues
  *  If Save On Exit fails, it won't exit any more

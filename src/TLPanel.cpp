@@ -179,6 +179,10 @@ void TLPanel::OnSize(wxSizeEvent& event)
 }
 void TLPanel::OnMouseMotion(wxMouseEvent& event)
 {
+	if (event.m_shiftDown)
+		m_TlView->SuspendSnap();
+	else
+		m_TlView->ResumeSnap();
 	if (m_sampleDrag) {
 		UpdateSampleDrag(event.m_x,event.m_y);
 		return;
@@ -211,6 +215,11 @@ void TLPanel::OnMouseMotion(wxMouseEvent& event)
 }
 void TLPanel::OnMouseUp(wxMouseEvent& event)
 {
+	if (event.m_shiftDown)
+		m_TlView->SuspendSnap();
+	else
+		m_TlView->ResumeSnap();
+
 	if (m_rubberDrag) {
 		EndRubberFrame(event.m_x, event.m_y);
 		return;

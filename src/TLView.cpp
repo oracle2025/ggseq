@@ -140,7 +140,10 @@ TLView::TLView(TLData *TlData)
 	wxConfig config(wxT("ggseq"));
 	m_TlData->SetSnapValue(config.Read(wxT("SnapPosition"), SNAP_POSITION));
 	m_gungirl=new wxIcon(gun_girl_xpm);	
+	m_SnapSuspended=false;
 }
+void TLView::SuspendSnap() { m_SnapSuspended=true; }
+void TLView::ResumeSnap() { m_SnapSuspended=false; }
 TLView::~TLView()
 {
 	wxConfig config(wxT("ggseq"));
@@ -443,13 +446,27 @@ void TLView::SnapItem(TLItem *item)
 {
 	if (m_TlData->IsBlocked())
 		return;
-	gg_tl_dat pos=item->GetPosition()% (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
+//	gg_tl_dat pos=item->GetPosition()% (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
+//	if (pos) {
+//		if (pos>m_TlData->GetSnapValue()/*m_SnapPosition*//2)
+//			m_TlData->SetItemPosition(item,item->GetPosition()-pos+ (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/);
+//		else
+//			m_TlData->SetItemPosition(item,item->GetPosition()-pos);
+//	}
+	m_TlData->SetItemPosition(item,GetSnap(item->GetPosition()));
+}
+gg_tl_dat TLView::GetSnap(gg_tl_dat x)
+{
+	if (m_SnapSuspended)
+		return x;
+	gg_tl_dat pos=x%(gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
 	if (pos) {
-		if (pos>m_TlData->GetSnapValue()/*m_SnapPosition*//2)
-			m_TlData->SetItemPosition(item,item->GetPosition()-pos+ (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/);
+		if (pos> (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*//2)
+			x=x-pos+ (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
 		else
-			m_TlData->SetItemPosition(item,item->GetPosition()-pos);
+			x=x-pos;
 	}
+	return x;
 }
 
 void TLView::SetPlaybackPosition(long Position)
@@ -472,13 +489,14 @@ TLSample *TLView::GetSample(long position, long trackNr)
 long TLView::GetScreenSnapPosition(long position)
 {	
 	gg_tl_dat pos1=FromScreenXtoTL(position);
-	gg_tl_dat pos=pos1% (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
-	if (pos) {
-		if (pos> (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*//2)
-			pos1=pos1-pos+ (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
-		else
-			pos1=pos1-pos;
-	}
+	pos1=GetSnap(pos1);
+//	gg_tl_dat pos=pos1% (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
+//	if (pos) {
+//		if (pos> (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*//2)
+//			pos1=pos1-pos+ (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
+//		else
+//			pos1=pos1-pos;
+//	}
 	return FromTLtoScreenX(pos1);
 }
 
@@ -580,13 +598,14 @@ void TLView::DrawSelection(wxDC *dc)
 void TLView::EndSelectionDrag(int x, int y, bool copy, long x_offset)
 {
 	gg_tl_dat TL_x=FromScreenXtoTL(x);
-	gg_tl_dat pos=TL_x% (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
-	if (pos) {
-		if (pos>m_TlData->GetSnapValue()/*m_SnapPosition*//2)
-			TL_x=TL_x-pos+ (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
-		else
-			TL_x=TL_x-pos;
-	}
+	TL_x=GetSnap(TL_x);
+//	gg_tl_dat pos=TL_x% (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
+//	if (pos) {
+//		if (pos>m_TlData->GetSnapValue()/*m_SnapPosition*//2)
+//			TL_x=TL_x-pos+ (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
+//		else
+//			TL_x=TL_x-pos;
+//	}
 
 	int track=GetTrackByY(y);
 	if (x+x_offset<m_FrameX || x+x_offset>m_FrameX+m_FrameWidth)
