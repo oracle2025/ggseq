@@ -40,6 +40,46 @@ TLItem::TLItem(TLSample *sample/*, int trackNr*/ , gg_tl_dat position, long refe
 	m_trackListener = trackListener;
 	m_x_test = 10;
 	m_y_test = 10;
+	m_leftFadeIn   = wxRect( 0, 0, 7, 7 );
+	m_rightFadeIn  = wxRect( 10, 0, 7, 7 );
+	m_leftFadeOut  = wxRect( 20, 0, 7, 7 );
+	m_rightFadeOut = wxRect( (int)(m_sample->GetLength() / ( 117600.0 / 31.0 )-7), 0, 7, 7 );
+
+}
+void DrawWxRect( wxDC &dc, const wxRect &rect ) // TODO make Helper Functions File
+{
+	dc.DrawRectangle(rect.x, rect.y, rect.width, rect.height);
+}
+void TLItem::DrawEnvelope( wxDC &dc, int xOffset, int yOffset )
+{
+	dc.SetDeviceOrigin( xOffset, yOffset );
+	wxPoint lines[4] = {
+		wxPoint( m_leftFadeIn.x, m_leftFadeIn.y ),
+		wxPoint( m_rightFadeIn.x, m_rightFadeIn.y ),
+		wxPoint( m_leftFadeOut.x, m_leftFadeOut.y ),
+		wxPoint( m_rightFadeOut.x, m_rightFadeOut.y ) };
+	dc.DrawLines( 4, lines, 3, 3 );
+	DrawWxRect( dc, m_leftFadeIn );
+	DrawWxRect( dc, m_rightFadeIn );
+	DrawWxRect( dc, m_leftFadeOut );
+	DrawWxRect( dc, m_rightFadeOut );
+	dc.SetDeviceOrigin( 0, 0 );
+}
+wxRect *TLItem::TouchingEnvelopeCtrl( int x, int y )
+{
+	if ( m_leftFadeIn.Inside( x, y ) ) {
+		return &m_leftFadeIn;
+	}
+	if ( m_rightFadeIn.Inside( x, y ) ) {
+		return &m_rightFadeIn;
+	}
+	if ( m_leftFadeOut.Inside( x, y ) ) {
+		return &m_leftFadeOut;
+	}
+	if ( m_rightFadeOut.Inside( x, y ) ) {
+		return &m_rightFadeOut;
+	}
+	return NULL;
 }
 TLItem::~TLItem()
 {

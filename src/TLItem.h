@@ -47,6 +47,12 @@ class TLItem
 //    bool HandleInternal(gg_tl_dat x, float y);
 		long m_x_test;
 		long m_y_test;
+		wxRect m_leftFadeIn;
+		wxRect m_rightFadeIn;
+		wxRect m_leftFadeOut;
+		wxRect m_rightFadeOut;
+		void DrawEnvelope( wxDC &dc, int xOffset, int yOffset );
+		wxRect *TouchingEnvelopeCtrl( int x, int y );
 	private:
 		long m_referenceId;
 		TLSample *m_sample;

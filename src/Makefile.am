@@ -19,6 +19,8 @@ ggseq_SOURCES = PreferencesDialog.h\
 		RubberDragHandler.h\
 		RubberDragHandler.cpp\
                 ggseq_ui.h\
+								EnvelopeDragHandler.h\
+								EnvelopeDragHandler.cpp\
                 ggseq_ui_wdr.cpp\
 								colour_helper.h\
 								colour_helper.cpp\

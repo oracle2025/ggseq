@@ -84,12 +84,8 @@ class TLPanel : public wxPanel
 		void DeleteControls(TLTrack *track);
 	private:
 		void DrawCaret(wxDC& dc);
-//		void SetRubberframePen(wxDC* dc);
-//		void StartRubberFrame(int x, int y);
-//		void UpdateRubberFrame(int x, int y);
-//		void EndRubberFrame(int x, int y);
 		void UpdateRulerTicks();
-		TLView *m_TlView;
+		TLView *m_view;
 		BigScrollBar *m_scrollBar;
 		wxScrollBar *m_scrollBar2;
 		TLData *m_data;
@@ -100,27 +96,15 @@ class TLPanel : public wxPanel
 #else
 		wxDragImage *m_dragImage;
 #endif
-//		bool m_rubberDrag;
 
-		int m_SampleDragItemWidth;
 
 		int m_DragX;
 		int m_DragY;
-		int x_offset;
-		int y_offset;
-		wxRect m_oldImgPos;
-
-		wxRect m_selectionFrame;
-		wxRect m_sampleFrame;
-		wxRect m_rubberFrame;
-//		bool m_frameVisible;
-//		void ShowFrame(wxRect& rect, wxDC* dc);
-//		void HideFrame(wxRect& rect, wxDC* dc);
 		void UpdateButtons();
 		Ruler *m_ruler;
 		int m_CaretPosition;
 		bool m_CaretVisible;
-    MouseDragHandler *m_dragHandler;
+		MouseDragHandler *m_dragHandler;
 		DECLARE_EVENT_TABLE()
 };
 

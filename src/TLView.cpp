@@ -175,7 +175,8 @@ void TLView::DrawItem(wxDC& dc, TLItem* item, long left, long delta_left, long t
 /* - Extras ;) -*/ 
 	dc.SetPen( *wxBLACK_PEN );
 	dc.SetBrush( *wxWHITE_BRUSH );
-	dc.DrawRectangle( left + item->m_x_test, top+item->m_y_test, 10, 10);
+	item->DrawEnvelope( dc, left, top );
+//	dc.DrawRectangle( left + item->m_x_test, top+item->m_y_test, 10, 10);
 }
 
 bool TLView::ItemVisible( TLItem* item )

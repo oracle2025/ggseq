@@ -1,4 +1,4 @@
-/* MouseDragHandler.h
+/* EnvelopeDragHandler.h
  *
  *  Copyright (C) 2003 Richard Spindler <oracle2025@gmx.de>
  *
@@ -16,44 +16,31 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _MOUSE_DRAG_HANDLER_H_
-#define _MOUSE_DRAG_HANDLER_H_
 
-class TLItem;
-class wxDragImage;
+#ifndef _ENVELOPE_DRAG_HANDLER_H_
+#define _ENVELOPE_DRAG_HANDLER_H_
 
-
-class MouseDragHandler
+class EnvelopeDragHandler : public MouseDragHandler
 {
 	public:
-		virtual ~MouseDragHandler(){};
-		virtual void OnDrag( int x, int y ) = 0;
-		virtual void OnDrop( int x, int y, bool copy ) = 0; //TODO put copy bit into constructor!
-};
-
-class SampleDragHandler : public MouseDragHandler
-{
-	public:
-		SampleDragHandler( wxWindow* canvas, TLItem *item, TLView *view, int x, int y );
-		~SampleDragHandler();
+		EnvelopeDragHandler (
+			wxWindow* canvas, TLView *view,
+			TLItem *item, int x, int y, wxRect *envelopeHandle 
+			);
 		virtual void OnDrag( int x, int y );
 		virtual void OnDrop( int x, int y, bool copy );
 	private:
-		wxDragImage *GenerateDragImg( TLItem *item, int width );
-		void         ToggleFrame( wxDC& dc );
-		void         ShowFrame( wxDC& dc );
-		void         HideFrame( wxDC& dc );
 		wxWindow    *m_canvas;
-		TLItem      *m_item;
-		wxDragImage *m_dragImage;
-		wxRect       m_dragImagePos;
-		wxRect       m_dragFramePos;
 		TLView      *m_view;
+		TLItem      *m_item;
 		int          m_xOffset;
 		int          m_yOffset;
-		bool         m_frameVisible;
+		wxRect       m_itemBoundaries;
+		wxRect      *m_envelopeHandle;
+	private: /* Helper Functions */
+		wxPoint      FitInside( wxPoint handlePos );
+		void         Draw( wxDC &dc );
+		void         FixEnvelopeCtrls();
 };
 
-
-#endif /* _MOUSE_DRAG_HANDLER_H_ */
-
+#endif /* _ENVELOPE_DRAG_HANDLER_H_ */

@@ -32,7 +32,7 @@
 
 void SetRubberFramePen( wxDC& dc )
 {
-  dc.SetLogicalFunction( wxINVERT );
+	dc.SetLogicalFunction( wxINVERT );
 	dc.SetBrush( *wxTRANSPARENT_BRUSH );
 	dc.SetPen( wxPen( *wxBLACK, 1, wxSHORT_DASH ) );
 }
@@ -40,32 +40,32 @@ void SetRubberFramePen( wxDC& dc )
 
 SampleDragHandler::SampleDragHandler( wxWindow* canvas, TLItem *item, TLView *view, int x, int y )
 {
-  m_canvas = canvas;
-  m_item = item;
-  m_view = view;
-  m_view->ClearSelection();
-  m_canvas->Refresh();
-  m_canvas->Update();
-  m_dragImagePos = m_view->GetItemBoundaries( item ); /* ?? */
-  m_xOffset = x - m_dragImagePos.x;
-  m_yOffset = y - m_dragImagePos.y;
-  m_dragImage = GenerateDragImg( item, m_dragImagePos.width );
-  m_dragImage->BeginDrag( wxPoint( m_xOffset, m_yOffset ), m_canvas );
-  m_dragImage->Move( wxPoint( x, y ) );
-  m_dragImage->Show();
-  m_frameVisible = false;
+	m_canvas = canvas;
+	m_item = item;
+	m_view = view;
+	m_view->ClearSelection();
+	m_canvas->Refresh();
+	m_canvas->Update();
+	m_dragImagePos = m_view->GetItemBoundaries( item ); /* ?? */
+	m_xOffset = x - m_dragImagePos.x;
+	m_yOffset = y - m_dragImagePos.y;
+	m_dragImage = GenerateDragImg( item, m_dragImagePos.width );
+	m_dragImage->BeginDrag( wxPoint( m_xOffset, m_yOffset ), m_canvas );
+	m_dragImage->Move( wxPoint( x, y ) );
+	m_dragImage->Show();
+	m_frameVisible = false;
 }
 SampleDragHandler::~SampleDragHandler()
 {
-  delete m_dragImage;
+	delete m_dragImage;
 }
 wxDragImage *SampleDragHandler::GenerateDragImg( TLItem *item, int width )
 {
-  wxBitmap bmp1( width, 25 );
-  wxMemoryDC dc;
-  dc.SelectObject( bmp1 );
-  item->GetSample()->Draw( dc, m_view->GetRealZoom() );
-  return new wxDragImage( bmp1 );
+	wxBitmap bmp1( width, 25 );
+	wxMemoryDC dc;
+	dc.SelectObject( bmp1 );
+	item->GetSample()->Draw( dc, m_view->GetRealZoom() );
+	return new wxDragImage( bmp1 );
 }
 void SampleDragHandler::ToggleFrame( wxDC& dc )
 {
@@ -92,18 +92,18 @@ void SampleDragHandler::HideFrame( wxDC& dc )
 }
 void SampleDragHandler::OnDrag( int x, int y )
 {
-  wxClientDC dc( m_canvas );
-  HideFrame( dc );
-  m_dragImagePos.x = x - m_xOffset;
-  m_dragImagePos.y = y - m_yOffset;
-  m_dragImage->Move( wxPoint( x, y ) );
-  int trackNr = m_view->GetTrackByY( y );
-  if ( trackNr < 0 )
-    return; //No Frame Visible
-  int xNew = m_view->GetScreenSnapPosition( x - m_xOffset );
-  int yNew = trackNr * 30 + TOP_OFFSET_TRACKS - m_view->GetYScrollPosition();
-  m_dragFramePos = wxRect( xNew, yNew, m_dragImagePos.width, 25 );
-  ShowFrame( dc );
+	wxClientDC dc( m_canvas );
+	HideFrame( dc );
+	m_dragImagePos.x = x - m_xOffset;
+	m_dragImagePos.y = y - m_yOffset;
+	m_dragImage->Move( wxPoint( x, y ) );
+	int trackNr = m_view->GetTrackByY( y );
+	if ( trackNr < 0 )
+		return; //No Frame Visible
+	int xNew = m_view->GetScreenSnapPosition( x - m_xOffset );
+	int yNew = trackNr * 30 + TOP_OFFSET_TRACKS - m_view->GetYScrollPosition();
+	m_dragFramePos = wxRect( xNew, yNew, m_dragImagePos.width, 25 );
+	ShowFrame( dc );
 }
 void SampleDragHandler::OnDrop( int x, int y, bool copy )
 {
