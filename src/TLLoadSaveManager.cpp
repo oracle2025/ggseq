@@ -64,6 +64,7 @@ bool TLLoadSaveManager::SaveAs()/*Datei auf existenz prüfen*/
 {
 	//wxConfig config(wxT("ggseq"));
 	wxConfigBase *conf=wxConfigBase::Get();
+	conf->SetPath(wxT("/"));
 	wxString lastFolder = conf->Read(wxT("LastSaveFolder"), wxT(""));
 	
 	wxString filename = wxFileSelector(wxT("Save File as"),lastFolder,wxT(""),wxT("ggseq"),GG_FILE_EXTS,wxSAVE,m_parent);
@@ -99,6 +100,7 @@ void TLLoadSaveManager::Load()
 		}
 	}
 	wxConfigBase *conf=wxConfigBase::Get();
+	conf->SetPath(wxT("/"));
 	//wxConfig config(wxT("ggseq"));
 	wxString lastFolder = conf->Read(wxT("LastLoadFolder"), wxT(""));
 

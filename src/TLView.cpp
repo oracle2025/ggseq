@@ -138,6 +138,7 @@ TLView::TLView(TLData *TlData)
 	m_TrackDrawDist=5;
 	m_selectionSet=new TLSelectionSet();
 	wxConfigBase *conf=wxConfigBase::Get();
+	conf->SetPath(wxT("/"));
 //	wxConfig config(wxT("ggseq"));
 	m_TlData->SetSnapValue(conf->Read(wxT("SnapPosition"), SNAP_POSITION));
 	m_gungirl=new wxIcon(gun_girl_xpm);	

@@ -1,4 +1,4 @@
-/* TLSelectColourDialog.h
+/* TLSetSnapDialog.h
  *
  *  Copyright (C) 2003 Richard Spindler <oracle2025@gmx.de>
  *
@@ -30,37 +30,41 @@ class TLSetSnapDialog: public wxDialog
 //		void OnHipHopButton(wxCommandEvent &event);
 //		void OnOldSkoolButton(wxCommandEvent &event);
 //		void OnFunkButton(wxCommandEvent &event);
+		void OnAddButton(wxCommandEvent &event);
+		void OnDeleteButton(wxCommandEvent &event);
+		void OnPresetNameText(wxCommandEvent &event);
+		void OnPresetsList(wxCommandEvent &event);
+		void OnClose(wxCloseEvent &event);
+
 		void OnSpin(wxSpinEvent &event);
 		void OnSecondsText(wxCommandEvent &event);
 		void OnBpmText(wxCommandEvent &event);
 
-		void OnAddButton(wxCommandEvent &event);
-		void OnDeleteButton(wxCommandEvent &event);
-		void OnPresetNameText(wxCommandEvent &event);
-		
-		void OnPresetsList(wxCommandEvent &event);
-		
-		void OnClose(wxCloseEvent &event);
-		wxString m_SnapSize;
-		wxString m_bpmValue;
-		int m_SnapPosition; //int m_frameSnapValue; /*Als Zentraler Wert*/
+		//virtual bool TransferDataToWindow(){puts("test1");return true;}
+		//virtual bool TransferDataFromWindow(){puts("test2");return true;}
+
+		//wxString m_SnapSize; /*?*/
+		//wxString m_bpmValue; /*?*/
+		//int m_SnapPosition; /*?*/
+		int m_frameSnapValue; /*Als Zentraler Wert*/
 		wxSpinCtrl *m_FramesSpinCtrl;
 		wxTextCtrl *m_SecondsTextCtrl;
 		wxTextCtrl *m_bpmTextCtrl;
 		wxListBox *m_presetsListBox;
 		wxTextCtrl *m_presetNameText;
 	private:
+		void DisableEvtHandler();
+		void EnableEvtHandler();
 		void Save();
 		void Load();
 		void Select(wxString str, int length);
 		void Modify(wxString str);
 		void Modify(int length);
-		bool m_Lock;
-		void FromFramesToSeconds(int Frames=-1);
-		void FromFramesToBpm();
-		//void UpdateDisplaySeconds();
-		//void UpdateDisplayFrames(int Frames); ??
-		//void UpdateDisplayBpm();
+		//void FromFramesToSeconds(int Frames=-1); /* - */
+		//void FromFramesToBpm(); /* - */
+		void UpdateDisplaySeconds();
+		void UpdateDisplayFrames(int Frames);
+		void UpdateDisplayBpm();
 		//void SetFrameSnapFromSeconds(double Seconds)
 		//void SetFrameSnapFromBpm(double Bpm)
 		DECLARE_EVENT_TABLE()

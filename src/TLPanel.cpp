@@ -505,7 +505,7 @@ void TLPanel::DrawCaret(wxDC& dc)
 
 void TLPanel::ResetScrollBar()
 {
-	int ts = FromTLtoSB(m_TlView->GetScrollBarThumbSize());
+	/*int ts = FromTLtoSB(m_TlView->GetScrollBarThumbSize());*/
 	m_scrollBar->SetBigScrollBar(m_TlView->GetPosition(),m_TlView->GetScrollBarThumbSize(),m_TlView->GetScrollBarRange());
 }
 bool TLPanel::New()
@@ -708,10 +708,11 @@ void TLPanel::SetSnap()
 	TLSetSnapDialog dlg(this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),-1,m_TlView->GetSnapValue()/2,wxT("Set Sample Snapping Position"));
 	dlg.Centre();
 	if (dlg.ShowModal()==wxID_OK) {
-		m_TlView->SetSnapValue(dlg.m_SnapPosition*2);
+		m_TlView->SetSnapValue(dlg.m_frameSnapValue*2);
 	}
 	m_ruler->SetSnap((m_TlView->GetSnapValue()*31)/117600);
 	m_ruler->Refresh();
+	m_scrollBar->Enable(); /*TODO: Evil Hack*/
 }
 
 void TLPanel::DropFileAt(int x, int y, wxString filename)

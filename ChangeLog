@@ -1,3 +1,11 @@
+2004-02-03  Richard Spindler <oracle2025@gmx.de>
+
+ * Fixed a Bug that caused a floatingpoint exception in the scrollbar
+
+2004-02-02  Richard Spindler <oracle2025@gmx.de>
+
+ * Added a BPM-Input for Snap Value
+
 2004-01-29  Richard Spindler <oracle2025@gmx.de>
 
  *  Fixed broken config-file stuff

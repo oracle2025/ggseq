@@ -46,9 +46,10 @@ enum
 	ID_PresetsList,
 };
 BEGIN_EVENT_TABLE(TLSetSnapDialog, wxDialog)
-	EVT_SPINCTRL(ID_FramesCtrl, TLSetSnapDialog::OnSpin)
-	EVT_TEXT(ID_SecondsCtrl,TLSetSnapDialog::OnSecondsText)
-	EVT_TEXT(ID_BpmCtrl,TLSetSnapDialog::OnBpmText)
+	//EVT_TEXT(ID_FramesCtrl, TLSetSnapDialog::OnSpin) /* den */ /*unter GTK2 notwendig?*/
+	EVT_SPINCTRL(ID_FramesCtrl, TLSetSnapDialog::OnSpin) /* den */
+	EVT_TEXT(ID_SecondsCtrl,TLSetSnapDialog::OnSecondsText) /* und den */
+	EVT_TEXT(ID_BpmCtrl,TLSetSnapDialog::OnBpmText) /* und den */
 	EVT_BUTTON(ID_AddButton, TLSetSnapDialog::OnAddButton)
 	EVT_BUTTON(ID_DeleteButton, TLSetSnapDialog::OnDeleteButton)
 	EVT_LISTBOX(ID_PresetsList,TLSetSnapDialog::OnPresetsList)
@@ -56,66 +57,147 @@ BEGIN_EVENT_TABLE(TLSetSnapDialog, wxDialog)
 	EVT_CLOSE(TLSetSnapDialog::OnClose)
 END_EVENT_TABLE()
 
+class NumberOnlyEvtHandler : public wxEvtHandler
+{	
+	public:
+		NumberOnlyEvtHandler() :wxEvtHandler(){}
+		void OnKey(wxKeyEvent &event)
+		{
+			wxString s = wxT("0123456789,.");
+			s << (wxChar)WXK_BACK;
+			s << (wxChar)WXK_TAB;
+			s << (wxChar)WXK_RETURN;
+			s << (wxChar)WXK_ESCAPE;
+			//s << (wxChar)WXK_SPACE;
+			s << (wxChar)WXK_DELETE;
+			s << (wxChar)WXK_START;
+			s << (wxChar)WXK_LBUTTON;
+			s << (wxChar)WXK_RBUTTON;
+			s << (wxChar)WXK_CANCEL;
+			s << (wxChar)WXK_MBUTTON;
+			s << (wxChar)WXK_CLEAR;
+			s << (wxChar)WXK_SHIFT;
+			s << (wxChar)WXK_CONTROL;
+			s << (wxChar)WXK_MENU;
+			s << (wxChar)WXK_PAUSE;
+			s << (wxChar)WXK_CAPITAL;
+			s << (wxChar)WXK_PRIOR;
+			s << (wxChar)WXK_NEXT;
+			s << (wxChar)WXK_END;
+			s << (wxChar)WXK_HOME;
+			s << (wxChar)WXK_LEFT;
+			s << (wxChar)WXK_UP;
+			s << (wxChar)WXK_RIGHT;
+			s << (wxChar)WXK_DOWN;
+			s << (wxChar)WXK_SELECT;
+			s << (wxChar)WXK_PRINT;
+			s << (wxChar)WXK_EXECUTE;
+			s << (wxChar)WXK_SNAPSHOT;
+			s << (wxChar)WXK_INSERT;
+			s << (wxChar)WXK_HELP;
+			s << (wxChar)WXK_NUMPAD0;
+			s << (wxChar)WXK_NUMPAD1;
+			s << (wxChar)WXK_NUMPAD2;
+			s << (wxChar)WXK_NUMPAD3;
+			s << (wxChar)WXK_NUMPAD4;
+			s << (wxChar)WXK_NUMPAD5;
+			s << (wxChar)WXK_NUMPAD6;
+			s << (wxChar)WXK_NUMPAD7;
+			s << (wxChar)WXK_NUMPAD8;
+			s << (wxChar)WXK_NUMPAD9;
+			s << (wxChar)WXK_MULTIPLY;
+			s << (wxChar)WXK_ADD;
+			s << (wxChar)WXK_SEPARATOR;
+			s << (wxChar)WXK_SUBTRACT;
+			s << (wxChar)WXK_DECIMAL;
+			s << (wxChar)WXK_DIVIDE;
+			s << (wxChar)WXK_F1;
+			s << (wxChar)WXK_F2;
+			s << (wxChar)WXK_F3;
+			s << (wxChar)WXK_F4;
+			s << (wxChar)WXK_F5;
+			s << (wxChar)WXK_F6;
+			s << (wxChar)WXK_F7;
+			s << (wxChar)WXK_F8;
+			s << (wxChar)WXK_F9;
+			s << (wxChar)WXK_F10;
+			s << (wxChar)WXK_F11;
+			s << (wxChar)WXK_F12;
+			s << (wxChar)WXK_F13;
+			s << (wxChar)WXK_F14;
+			s << (wxChar)WXK_F15;
+			s << (wxChar)WXK_F16;
+			s << (wxChar)WXK_F17;
+			s << (wxChar)WXK_F18;
+			s << (wxChar)WXK_F19;
+			s << (wxChar)WXK_F20;
+			s << (wxChar)WXK_F21;
+			s << (wxChar)WXK_F22;
+			s << (wxChar)WXK_F23;
+			s << (wxChar)WXK_F24;
+			s << (wxChar)WXK_NUMLOCK;
+			s << (wxChar)WXK_SCROLL ;
+			for (unsigned int i=0;i<s.Len();i++) {
+				if (((int)s[i])==event.GetKeyCode()) {
+					event.Skip();
+					return;
+				}
+			}
+		}
+	private:
+		DECLARE_EVENT_TABLE()
+};
+BEGIN_EVENT_TABLE(NumberOnlyEvtHandler, wxEvtHandler)
+	EVT_CHAR(NumberOnlyEvtHandler::OnKey)
+END_EVENT_TABLE()
+class NoChangeEvtHandler : public wxEvtHandler
+{
+	public:
+		NoChangeEvtHandler() :wxEvtHandler(){}
+		void OnSpin(wxSpinEvent &event){}
+		void OnSecondsText(wxCommandEvent &event){}
+		void OnBpmText(wxCommandEvent &event){}
+	private:
+		DECLARE_EVENT_TABLE()
+};
+BEGIN_EVENT_TABLE(NoChangeEvtHandler, wxEvtHandler)
+	EVT_SPINCTRL(ID_FramesCtrl, NoChangeEvtHandler::OnSpin) /* den */
+	EVT_TEXT(ID_SecondsCtrl,NoChangeEvtHandler::OnSecondsText) /* und den */
+	EVT_TEXT(ID_BpmCtrl,NoChangeEvtHandler::OnBpmText) /* und den */
+END_EVENT_TABLE()
+
+
 TLSetSnapDialog::TLSetSnapDialog(wxWindow* parent, wxWindowID id,int SnapPosition, const wxString& title, const wxPoint& pos, const wxSize& size)
 	:wxDialog(parent, -1, title, pos, size, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER   )
 {
-	m_Lock=true;
-	m_SnapSize.Clear();
-	m_SnapSize << ((double)SnapPosition)/SAMPLE_RATE;
 	MyDialogFunc(this,true);
 
 	int *len=new int;
 	*len=SnapPosition;
 	m_presetsListBox->Append(wxT("Custom ..."), (void*)len);
-/*	len=new int;
-	*len=FUNK;
-        m_presetsListBox->Append(wxT("Funk"), (void*)len);
-	len=new int;
-	*len=HIP_HOP;
-        m_presetsListBox->Append(wxT("HipHop"), (void*)len);
-	len=new int;
-	*len=OLD_SKOOL;
-        m_presetsListBox->Append(wxT("OldSkool"), (void*)len);*/
 
 	Load();
 
 	m_presetsListBox->SetSelection(0);
-//	FromFramesToSeconds(SnapPosition);
-	Select(wxT("Custom ..."),SnapPosition);
 	FindWindowById(ID_DeleteButton)->Enable(false);
 	m_presetNameText->Enable(false);
-	m_Lock=false;
+
+	Select(wxT("Custom ..."),SnapPosition);
+	//m_FramesSpinCtrl->SetValue(5);
+	//m_SecondsTextCtrl->SetValue(wxT("test"));
+	
+	//UpdateDisplaySeconds();
+	//UpdateDisplayBpm();
 }
 void TLSetSnapDialog::Save()
 {
 	wxConfigBase *conf=wxConfigBase::Get();
-//	wxConfig config(wxT("ggseq"));
 	if (conf->Exists(wxT("/Snaps"))) {
 		conf->DeleteGroup(wxT("/Snaps"));
 	}
-
-/*	config.SetPath(wxT("/Snaps"));
-	wxArrayString aNames;
-	wxString str;
-	long dummy;
-	bool bCont = config.GetFirstEntry(str, dummy);
-	while ( bCont ) {
-		aNames.Add(str);
-		bCont = config.GetNextEntry(str, dummy);
-	}
-	for (unsigned int i=0;i<aNames.Count();i++) {
-		wxString str1=aNames.Item(i);
-		config.DeleteEntry(str1, false);
-	}
-*/
-
-	
-//	config.Flush();
 	conf->SetPath(wxT("/Snaps"));
 	for (int i=1;i<m_presetsListBox->GetCount();i++) {
 		int t=*(int*)m_presetsListBox->GetClientData(i);
-//		std::cout << "int: " << t << std::endl;
-//		std::cout << "str: " << m_presetsListBox->GetString(i).mb_str() << " " << i << std::endl;
 		conf->Write(m_presetsListBox->GetString(i), t);
 	}
 	conf->Flush();
@@ -123,7 +205,6 @@ void TLSetSnapDialog::Save()
 void TLSetSnapDialog::Load()
 {
 	wxConfigBase *conf=wxConfigBase::Get();
-//	wxConfig config(wxT("ggseq"));
 	if (!conf->Exists(wxT("/Snaps"))) {
 		int *len=new int;
 		*len=FUNK;
@@ -159,6 +240,8 @@ void TLSetSnapDialog::OnClose(wxCloseEvent &event)
 }
 TLSetSnapDialog::~TLSetSnapDialog()
 {
+	m_SecondsTextCtrl->PopEventHandler(true);
+	m_bpmTextCtrl->PopEventHandler(true);
 	Save();
 	for (int i=0;i<m_presetsListBox->GetCount();i++) {
 		int *t=(int*)m_presetsListBox->GetClientData(i);
@@ -167,14 +250,15 @@ TLSetSnapDialog::~TLSetSnapDialog()
 }
 void TLSetSnapDialog::OnSpin(wxSpinEvent &event)
 {
-	FromFramesToSeconds();
-	FromFramesToBpm();
-	Modify(m_SnapPosition);
+	m_frameSnapValue=event.GetPosition();
+	Modify(m_frameSnapValue);
+	UpdateDisplaySeconds();
+	UpdateDisplayBpm();
 }
 void TLSetSnapDialog::OnAddButton(wxCommandEvent &event)
 {
 	int *t=new int;
-	*t=m_SnapPosition;
+	*t=m_frameSnapValue;
 	m_presetsListBox->Append(wxT("Unnamed"),(void*)t);
 	m_presetsListBox->SetSelection(m_presetsListBox->GetCount()-1);
 	Select(wxT("Unnamed"),*t);
@@ -210,8 +294,9 @@ void TLSetSnapDialog::OnPresetsList(wxCommandEvent &event)
 void TLSetSnapDialog::Select(wxString str, int length)
 {
 	m_presetNameText->SetValue(str);
-	FromFramesToSeconds(length);
-	FromFramesToBpm();
+	UpdateDisplayFrames(length);
+	UpdateDisplaySeconds();
+	UpdateDisplayBpm();
 }
 void TLSetSnapDialog::Modify(wxString str)
 {
@@ -229,45 +314,50 @@ void TLSetSnapDialog::Modify(int length)
 		*t = length;
 	}
 }
-void TLSetSnapDialog::FromFramesToSeconds(int Frames)
+void TLSetSnapDialog::UpdateDisplaySeconds()
 {
-	m_Lock=true;
-	if(Frames>0) {
-		m_FramesSpinCtrl->SetValue(Frames);
-	}
-	m_SnapPosition=m_FramesSpinCtrl->GetValue();
-	double a = ((double)m_SnapPosition)/SAMPLE_RATE;
+	PushEventHandler(new NoChangeEvtHandler());
+	double a = ((double)m_frameSnapValue)/SAMPLE_RATE;
 	m_SecondsTextCtrl->Clear();
 	*m_SecondsTextCtrl << a;
-	m_Lock=false;
+	PopEventHandler(true);
 }
-void TLSetSnapDialog::FromFramesToBpm()
+void TLSetSnapDialog::UpdateDisplayFrames(int Frames)
 {
-	m_Lock=true;
-//	m_SnapPosition=m_FramesSpinCtrl->GetValue();
-	
-	double a = 60./(((double)m_SnapPosition)/SAMPLE_RATE);
+	PushEventHandler(new NoChangeEvtHandler());
+	m_frameSnapValue=Frames;
+	m_FramesSpinCtrl->SetValue(m_frameSnapValue);
+	PopEventHandler(true);
+}
+void TLSetSnapDialog::UpdateDisplayBpm()
+{
+	PushEventHandler(new NoChangeEvtHandler());
+	double a = 60./(((double)m_frameSnapValue)/SAMPLE_RATE);
 	m_bpmTextCtrl->Clear();
 	*m_bpmTextCtrl << a;
-	m_Lock=false;
-
+	PopEventHandler(true);
 }
 void TLSetSnapDialog::OnSecondsText(wxCommandEvent &event)
 {
-	if (!m_Lock) {
-		double a;
-		m_SecondsTextCtrl->GetValue().ToDouble(&a);
-		int b = (int)(a*44100);
-		m_FramesSpinCtrl->SetValue(b);
-		m_SnapPosition=b;
-		Modify(m_SnapPosition);
-	}
+	if (event.GetString().IsEmpty())
+		return;
+	double a;
+	m_SecondsTextCtrl->GetValue().ToDouble(&a);
+	int b = (int)(a*44100);
+	UpdateDisplayFrames(b);
+	UpdateDisplayBpm();
+	Modify(m_frameSnapValue);
 }
 void TLSetSnapDialog::OnBpmText(wxCommandEvent &event)
 {
-	if (!m_Lock) {
-	}
-
+	if (event.GetString().IsEmpty())
+		return;
+	double a;
+	m_bpmTextCtrl->GetValue().ToDouble(&a);
+	int b = (int)((60./a)*44100);
+	UpdateDisplayFrames(b);
+	UpdateDisplaySeconds();
+	Modify(m_frameSnapValue);
 }
 wxSizer *MyDialogFunc( TLSetSnapDialog *parent, bool call_fit, bool set_sizer )
 {
@@ -297,9 +387,10 @@ wxSizer *MyDialogFunc( TLSetSnapDialog *parent, bool call_fit, bool set_sizer )
     wxStaticText *item8 = new wxStaticText( parent, ID_TEXT, wxT("Seconds"), wxDefaultPosition, wxDefaultSize, 0 );
     item5->Add( item8, 0,wxALIGN_LEFT, 5 );
 
-    wxTextValidator tVal(wxFILTER_NUMERIC, &(parent->m_SnapSize));
+    //wxTextValidator tVal(wxFILTER_NUMERIC, &(parent->m_SnapSize));
 
-    parent->m_SecondsTextCtrl = new wxTextCtrl( parent, ID_SecondsCtrl, parent->m_SnapSize, wxDefaultPosition, wxSize(80,-1), 0,tVal );
+    parent->m_SecondsTextCtrl = new wxTextCtrl( parent, ID_SecondsCtrl, wxT("") , wxDefaultPosition, wxSize(80,-1), 0/*,tVal */);
+    parent->m_SecondsTextCtrl->PushEventHandler(new NumberOnlyEvtHandler());
     item5->Add( parent->m_SecondsTextCtrl, 0, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
 
 /**/
@@ -307,12 +398,13 @@ wxSizer *MyDialogFunc( TLSetSnapDialog *parent, bool call_fit, bool set_sizer )
 	wxStaticText *bpmLabel = new wxStaticText( parent, ID_TEXT, wxT("BPM"), wxDefaultPosition, wxDefaultSize, 0 );
     item5->Add( bpmLabel, 0, wxALIGN_LEFT, 5 );
 
-    wxTextValidator bpmVal(wxFILTER_NUMERIC, &(parent->m_bpmValue));
+    //wxTextValidator bpmVal(wxFILTER_NUMERIC, &(parent->m_bpmValue));
 
-    parent->m_bpmTextCtrl = new wxTextCtrl( parent, ID_BpmCtrl, wxT(""), wxDefaultPosition, wxSize(80,-1), 0,bpmVal );
+    parent->m_bpmTextCtrl = new wxTextCtrl( parent, ID_BpmCtrl, wxT(""), wxDefaultPosition, wxSize(80,-1), 0/*,bpmVal */);
+    parent->m_bpmTextCtrl->PushEventHandler(new NumberOnlyEvtHandler());
     item5->Add( parent->m_bpmTextCtrl, 0, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
-	bpmLabel->Hide();
-	 parent->m_bpmTextCtrl->Hide();
+//	bpmLabel->Hide();
+//	 parent->m_bpmTextCtrl->Hide();
 /**/
     item3->Add( item5, 0, wxALIGN_CENTRE|wxALL, 5 );
 

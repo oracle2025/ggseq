@@ -32,6 +32,10 @@ BigScrollBar::BigScrollBar(wxWindow* parent, wxWindowID id) : wxScrollBar(parent
 void BigScrollBar::SetBigScrollBar(gg_tl_dat position, gg_tl_dat thumbSize, gg_tl_dat range)
 {
 	m_BigRange = range;
+	if (m_BigRange<20) {
+		m_BigRange=20;
+	}
+	/*TODO: range darf nicht null sein -- erledigt*/
 	int sbPosition = (int) ( (position*SCROLLBAR_LENGTH)/m_BigRange );
 	int sbThumbSize = (int) ( (thumbSize*SCROLLBAR_LENGTH)/m_BigRange );
 	SetScrollbar(sbPosition, sbThumbSize, SCROLLBAR_LENGTH, sbThumbSize);
