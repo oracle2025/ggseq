@@ -363,10 +363,8 @@ void TLView::AddItem(TLSample *sample, long position, long trackNr)
 {
 	if (m_TlData->IsBlocked())
 		return;
-	TLItem *item=m_TlData->AddItem(sample,FromScreenXtoTL(position),trackNr);
-	if (!item)
-		return;
-	SnapItem(item);
+//	m_TlData->AddItem(sample,GetSnap(FromScreenXtoTL(position)),trackNr);
+	m_docManager->SubmitCommand( new GgseqAddItemCommand( m_TlData, sample->GetFilename(), GetSnap(FromScreenXtoTL(position)), trackNr, sample ));
 }
 
 void TLView::AddItem(wxString filename, long position, long trackNr)
@@ -374,7 +372,7 @@ void TLView::AddItem(wxString filename, long position, long trackNr)
 	if (m_TlData->IsBlocked())
 		return;
 	m_docManager->SubmitCommand( new GgseqAddItemCommand( m_TlData, filename,
-		FromScreenXtoTL(position),trackNr ) );
+		GetSnap(FromScreenXtoTL(position)),trackNr ) );
 /*	TLItem *item=m_TlData->AddItem(filename,FromScreenXtoTL(position),trackNr);
 	if (!item)
 		return;
@@ -385,7 +383,8 @@ void TLView::DeleteItem(TLItem *item, long trackNr)
 {
 	if (m_TlData->IsBlocked())
 		return;
-	m_TlData->DeleteItem(item,trackNr);
+//	m_TlData->DeleteItem(item,trackNr);
+	m_docManager->SubmitCommand( new GgseqDeleteItemCommand( m_TlData, item ) );
 }
 
 gg_tl_dat TLView::FromScreenXtoTL(long x)
@@ -440,17 +439,18 @@ void TLView::DoDrop(long x, long y, TLItem *item, long srcTrack, long x_offset, 
 		return;
 	if (copy) {
 		AddItem(item->GetSample(),x,track);
-	} else {
-		if (srcTrack==track) { /*Move in Track*/
-			m_TlData->SetItemPosition(item,FromScreenXtoTL(x));
-			SnapItem(item);
-		} else { /*Move out of Track*/
-			AddItem(item->GetSample(),x,track);
-			DeleteItem(item,srcTrack);
-		}
+	} else { /* TODO: Hier den move Command verwenden */
+		m_docManager->SubmitCommand( new GgseqMoveItemCommand( m_TlData, item, GetSnap(FromScreenXtoTL(x)), track ) );
+		//if (srcTrack==track) { /*Move in Track*/
+		//	m_TlData->SetItemPosition(item,FromScreenXtoTL(x));
+		//	SnapItem(item);
+		//} else { /*Move out of Track*/
+		//	AddItem(item->GetSample(),x,track);
+		//	DeleteItem(item,srcTrack);
+		//}
 	}
 }
-void TLView::SnapItem(TLItem *item)
+void TLView::SnapItem(TLItem *item)/*TODO: Soll verschwinden*/
 {
 	if (m_TlData->IsBlocked())
 		return;
@@ -605,7 +605,7 @@ void TLView::DrawSelection(wxDC *dc)
 }
 void TLView::EndSelectionDrag(int x, int y, bool copy, long x_offset)
 {
-	gg_tl_dat TL_x=FromScreenXtoTL(x);
+	gg_tl_dat TL_x=FromScreenXtoTL(x);/*TODO: festellen wann: Add, Move, Delete*/
 	TL_x=GetSnap(TL_x);
 //	gg_tl_dat pos=TL_x% (gg_tl_dat)m_TlData->GetSnapValue()/*m_SnapPosition*/;
 //	if (pos) {
@@ -619,14 +619,30 @@ void TLView::EndSelectionDrag(int x, int y, bool copy, long x_offset)
 	if (x+x_offset<m_FrameX || x+x_offset>m_FrameX+m_FrameWidth)
 		track=-1;
 	TLSelectionSet *SelSet;
-	if (track>=0)
+	//Add: track>=0 and copy==true
+	//Move: track>=0 and copy==false
+	//Delete: track<0 and copy==false
+	if ( track>=0 && copy ) { /*Add*/
+		m_docManager->SubmitCommand( new GgseqAddItemsCommand( m_TlData, m_selectionSet, &SelSet, TL_x, track ));
+		delete m_selectionSet;
+		m_selectionSet=SelSet;
+	}
+	if ( track>=0 && !copy ) {
+		m_docManager->SubmitCommand( new GgseqMoveItemsCommand( m_TlData, m_selectionSet, &SelSet, TL_x, track ));
+		delete m_selectionSet;
+		m_selectionSet=SelSet;
+	}
+	if ( track<0 and !copy ) {
+		m_docManager->SubmitCommand( new GgseqDeleteItemsCommand( m_TlData, m_selectionSet ));
+	}
+	/*if (track>=0)
 		SelSet=m_selectionSet->AddTo(m_TlData,TL_x,track);
 	if (!copy)
 		m_selectionSet->DeleteFrom(m_TlData);
 	if (track>=0) {
 		delete m_selectionSet;
 		m_selectionSet=SelSet;
-	}
+	}*/
 }
 
 
@@ -637,4 +653,18 @@ void TLView::SetSnapValue(long snapValue)
 long TLView::GetSnapValue()
 {
 	return m_TlData->GetSnapValue();
+}
+void TLView::Undo()
+{
+	if (m_docManager->CanUndo()) {
+		ClearSelection();
+		m_docManager->Undo();
+	}
+}
+void TLView::Redo()
+{
+	if (m_docManager->CanRedo()) {
+		ClearSelection();
+		m_docManager->Redo();
+	}
 }

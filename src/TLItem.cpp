@@ -28,13 +28,14 @@
 #include "TLSample.h"
 #include <iostream>
 
-TLItem::TLItem(TLSample *sample, int trackNr, gg_tl_dat position)
+TLItem::TLItem(TLSample *sample, int trackNr, gg_tl_dat position, long reference )
 {
 	m_sample=sample;
 	m_position=position;
 	m_sample->Ref();
 	m_selected=false;
 	m_trackNr = trackNr;
+	m_referenceId = reference;
 }
 TLItem::~TLItem()
 {
@@ -112,4 +113,5 @@ bool TLItem::IsSelected()
 {
 	return m_selected;
 }
+long TLItem::GetReference() { return m_referenceId; }
 

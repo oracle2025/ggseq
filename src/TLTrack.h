@@ -34,8 +34,8 @@ class TLTrack
 
 		TLItemList::Node *GetFirst();
 		TLItem *ItemAtPos(gg_tl_dat Position);
-		TLItem *AddItem(TLSample *sample, gg_tl_dat position);
-		void DeleteItem(TLItem *item);
+		TLItem *AddItem(TLSample *sample, gg_tl_dat position, long referenceId );
+		void DeleteItem(TLItem *item/*, long referenceId*/);
 
 		int GetHeight();
 		gg_tl_dat GetLength();
@@ -50,7 +50,7 @@ class TLTrack
 		bool IsMuted();
 		void addXmlData(TiXmlElement *tracks);
 	private:
-		TLItemList m_itemList;
+		TLItemList *m_itemList;// = TLItemList(wxKEY_INTEGER);
 		int m_height;
 		int m_trackNr;
 		bool m_mute;

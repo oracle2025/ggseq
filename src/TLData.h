@@ -27,6 +27,7 @@ class TLSampleManager;
 class TLColourManager;
 class UpdateListener;
 WX_DECLARE_LIST(TLTrack, TLTrackList);
+WX_DECLARE_HASH_MAP( unsigned int, TLItem*, wxIntegerHash, wxIntegerEqual, TLItemHash );
 
 #include "Ruler.h"
 
@@ -41,11 +42,11 @@ class TLData: public LoopSetupListener
 		void AddTrack();
 		void SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2);
 
-		TLItem *AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr);
-		TLItem *AddItem(wxString& filename, gg_tl_dat Position, int TrackNr);
+		TLItem *AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long referenceId = 0 );
+		TLItem *AddItem(wxString& filename, gg_tl_dat Position, int TrackNr, long referenceId = 0 );
 		TLItem *ItemAtPos(gg_tl_dat Position, int TrackNr);
 		void SetItemPosition(TLItem *item, gg_tl_dat Position);
-		void DeleteItem(TLItem *item, int TrackNr);
+		void DeleteItem(TLItem *item, int TrackNr/*, long referenceId*/ );
 		void SetTrackMute(bool mute, int TrackNr);
 		void SetTrackVolume(double vol, int TrackNr);
 
@@ -77,6 +78,7 @@ class TLData: public LoopSetupListener
 		long GetSnapValue();
 		void SetMasterVolume(float volume);
 		gg_tl_dat m_position;/*Wird während des Abspielens inkrementiert*/
+		TLItem* GetItem(long referenceId);
 	private:
 		gg_tl_dat m_loopPos1;
 		gg_tl_dat m_loopPos2;
@@ -95,6 +97,7 @@ class TLData: public LoopSetupListener
 		gg_tl_dat m_length;
 		float m_masterVolume;
 		UpdateListener *m_updateListener;
+		TLItemHash m_allItemsHash;
 };
 
 #endif /*_TLDATA_H_*/

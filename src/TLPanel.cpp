@@ -760,3 +760,15 @@ void TLPanel::UpdateRulerTicks()
 	m_ruler->SetPosition(m_TlView->GetPosition());
 }
 void TLPanel::SetMasterVolume(float volume) { m_data->SetMasterVolume(volume); }
+
+void TLPanel::Undo()
+{
+	m_TlView->Undo();
+	Refresh();
+}
+void TLPanel::Redo()
+{
+	m_TlView->Redo();
+	Refresh();
+}
+

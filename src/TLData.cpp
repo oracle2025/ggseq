@@ -22,6 +22,7 @@
     #include "wx/wx.h"
 #endif
 #include <sndfile.h>
+#include <wx/hashmap.h>
 
 //#include <iostream>
 #include <fstream>
@@ -74,7 +75,7 @@ void TLData::SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2)
 	m_loopPos2=pos2;
 	m_loop_enabled=true;
 	m_playbackPosition=m_loopPos1;
-	puts("abc-Test");
+/*	puts("abc-Test");*/
 }
 TLTrackList::Node *TLData::GetFirst()
 {
@@ -90,9 +91,10 @@ TLItem *TLData::ItemAtPos(gg_tl_dat Position, int TrackNr)
 	return tlTrack->ItemAtPos(Position);
 }
 
-void TLData::DeleteItem(TLItem *item, int TrackNr)
+void TLData::DeleteItem( TLItem *item, int TrackNr/*, long referenceId */)
 {
 	TLTrack *tlTrack = m_trackList.Item(TrackNr)->GetData();
+	long referenceId = item->GetReference();
 	TLSample *sample=item->GetSample();
 	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::DeleteItem!" );
 	if (!tlTrack)
@@ -100,13 +102,14 @@ void TLData::DeleteItem(TLItem *item, int TrackNr)
 	tlTrack->DeleteItem(item);
 	m_sampleManager->Clear(sample);
 	m_changed=true;
+	m_allItemsHash.erase(referenceId);
 }
 void TLData::ClearSample(TLSample *sample)
 {
 	m_sampleManager->Clear(sample);
 }
 
-TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr)
+TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr, long referenceId )
 {
 	TLTrackList::Node *node =  m_trackList.Item(TrackNr);
 	if (!node)
@@ -119,11 +122,11 @@ TLItem *TLData::AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr)
 	if (Position+sample->GetLength()>m_length-LENGTH_ADD) {
 		m_length=Position+sample->GetLength()+LENGTH_TO_ADD;
 	}
-
-
-	return tlTrack->AddItem(sample, Position);
+	TLItem *item = tlTrack->AddItem(sample, Position, referenceId);
+	m_allItemsHash[referenceId]=item;
+	return item;
 }
-TLItem *TLData::AddItem(wxString& filename, gg_tl_dat Position, int TrackNr)
+TLItem *TLData::AddItem(wxString& filename, gg_tl_dat Position, int TrackNr, long referenceId )
 {
 	TLTrack *tlTrack = m_trackList.Item(TrackNr)->GetData();
 	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::AddItem!" );
@@ -137,7 +140,9 @@ TLItem *TLData::AddItem(wxString& filename, gg_tl_dat Position, int TrackNr)
 		if (Position+sample->GetLength()>m_length-LENGTH_ADD) {
 			m_length=Position+sample->GetLength()+LENGTH_TO_ADD;
 		}
-		return tlTrack->AddItem(sample, Position);
+		TLItem *item = tlTrack->AddItem(sample, Position, referenceId );
+		m_allItemsHash[referenceId]=item;
+		return item;
 	}
 	return NULL;
 }
@@ -465,3 +470,8 @@ long TLData::GetSnapValue()
 	return m_snapValue;
 }
 void TLData::SetMasterVolume(float volume) { m_masterVolume=volume;} 
+TLItem* TLData::GetItem(long referenceId)
+{
+	return m_allItemsHash[referenceId];
+}
+

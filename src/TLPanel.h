@@ -77,6 +77,8 @@ class TLPanel : public wxPanel
 		void SetUpdateListener(UpdateListener *updateListener);
 		wxString GetFilename();
 		void SetMasterVolume(float volume);
+		void Undo();
+		void Redo();
 	private:
 		void DrawCaret(wxDC& dc);
 		void SetRubberframePen(wxDC* dc);

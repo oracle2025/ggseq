@@ -66,6 +66,8 @@
 #include "snap.xpm"
 #include "ggseq_32.xpm"
 #include "help.xpm"
+#include "undo.xpm"
+#include "redo.xpm"
 //#include "prefs_misc.xpm"
 
 
@@ -129,6 +131,8 @@ class TestFrame1: public wxFrame
 		void OnMasterVolume(wxScrollEvent& event);
 		void OnQuit(wxCommandEvent& event);
 		void OnSize(wxSizeEvent &event); /*Nur für Windows*/
+		void OnUndo(wxCommandEvent& event);
+		void OnRedo(wxCommandEvent& event);
 		wxString argv0;
 	private:
 		void MakeToolBar();
@@ -174,6 +178,8 @@ BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
 	EVT_TOOL(ID_SetSnap,TestFrame1::OnSetSnap)
 	EVT_TOOL(ID_Preferences,TestFrame1::OnPreferences)
 	EVT_TOOL(wxID_HELP,TestFrame1::OnHelp)
+	EVT_TOOL(wxID_UNDO,TestFrame1::OnUndo)
+	EVT_TOOL(wxID_REDO,TestFrame1::OnRedo)
 
 	EVT_MENU(wxID_OPEN, TestFrame1::OnLoad)
 	EVT_MENU(wxID_SAVE, TestFrame1::OnSave)
@@ -526,6 +532,9 @@ void TestFrame1::MakeToolBar()
 	m_toolBar->AddSeparator();
 	m_toolBar->AddTool(ID_SetColours,wxT("Setup Colours..."),wxBitmap(colours2_xpm),wxT("Setup Colours..."));
 	m_toolBar->AddTool(ID_SetSnap,wxT("Set Snap Width"),wxBitmap(snap_xpm),wxT("Set Snap Width"));
+	m_toolBar->AddSeparator();
+	m_toolBar->AddTool(wxID_UNDO, wxT("Undo"),wxBitmap(undo_xpm),wxT("Undo"));
+	m_toolBar->AddTool(wxID_REDO, wxT("Redo"),wxBitmap(redo_xpm),wxT("Redo"));
 #if 0
 	m_toolBar->AddSeparator();
 	m_toolBar->AddTool(wxID_HELP,wxT("Help"),wxBitmap(help_xpm),wxT("Show Help"));
@@ -650,6 +659,14 @@ void TestFrame1::OnWavExport(wxCommandEvent& event)
 {
 	Stop();
 	m_tp->WavExport();
+}
+void TestFrame1::OnUndo(wxCommandEvent& event)
+{
+	m_tp->Undo();
+}
+void TestFrame1::OnRedo(wxCommandEvent& event)
+{
+	m_tp->Redo();
 }
 
 void TestFrame1::RefreshWindowTitle()

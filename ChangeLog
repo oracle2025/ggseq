@@ -1,3 +1,7 @@
+2004-04-22  Richard Spindler <oracle2025@gmx.de>
+
+ * ha, Undo-Redo finally done :)
+
 2004-04-04  Richard Spindler <oracle2025@gmx.de>
 
  * Implemented Simple Loop Functionality. (Not quite done yet, but it works)

@@ -35,39 +35,43 @@ WX_DEFINE_LIST(TLItemList);
 
 TLTrack::TLTrack(int trackNr)
 {
+	m_itemList = new TLItemList(wxKEY_INTEGER);
 	m_height=25;
 	m_trackNr=trackNr;
-	m_itemList.DeleteContents(true);
+	m_itemList->DeleteContents(true);
 	m_volume=1.0;
 	m_mute=false;
 	m_length=0;
 }
 TLTrack::~TLTrack()
 {
-	m_itemList.Clear();
+	m_itemList->Clear();
+	delete m_itemList;
+	m_itemList = (TLItemList*) 0;
 }
 
 TLItemList::Node *TLTrack::GetFirst()
 {
-	return m_itemList.GetFirst();
+	return m_itemList->GetFirst();
 }
 TLItem *TLTrack::ItemAtPos(gg_tl_dat Position)
 {
-	for ( TLItemList::Node *node = m_itemList.GetLast(); node; node = node->GetPrevious() ) {
+	for ( TLItemList::Node *node = m_itemList->GetLast(); node; node = node->GetPrevious() ) {
 		TLItem *current = node->GetData();
 		if ((current->GetPosition()<Position)&&(current->GetEndPosition()/*+current->GetLength()*/>Position))
 			return current;
 	}
 	return (TLItem*)NULL;
 }
-void TLTrack::DeleteItem(TLItem *item)
+void TLTrack::DeleteItem(TLItem *item /*, long referenceId*/)
 {
-	m_itemList.DeleteObject(item);
+//	m_itemList->DeleteNode(m_itemList->Find(referenceId));
+	m_itemList->DeleteObject(item);
 }
-TLItem *TLTrack::AddItem(TLSample *sample, gg_tl_dat position)
+TLItem *TLTrack::AddItem(TLSample *sample, gg_tl_dat position, long referenceId )
 {
-	TLItem *tmp = new TLItem(sample,m_trackNr,position);
-	m_itemList.Append(tmp);
+	TLItem *tmp = new TLItem(sample,m_trackNr,position, referenceId);
+	m_itemList->Append(referenceId, tmp);
 	return tmp;
 }
 
@@ -75,8 +79,8 @@ static int TlListCompare(const TLItem **arg1, const TLItem **arg2);
 
 void TLTrack::SortItems()
 {
-	m_itemList.Sort(TlListCompare);
-	TLItemList::Node *node= m_itemList.GetLast();
+	m_itemList->Sort(TlListCompare);
+	TLItemList::Node *node= m_itemList->GetLast();
 	if (node) {
 		TLItem *item=node->GetData();
 		m_length=item->GetLength()+item->GetPosition();
@@ -97,7 +101,7 @@ int TLTrack::GetHeight()
 }
 void TLTrack::ResetOffsets()
 {
-	m_currentNode = m_itemList.GetFirst();
+	m_currentNode = m_itemList->GetFirst();
 }
 unsigned int TLTrack::FillBuffer(float* outBuffer, unsigned int count, gg_tl_dat position)
 {
@@ -129,7 +133,7 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 	tracks->LinkEndChild(track);
 	track->SetAttribute("mute",m_mute);
 	track->SetAttribute("volume",(int)(m_volume*100));
-	for ( TLItemList::Node *node = m_itemList.GetFirst(); node; node = node->GetNext() ) {
+	for ( TLItemList::Node *node = m_itemList->GetFirst(); node; node = node->GetNext() ) {
 		TLItem *current = node->GetData();
 		wxString tmp;
 //		char buffer[100];
@@ -147,7 +151,7 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 }
 void TLTrack::Clear()
 {
-	m_itemList.Clear();
+	m_itemList->Clear();
 }
 
 void TLTrack::SetMute(bool mute)

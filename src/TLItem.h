@@ -24,7 +24,11 @@ class TLSample;
 class TLItem
 {
 	public:
-		TLItem(TLSample *sample, int trackNr, gg_tl_dat position);
+		TLItem( TLSample *sample,
+			int trackNr,
+			gg_tl_dat position,
+			long referenceId
+		);
 		~TLItem();
 		unsigned int FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int count, bool mute, double volume);
 		gg_tl_dat GetLength();
@@ -37,7 +41,9 @@ class TLItem
 		void Select();
 		void UnSelect();
 		bool IsSelected();
+		long GetReference();
 	private:
+		long m_referenceId;
 		TLSample *m_sample;
 		bool m_selected;
 		int m_trackNr;

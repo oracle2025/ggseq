@@ -76,6 +76,8 @@ class TLView
 		static wxColour GetLightColour(wxColour colour);
 		void SuspendSnap();
 		void ResumeSnap();
+		void Undo();
+		void Redo();
 	private:
 		GgseqDocManager *m_docManager;
 		gg_tl_dat GetSnap(gg_tl_dat x);

@@ -22,7 +22,9 @@
 #define _GGSEQ_DOC_MANAGER_H_
 
 class GgseqCommand;
+class GgseqUndoItem;
 WX_DECLARE_LIST(GgseqCommand, GgseqCommandList);
+WX_DECLARE_LIST(GgseqUndoItem, GgseqUndoItemList);
 
 class GgseqDocManager
 {
@@ -34,27 +36,36 @@ class GgseqDocManager
 		void Redo();
 		bool CanUndo();
 		bool CanRedo();
+		long GetNewRefId();
 	private:
 		TLData *m_document;
 		GgseqCommandList m_commandList;
 		GgseqCommandList m_redoList;
+		long m_referenceCount;
 };
 
 class GgseqCommand
 {
 	public:
+		//void SetReferenceId( unsigned int referenceId );
+		void SetDocManager( GgseqDocManager *docManager );
 		virtual void Do() = 0;
 		virtual void Undo() = 0;
-//		virtual ~GgseqCommand() = 0;
+		virtual ~GgseqCommand() {};
+		bool GetError();
 	protected:
 		TLData *m_document;
+		long m_referenceId;
+		//TLItem *m_itemReference;
+		GgseqDocManager *m_docManager;
+		bool m_error;
 };
 
 class GgseqSingleItemCommand : public GgseqCommand
 {
-	public:
-		virtual void Do() = 0;
-		virtual void Undo() = 0;
+//	public:
+//		virtual void Do() = 0;
+//		virtual void Undo() = 0;
 	protected:
 		wxString m_filename;
 		int64_t m_position;
@@ -65,11 +76,13 @@ class GgseqAddItemCommand : public GgseqSingleItemCommand
 {
 	public:
 		GgseqAddItemCommand( TLData *doc, const wxString& filename,
-		                     int64_t position, unsigned int trackId );
+		                     int64_t position, unsigned int trackId,
+		                     TLSample *sample = (TLSample*) 0 );
 		void Do();
 		void Undo();
 	private:
-		TLItem *m_itemReference;
+//		TLItem *m_itemReference;
+		TLSample *m_sample;
 };
 
 class GgseqDeleteItemCommand : public GgseqSingleItemCommand
@@ -99,7 +112,59 @@ class GgseqMoveItemCommand : public GgseqSingleItemCommand
 		m_itemReference=Document->Add(sample_reference, position, track);
 	}*/
 	private:
-		TLItem *m_itemReference;
+		TLItem *m_item;
+//		TLItem *m_itemReference;
+};
+
+class GgseqBunchOfItemsCommand : public GgseqCommand
+{
+	/*
+	ItemList
+	 */
+	protected:
+		GgseqUndoItemList m_itemList;
+};
+
+class GgseqAddItemsCommand : public GgseqBunchOfItemsCommand /*wird beim Kopieren mit der rechten Maustaste verwendet.*/
+{
+	public:
+		GgseqAddItemsCommand( TLData *doc,
+			TLSelectionSet *selSet,
+			TLSelectionSet **newSet,
+			int64_t offsetPos,
+			unsigned int trackId );
+		void Do();
+		void Undo();
+	private:
+		int64_t m_position;
+		unsigned int m_trackId;
+		TLSelectionSet **m_selSetPointer;
+		TLSelectionSet *m_selectionSet;
+};
+
+class GgseqMoveItemsCommand : public GgseqBunchOfItemsCommand
+{
+	public:
+		GgseqMoveItemsCommand( TLData *doc,
+			TLSelectionSet *selSet,
+			TLSelectionSet **newSet,
+			int64_t offsetPos,
+			unsigned int trackId );
+		void Do();
+		void Undo();
+	private:
+		int64_t m_position;
+		unsigned int m_trackId;
+		TLSelectionSet **m_selSetPointer;
+		TLSelectionSet *m_selectionSet;
+};
+class GgseqDeleteItemsCommand : public GgseqBunchOfItemsCommand
+{
+	public:
+		GgseqDeleteItemsCommand( TLData *doc,
+			TLSelectionSet *selSet );
+		void Do();
+		void Undo();
 };
 
 #endif /* _GGSEQ_DOC_MANAGER_H_ */
