@@ -20,10 +20,14 @@
 #ifndef _MINIPLAYER_H_
 #define _MINIPLAYER_H_
 
+class TLSample;
+class UpdateListener;
+
 class MiniPlayerInterface
 {
 	public:
 		virtual void SetFilename(wxString filename)=0;
+		virtual void SetSample(TLSample *sample)=0;
 		virtual void Play()=0;
 		virtual void Stop()=0;
 };
@@ -32,6 +36,7 @@ class MiniPlayer : public wxPanel, public MiniPlayerInterface
 {
 	public:
 		MiniPlayer(wxWindow* parent, SoundManager *soundManager,
+				UpdateListener *updateListener=NULL,
 				wxWindowID id = -1,
 				const wxPoint& pos = wxDefaultPosition,
 				const wxSize& size = wxDefaultSize,
@@ -39,6 +44,7 @@ class MiniPlayer : public wxPanel, public MiniPlayerInterface
 				const wxString& name = wxT("panel"));
 		void MakeMiniPlayerWindow(wxWindow *parent);
 		void SetFilename(wxString filename);
+		void SetSample(TLSample *sample);
 		void Play();
 		void Stop();
 		void OnPlay(wxCommandEvent *event);
@@ -51,7 +57,9 @@ class MiniPlayer : public wxPanel, public MiniPlayerInterface
 		wxSlider *m_slider;
 		wxTimer *m_timer;
 		wxString m_filename;
+		TLSample *m_sample;
 		SoundManager *m_soundManager;
+		UpdateListener *m_updateListener;
 		DECLARE_EVENT_TABLE()
 
 };

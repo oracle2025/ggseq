@@ -38,6 +38,12 @@ ggseq_SOURCES = MiniFilerTest.cpp\
 		MiniPlayer.cpp\
 		Ruler.h\
 		Ruler.cpp\
+		UpdateListener.cpp\
+		UpdateListener.h\
+		StatusProgressBar.cpp\
+		StatusProgressBar.h\
+		DisableListener.h\
+		DisableListener.cpp\
                 SoundManager.h\
                 tinystr.h\
                 tinyxml.h\

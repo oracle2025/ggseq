@@ -1,4 +1,4 @@
-/* TLSampleManager.h
+/* UpdateListener.cpp
  *
  *  Copyright (C) 2003 Richard Spindler <oracle2025@gmx.de>
  *
@@ -17,33 +17,36 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _TLSAMPLEMANAGER_H_
-#define _TLSAMPLEMANAGER_H_
+#include "UpdateListener.h"
+#include <iostream>
 
-class TLSample;
-class TLColourManager;
-class TiXmlElement;
-class UpdateListener;
-
-WX_DECLARE_LIST(TLSample, TLSampleList);
-
-class TLSampleManager
+bool SimpleUpdateListener::Update(int status)
 {
-	public:
-		TLSampleManager();
-		~TLSampleManager();
-		TLSample *GetSample(wxString filename, UpdateListener* updateListener=NULL);
-		TLSample *GetSample(int id); /*Fürs XML laden*/
-		TLSample *AddSample(wxString filename, int id, UpdateListener* updateListener=NULL);
-		void addXmlData(TiXmlElement *samples);
-		void Clear(TLSample* tlSample);
-		void ClearAll();
-		TLColourManager *GetColourManager();
-	private:
-		wxString NormalizePath(wxString filename);
-		TLSampleList m_sampleList;
-		int m_MaxId;
-		TLColourManager *m_colourMan;
-};
+	std::cout << "Status: " << status << std::endl;
+	return true;
+}
+void SimpleUpdateListener::StartUpdateProcess()
+{
+}
+void SimpleUpdateListener::EndUpdateProcess()
+{
+}
 
-#endif /*_TLSAMPLEMANAGER_H_*/
+
+RecursiveUpdateListener::RecursiveUpdateListener(UpdateListener *updateListener, int start, int stop)
+{
+	m_start=start;
+	m_stop=stop;
+	m_updateListener=updateListener;
+}
+bool RecursiveUpdateListener::Update(int status)
+{
+	return m_updateListener->Update(m_start+(status*(m_stop-m_start))/100);
+}
+void RecursiveUpdateListener::StartUpdateProcess()
+{
+}
+void RecursiveUpdateListener::EndUpdateProcess()
+{
+}
+

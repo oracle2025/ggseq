@@ -32,6 +32,9 @@
 #include "TLPanel.h"
 #include "TLMiniFiler2.h"
 #include "MiniPlayer.h"
+#include "UpdateListener.h"
+#include "StatusProgressBar.h"
+#include "DisableListener.h"
 
 #include "new1.xpm"
 #include "open.xpm"
@@ -104,6 +107,7 @@ class TestFrame1: public wxFrame
 		wxToolBar *m_toolBar;
 		wxTimer *m_Timer;
 		MiniPlayerInterface *m_miniPlayer;
+		UpdateListener *m_updateListener;
 		bool m_DraggingFile;
 		wxDragImage *m_dragImage;
 		DECLARE_EVENT_TABLE()
@@ -152,8 +156,17 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	wxAcceleratorTable accel(1, entries);
 	panel1->SetAcceleratorTable(accel);
 	panel1->SetFocus();
+//	panel1->Enable(false);
+
+	StatusProgressBar *cc = new StatusProgressBar(this,-1);
+	SetStatusBar(cc);
+	m_updateListener=cc;
+
+	cc->SetDisableListener(new DoubleDisabler(panel1,GetToolBar()));
 
 	MakeMainWindow(panel1);
+	
+	m_tp->SetUpdateListener(cc);
 
 	panelSizer->Add(panel1,1,wxEXPAND);
 	SetSizer( panelSizer );
@@ -163,7 +176,7 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	RefreshWindowTitle();
 	m_DraggingFile=false;
 	m_dragImage = new wxDragImage(wxBitmap(dndfile_xpm));
-	CreateStatusBar();
+
 	SetSize(size);
 }
 TestFrame1::~TestFrame1()
@@ -198,7 +211,7 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 	wxBoxSizer *miniPanSizer = new wxBoxSizer(wxVERTICAL);
 	miniPanSizer->Add(m_fileList,1,wxEXPAND);
 //--
-	MiniPlayer *mP = new MiniPlayer(miniplayerPanel,m_tp->GetSoundManager());
+	MiniPlayer *mP = new MiniPlayer(miniplayerPanel,m_tp->GetSoundManager(),m_updateListener );
 	miniPanSizer->Add(mP,0,wxEXPAND|wxTOP,5);
 	m_miniPlayer = mP;
 	m_tp->SetMiniPlayer(m_miniPlayer);
@@ -301,6 +314,7 @@ void TestFrame1::MakeToolBar()
 	m_toolBar->Realize();
 	m_toolBar->EnableTool(ID_Stop,false);
 	this->SetToolBar(m_toolBar);
+//	m_toolBar->Enable(false);
 }
 void TestFrame1::MakeTlPanel(wxWindow *parent)
 {

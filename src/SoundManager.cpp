@@ -30,6 +30,7 @@
 #include "TLItem.h"
 #include "TLSample.h"
 #include "SoundManager.h"
+#include "UpdateListener.h"
 
 //DEFINE_EVENT_TYPE(wxEVT_DONE_SAMPLE_COMMAND)
 
@@ -96,8 +97,10 @@ void SoundManager::Stop()
 	if (!m_tlPlaying && !m_samplePlaying)
 		return;
 	StopStream();
-	if (m_samplePlaying)
-		delete m_sample;
+	if (m_samplePlaying) {
+		if (m_sample->GetRefCount()==0)
+			delete m_sample;
+	}
 	if (m_tlPlaying)
 		m_data->UnBlock();
 	m_tlPlaying = false;
@@ -115,21 +118,35 @@ unsigned int SoundManager::FillBuffer_Sample(float* outBuffer, unsigned int coun
 	return i;
 }
 
-void SoundManager::Play(wxString filename, long &length)
+void SoundManager::Play(wxString filename, long &length, UpdateListener *updateListener)
 {
 	if (m_tlPlaying)
 		return;
 	if (m_samplePlaying)
 		Stop();
-	m_sample = new TLSample(filename,0,NULL);
-	if (!m_sample->IsValid()) {
+	if (updateListener)
+		updateListener->StartUpdateProcess();
+	TLSample *sample = new TLSample(filename,0,NULL,updateListener);
+	if (updateListener)
+		updateListener->EndUpdateProcess();
+	if (!sample->IsValid()) {
 		wxLogError(wxT("Couldn't load Samplefile \"%s\""),filename.c_str());
-		delete m_sample;
+		delete sample;
 		return;
 	}
+	
+	length=sample->GetLength();
+	Play(sample);
+}
+void SoundManager::Play(TLSample *sample)
+{
+	if (m_tlPlaying)
+		return;
+	if (m_samplePlaying)
+		Stop();
+	m_sample = sample;//new TLSample(filename,0,NULL);
 	m_position=0;
 	m_samplePlaying=true;
-	length=m_sample->GetLength();
 	StartStream((void*)callback_sample);
 }
 void SoundManager::StartStream(void* callback)

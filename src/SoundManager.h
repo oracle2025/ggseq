@@ -21,6 +21,7 @@
 #define _SOUNDMANAGER_H_
 class TLData;
 class TLSample;
+class UpdateListener;
 
 /*BEGIN_DECLARE_EVENT_TYPES()
     DECLARE_EVENT_TYPE(wxEVT_DONE_SAMPLE_COMMAND, 7778)
@@ -45,7 +46,8 @@ class SoundManager// : public wxEvtHandler
 //		void OnDonePlayingSample(wxCommandEvent& event);
 //		int GetPlaybackPosition();
 		void Play();
-		void Play(wxString filename, long &length);
+		void Play(wxString filename, long &length, UpdateListener *updateListener=NULL);
+		void Play(TLSample *sample);
 		void Stop();
 		bool Done();
 		long GetPosition();

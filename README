@@ -3,7 +3,7 @@ Gungirl Sequencer README
 Gungirl Sequencer is an easy to use Audiosequencer.
 It includes a simple Filemanager and uses Drag & Drop to arrange Audiosamples.
 
-Gungirl Sequencer has suppport for 44100hz WAV-Audiofiles.
+Gungirl Sequencer has suppport for WAV-Audiofiles.
 
 HOWTO Compile?
 

@@ -38,6 +38,7 @@
 using namespace CSL::XML;
 #include "TLXMLLoader.h"*/
 #include "TLXmlLoader2.h"
+#include "UpdateListener.h"
 
 #include "tinyxml.h"
 
@@ -60,6 +61,7 @@ TLData::TLData()
 	m_filename=wxT("");
 	SetPlaybackPosition(0);
 	m_length=2000000;
+	m_updateListener=NULL;
 }
 
 TLData::~TLData()
@@ -116,6 +118,7 @@ TLItem *TLData::AddItem(TLSample *sample, int Position, int TrackNr)
 		m_length=Position+sample->GetLength()+LENGTH_TO_ADD;
 	}
 
+
 	return tlTrack->AddItem(sample, Position);
 }
 TLItem *TLData::AddItem(wxString filename, int Position, int TrackNr)
@@ -124,8 +127,9 @@ TLItem *TLData::AddItem(wxString filename, int Position, int TrackNr)
 	wxASSERT_MSG( (tlTrack != NULL), "Track-Index out of Range in TLData::AddItem!" );
 	if (!tlTrack)
 		return NULL;
-
-	TLSample *sample = m_sampleManager->GetSample(filename);
+	m_updateListener->StartUpdateProcess();
+	TLSample *sample = m_sampleManager->GetSample(filename, m_updateListener);
+	m_updateListener->EndUpdateProcess();
 	if (sample) {
 		m_changed=true;
 		if (Position+sample->GetLength()>m_length-LENGTH_ADD) {
@@ -192,7 +196,10 @@ void TLData::loadXML(wxString filename)
 	Clear();
 	TLXMLLoader2 loader(this,m_sampleManager);
 	m_filename=filename;
-	loader.LoadFile(filename);
+/*	SimpleUpdateListener listener;*/
+	m_updateListener->StartUpdateProcess();
+	loader.LoadFile(filename,m_updateListener/*&listener*/);
+	m_updateListener->EndUpdateProcess();
 	m_changed=false;
 
 }
@@ -399,4 +406,7 @@ void TLData::SetTrackVolume(double vol, int TrackNr)
 	m_changed=true;
 	tlTrack->SetVolume(vol);
 }
-
+void TLData::SetUpdateListener(UpdateListener *updateListener)
+{
+	m_updateListener=updateListener;
+}

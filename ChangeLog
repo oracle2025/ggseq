@@ -1,3 +1,8 @@
+2003-11-30  Richard Spindler <oracle2025@gmx.de>
+
+ *  added StatusProgressBar.cpp .h and UpdateListener.cpp .h
+ *  Progressbars for Loading of Samples and Songs implemented
+
 2003-11-26  Richard Spindler <oracle2025@gmx.de>
 
  *  fixed nasty Bug in TLTrack.cpp when sorting the List

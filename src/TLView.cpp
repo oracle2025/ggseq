@@ -146,9 +146,9 @@ long TLView::DrawTrack(wxDC& dc, long yoffset, TLTrack* track)
 			dc.SetClippingRegion((long)(start*m_Faktor)+m_FrameX,yoffset,(long)((end-start)*m_Faktor),track->GetHeight());
 			dc.SetFont(*wxSMALL_FONT);
 			wxFileName fn(current->GetSample()->GetFilename());
-#ifndef __WXMSW__ 
+//#ifndef __WXMSW__ 
 			dc.DrawText(fn.GetName(),(long)(start*m_Faktor)+1+m_FrameX,yoffset+1);
-#endif
+//#endif
 			dc.DestroyClippingRegion();
 		}
 	}
@@ -260,15 +260,14 @@ void TLView::SetPlaybackPosition(long Position)
 		return;
 	m_TlData->SetPlaybackPosition(FromScreenXtoTL(Position));
 }
-wxString TLView::GetSampleFilename(long position, long trackNr)
+TLSample *TLView::GetSample(long position, long trackNr)
 {
-	puts("spass1");
 	TLItem *item = m_TlData->ItemAtPos(FromScreenXtoTL(position), trackNr);
 	if (!item)
-		return wxT("");;
-	TLSample *sample = item->GetSample();
-	puts("spass2");
-	return sample->GetFilename();
+		return NULL;
+	return item->GetSample();
+//	TLSample *sample = item->GetSample();
+//	return sample->GetFilename();
 	
 }
 

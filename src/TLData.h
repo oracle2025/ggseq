@@ -25,6 +25,7 @@ class TLSample;
 class TLTrack;
 class TLSampleManager;
 class TLColourManager;
+class UpdateListener;
 WX_DECLARE_LIST(TLTrack, TLTrackList);
 
 class TLData
@@ -66,6 +67,7 @@ class TLData
 		void SaveWAV(wxString filename);
 
 		void ClearSample(TLSample *sample);
+		void SetUpdateListener(UpdateListener *updateListener);
 	private:
 		int mixChannels(float *A, float *B, float* out);
 		void printXML(wxString filename);
@@ -78,6 +80,7 @@ class TLData
 		bool m_blocked;
 		long m_playbackPosition;
 		int m_length;
+		UpdateListener *m_updateListener;
 };
 
 #endif /*_TLDATA_H_*/

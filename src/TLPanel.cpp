@@ -146,7 +146,7 @@ void TLPanel::OnEraseBackground(wxPaintEvent& event)
 void TLPanel::OnSize(wxSizeEvent& event)
 {
 #ifdef __WXMSW__
-	m_TlView->SetVisibleFrame(GetSize().GetWidth()-11-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-22,5+LEFT_OFFSET_TRACKS,5);
+	m_TlView->SetVisibleFrame(GetSize().GetWidth()-11-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-22-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
 	m_scrollBar->SetSize(0,GetSize().GetHeight()-22,GetSize().GetWidth()-6,16);
 #else
 	m_TlView->SetVisibleFrame(GetSize().GetWidth()-10-LEFT_OFFSET_TRACKS,GetSize().GetHeight()-m_scrollBar->GetSize().GetHeight()-TOP_OFFSET_TRACKS,5+LEFT_OFFSET_TRACKS,TOP_OFFSET_TRACKS);
@@ -223,6 +223,8 @@ void TLPanel::OnMouseDown(wxMouseEvent& event)
 {
 	m_DragX=event.m_x;
 	m_DragY=event.m_y;
+	if(m_miniPlayer)
+		m_miniPlayer->Stop();
 }
 void TLPanel::OnDoubleClick(wxMouseEvent& event)
 {
@@ -235,18 +237,20 @@ void TLPanel::OnDoubleClick(wxMouseEvent& event)
 	int trackNr = m_TlView->GetTrackByY(event.m_y);
 	if (trackNr<0)
 		return;
-	wxString tmp = m_TlView->GetSampleFilename(event.m_x, trackNr);
-	if (tmp!=wxT("")) {
-//		wxLogStatus(wxT("Playing Sample: %s"),tmp.c_str());
+//	wxString tmp = m_TlView->GetSampleFilename(event.m_x, trackNr);
+	TLSample *sample = m_TlView->GetSample(event.m_x, trackNr);
+	if (sample !=NULL) {
 		if (m_miniPlayer) {
-			m_miniPlayer->SetFilename(tmp);
+			m_miniPlayer->SetSample(sample);
 			m_miniPlayer->Play();
 		}
-
-	/*	wxCommandEvent eventCustom(wxEVT_MF_ACTIVATE_COMMAND);
-		eventCustom.SetString(tmp);
-		wxPostEvent(this, eventCustom);*/
 	}
+//	if (tmp!=wxT("")) {
+//		if (m_miniPlayer) {
+//			m_miniPlayer->SetFilename(tmp);
+//			m_miniPlayer->Play();
+//		}
+//	}
 }
 void TLPanel::StartRubberFrame(int x, int y)
 {
@@ -590,6 +594,7 @@ void TLPanel::Rewind()
 }
 void TLPanel::Play()
 {
+	m_miniPlayer->Stop();
 	m_soundManager->Play();
 }
 void TLPanel::Stop()
@@ -756,7 +761,10 @@ void TLPanel::UpdateButtons()
 	}
 
 }
-
+void TLPanel::SetUpdateListener(UpdateListener *updateListener)
+{
+	m_data->SetUpdateListener(updateListener);
+}
 void TLPanel::UpdateRulerTicks()
 {
 //	m_TlView->m_SnapPosition;

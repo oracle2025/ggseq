@@ -22,11 +22,12 @@
 
 class wxString;
 class TLColourManager;
+class UpdateListener;
 
 class TLSample
 {
 	public:
-		TLSample(const wxString &filename, int id,TLColourManager *colourMan);
+		TLSample(const wxString &filename, int id,TLColourManager *colourMan, UpdateListener* updateListener=NULL);
 		~TLSample();
 		float *GetBuffer();
 		int GetLength();

@@ -23,6 +23,7 @@
 
 #include "SoundManager.h"
 #include "MiniPlayer.h"
+#include "TLSample.h"
 
 #include "play_12.xpm"
 #include "stop_12.xpm"
@@ -38,7 +39,7 @@ BEGIN_EVENT_TABLE(MiniPlayer, wxPanel)
 	EVT_TIMER(-1,MiniPlayer::OnTimer)
 END_EVENT_TABLE()
 
-MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager,
+MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListener *updateListener,
 		wxWindowID id,
 		const wxPoint& pos,
 		const wxSize& size,
@@ -49,6 +50,8 @@ MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager,
 	MakeMiniPlayerWindow(this);
 	m_soundManager=soundManager;
 	m_timer = new wxTimer(this);
+	m_updateListener = updateListener;
+	m_sample=NULL;
 }
 void MiniPlayer::MakeMiniPlayerWindow(wxWindow *parent)
 {
@@ -82,18 +85,31 @@ void MiniPlayer::MakeMiniPlayerWindow(wxWindow *parent)
 void MiniPlayer::SetFilename(wxString filename)
 {
 	m_filename = filename;
+	m_sample=NULL;
+}
+void MiniPlayer::SetSample(TLSample *sample)
+{
+	m_sample = sample;
 }
 void MiniPlayer::Play()
 {
+	TLSample *sample = m_sample;
+	Stop();
+	m_sample=sample;
 	m_stopButton->Enable(true);
 	m_playButton->Enable(false);
-	wxLogStatus(wxT("Playing Sample: %s"),m_filename.c_str());
-	long length;
-	m_soundManager->Play(m_filename,length);
-	m_slider->SetRange(0,length);
+	if (m_sample) {
+		wxLogStatus(wxT("Playing Sample: %s"),m_sample->GetFilename().c_str());
+		m_soundManager->Play(m_sample);
+		m_slider->SetRange(0,m_sample->GetLength());
+	} else {
+		wxLogStatus(wxT("Playing Sample: %s"),m_filename.c_str());
+		long length;
+		m_soundManager->Play(m_filename,length,m_updateListener);
+		m_slider->SetRange(0,length);
+	}
 	m_slider->SetValue(0);
 	m_timer->Start(100);
-	
 }
 void MiniPlayer::OnTimer(wxTimerEvent &event)
 {
@@ -119,5 +135,6 @@ void MiniPlayer::Stop()
 	m_timer->Stop();
 	m_slider->SetValue(0);
 	m_soundManager->Stop();
+	m_sample=NULL;
 }
 

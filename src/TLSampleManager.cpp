@@ -30,7 +30,7 @@
 #include "TLSampleManager.h"
 #include "TLSample.h"
 #include "TLColourManager.h"
-
+#include "UpdateListener.h"
 
 WX_DEFINE_LIST(TLSampleList);
 
@@ -47,7 +47,7 @@ TLSampleManager::~TLSampleManager()
 	delete m_colourMan;
 }
 
-TLSample *TLSampleManager::GetSample(wxString filename)
+TLSample *TLSampleManager::GetSample(wxString filename, UpdateListener* updateListener)
 {
 	wxString fnStr=NormalizePath(filename);
 	for ( TLSampleList::Node *node = m_sampleList.GetFirst(); node; node = node->GetNext() ) {
@@ -55,7 +55,7 @@ TLSample *TLSampleManager::GetSample(wxString filename)
 		if (fnStr==current->GetFilename())
 			return current;
 	}
-	return AddSample(fnStr, m_MaxId);
+	return AddSample(fnStr, m_MaxId, updateListener);
 }
 
 TLSample *TLSampleManager::GetSample(int id)
@@ -68,17 +68,18 @@ TLSample *TLSampleManager::GetSample(int id)
 	return NULL;
 }
 
-TLSample *TLSampleManager::AddSample(wxString filename, int id)
+TLSample *TLSampleManager::AddSample(wxString filename, int id, UpdateListener* updateListener)
 {
 	wxString fnStr=NormalizePath(filename);
-	TLSample *tmp = new TLSample(fnStr, id,m_colourMan);
+	TLSample *tmp = new TLSample(fnStr, id,m_colourMan, updateListener);
 	if (tmp->IsValid()) {
 		m_sampleList.Append(tmp);
 		if (id>=m_MaxId)
 			m_MaxId=id+1;
 	} else {
-		puts("FF1");
-		wxLogError(wxT("Couldn't load Samplefile \"%s\""),filename.c_str());
+		//puts("FF1");
+		if (updateListener->Update(100)!=false)
+			wxLogError(wxT("Couldn't load Samplefile \"%s\""),filename.c_str());
 		delete tmp;
 		tmp=NULL;
 	}
@@ -100,14 +101,17 @@ wxString TLSampleManager::NormalizePath(wxString filename)
 }
 void TLSampleManager::addXmlData(TiXmlElement *samples)
 {
+//	wxString count;
+//	count << m_sampleList.GetCount();
+	samples->SetAttribute("count",m_sampleList.GetCount());
 	for ( TLSampleList::Node *node = m_sampleList.GetFirst(); node; node = node->GetNext() )
 	{
 		TLSample *current = node->GetData();
-		wxString tmp;
-		tmp << current->GetId();
+//		wxString tmp;
+//		tmp << current->GetId();
 		TiXmlElement *sample = new TiXmlElement("sample");
 		samples->LinkEndChild(sample);
-		sample->SetAttribute("id",(const char*)tmp.mb_str());
+		sample->SetAttribute("id",current->GetId()/*(const char*)tmp.mb_str()*/);
 		sample->LinkEndChild(new TiXmlText(current->GetFilename().mb_str()));
 	}
 

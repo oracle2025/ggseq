@@ -22,12 +22,13 @@
 
 class TLData;
 class TLSampleManager;
+class UpdateListener;
 
 class TLXMLLoader2
 {
 	public:
 		TLXMLLoader2(TLData *data, TLSampleManager *sm);
-		void LoadFile(wxString filename);
+		void LoadFile(wxString filename, UpdateListener* updateListener=NULL);
 	private:
 		void Error(wxString msg);
 		TLData *m_data;

@@ -28,9 +28,10 @@
 
 #include "TLSample.h"
 #include "TLColourManager.h"
-//#include <iostream>
+#include "UpdateListener.h"
+#include <iostream>
 
-TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan)
+TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, UpdateListener* updateListener)/*100000 Frames als intervall*/
 {
 	SNDFILE *sndfile;
 	SF_INFO sfinfo;
@@ -55,37 +56,92 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan)
 	}*/
 	m_length = sfinfo.frames*2;
 	m_buffer=new float[m_length];
-	sf_readf_float(sndfile,m_buffer,sfinfo.frames);
-	if (sfinfo.channels==1) /*Mono-Sample strecken.*/
+
+	int factors;
+	if (sfinfo.samplerate==44100 && sfinfo.channels==2) {
+		factors=100;
+	} else if (sfinfo.samplerate!=44100 && sfinfo.channels==1) {
+		factors=33;
+	} else {
+		factors=50;
+	}
+	/*dieser aufruf ist zeitkritisch*/
+	for(int i=0;i<=sfinfo.frames;i+=100000) {
+		if (updateListener)
+			if(updateListener->Update((i*factors)/sfinfo.frames)==false) {
+				return;
+			}
+		int cnt;
+		if (i>sfinfo.frames)
+			cnt=sfinfo.frames;
+		else
+			cnt=100000;
+		sf_readf_float(sndfile,m_buffer+i*sfinfo.channels,cnt);
+	}
+//	sf_readf_float(sndfile,m_buffer,sfinfo.frames);
+	int prog_offset=factors;
+
+	
+	if (sfinfo.channels==1) {/*Mono-Sample strecken.*/ /*dieser aufruf ist zeitkritisch*/
 		for (int i=sfinfo.frames-1;i>=0;i--) {
 			m_buffer[2*i+1]=m_buffer[i];
 			m_buffer[2*i]=m_buffer[i];
+			if (i%100000==0) {
+				if (updateListener)
+					if (updateListener->Update(prog_offset+((sfinfo.frames-i)*factors)/sfinfo.frames)==false) {
+						return;
+					}
+			}
 		}
+		prog_offset+=factors;
+	}
 	/*Hier auf passende Samplerate strecken*/
 	if (sfinfo.samplerate!=44100) {
 //		wxLogMessage(wxT("No 44100 Samplerate")); // TODO Fehler ausgeben.
 		SRC_DATA src_data;
-		src_data.src_ratio=44100.0/sfinfo.samplerate;
-			/*output_sample_rate / input_sample_rate*/
-		src_data.input_frames=m_length/2;
-		src_data.output_frames=(src_data.input_frames*src_data.src_ratio)+5;
-		
+		src_data.src_ratio=44100.0/sfinfo.samplerate; /*output_sample_rate / input_sample_rate*/
+		src_data.input_frames=100000;//m_length/2;
+		src_data.output_frames=((m_length/2)*src_data.src_ratio)+25;
 		src_data.data_in=m_buffer;
-		src_data.data_out=new float[src_data.output_frames*2];
+		float *out_buffer=new float[src_data.output_frames*2];
+		src_data.data_out=out_buffer;
+
+		int error;
+		SRC_STATE *src_state = src_new(SRC_SINC_MEDIUM_QUALITY,2,&error);
 		
 		
-puts("---");
-		src_simple(&src_data,SRC_SINC_MEDIUM_QUALITY,2);
-puts("---");
-		delete src_data.data_in;
-		m_buffer=src_data.data_out;
-		m_length=src_data.output_frames_gen*2;
-/*		wxString Message;
-		Message << wxT("input_frames: ") << src_data.input_frames
-		<< wxT("\n output_frames: ") << src_data.output_frames
-		<< wxT("\n src_data.src_ratio: ") << src_data.src_ratio
-		<< wxT("\n output_frames_gen; ") << src_data.output_frames_gen;
-		wxLogMessage(Message);*/
+//		src_simple(&src_data,SRC_SINC_MEDIUM_QUALITY,2);/*dieser aufruf ist zeitkritisch*/
+		/*100000*/
+		long buffer_length=m_length/2;
+		long frames_generated=0;
+//		for (long i=0;src_data.input_frames_used;i+=src_data.input_frames_used) {
+		src_data.end_of_input=0;
+		for(long i=0;buffer_length;i+=src_data.input_frames_used) {
+			if (buffer_length<100000)
+				src_data.input_frames=buffer_length;
+			error=src_process(src_state, &src_data);
+			if(error!=0) {
+				std::cout << src_strerror(error) << std::endl;
+			}
+			src_data.output_frames-=src_data.output_frames_gen;
+			frames_generated+=src_data.output_frames_gen;
+			src_data.data_out+=src_data.output_frames_gen*2;
+			src_data.data_in+=src_data.input_frames_used*2;
+			buffer_length-=src_data.input_frames_used;
+			if (updateListener)
+				if (updateListener->Update(prog_offset+(i*factors)/(m_length/2))==false) {
+					delete out_buffer;
+					src_delete(src_state);
+					return;
+				}
+		}
+//		src_process(src_state, &src_data);
+
+		src_delete(src_state);
+
+		delete m_buffer;
+		m_buffer=out_buffer;//src_data.data_out;
+		m_length=frames_generated*2;//src_data.output_frames_gen*2;
 //		return;
 	}
 	
@@ -168,7 +224,7 @@ void TLSample::Draw(wxDC& dc)
 	dc.SetClippingRegion(0,0,width,25);
 	dc.SetFont(*wxSMALL_FONT);
 	wxFileName fn(GetFilename());
-//	dc.DrawText(fn.GetName(),1,1);
+	dc.DrawText(fn.GetName(),1,1);
 	dc.DestroyClippingRegion();
 }
 wxColour TLSample::GetColour()

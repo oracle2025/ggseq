@@ -23,10 +23,12 @@
 #endif
 #include "wx/encconv.h"
 
-#include "TLXmlLoader2.h"
 #include "TLData.h"
 #include "TLSampleManager.h"
 #include "tinyxml.h"
+#include "UpdateListener.h"
+
+#include "TLXmlLoader2.h"
 
 TLXMLLoader2::TLXMLLoader2(TLData *data, TLSampleManager *sm)
 {
@@ -34,7 +36,7 @@ TLXMLLoader2::TLXMLLoader2(TLData *data, TLSampleManager *sm)
 	m_sampleManager=sm;
 }
 
-void TLXMLLoader2::LoadFile(wxString filename)
+void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 {
 	TiXmlDocument doc(filename.mb_str());
 	if(!doc.LoadFile()) {
@@ -52,6 +54,13 @@ void TLXMLLoader2::LoadFile(wxString filename)
 		Error(filename);
 		return;
 	}
+
+	int sampleNum;
+	if (node->ToElement()->Attribute("count",&sampleNum)==NULL) {
+		Error(filename);
+		return;
+	}
+	
 	node = node->FirstChild("sample");
 	if (node==NULL) {
 		Error(filename);
@@ -59,7 +68,10 @@ void TLXMLLoader2::LoadFile(wxString filename)
 	}
 	element = node->ToElement();
 	
-	while (element) {
+	for (int i=0; element; i++) {
+		if (updateListener)
+			if(updateListener->Update((i*100)/sampleNum)==false)
+				return;
 		int id;
 		if (element->Attribute("id",&id)==NULL) {
 			Error(filename);
@@ -82,11 +94,9 @@ void TLXMLLoader2::LoadFile(wxString filename)
 	conv.Convert(text->Value(),out);
 	wxString tt; 
 	tt << out;
-
 /*-*/
-
-
-		m_sampleManager->AddSample(tt,id); /*TODO abbrechen einbauen*/
+		RecursiveUpdateListener s(updateListener, (i*100)/sampleNum, ((i+1)*100)/sampleNum);
+		m_sampleManager->AddSample(tt,id,&s); /*TODO abbrechen einbauen*/
 		element=element->NextSiblingElement("sample");
 	}
 	element = doc.RootElement();

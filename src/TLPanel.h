@@ -35,6 +35,7 @@ class TLMuteButton;
 class TLTrackVolumeDial;
 class MiniPlayerInterface;
 class Ruler; 
+class UpdateListener;
 
 class TLPanel : public wxPanel
 {
@@ -76,7 +77,7 @@ class TLPanel : public wxPanel
 		void SetSnap();
 		SoundManager *GetSoundManager();
 		void SetMiniPlayer(MiniPlayerInterface *mp);
-		
+		void SetUpdateListener(UpdateListener *updateListener);
 		wxString GetFilename();
 	private:
 		void DrawCaret(wxDC& dc);

@@ -61,7 +61,7 @@ class TLView
 
 		long FromScreenXtoTL(long x);
 		long FromTLtoScreenX(long x);
-		wxString GetSampleFilename(long position, long trackNr);
+		TLSample *GetSample(long position, long trackNr);
 		long GetScreenSnapPosition(long position);
 		
 //		bool HasSelection();

@@ -1,4 +1,4 @@
-/* TLSampleManager.h
+/* UpdateListener.h
  *
  *  Copyright (C) 2003 Richard Spindler <oracle2025@gmx.de>
  *
@@ -16,34 +16,35 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+#ifndef _UPDATELISTENER_H_
+#define _UPDATELISTENER_H_
 
-#ifndef _TLSAMPLEMANAGER_H_
-#define _TLSAMPLEMANAGER_H_
-
-class TLSample;
-class TLColourManager;
-class TiXmlElement;
-class UpdateListener;
-
-WX_DECLARE_LIST(TLSample, TLSampleList);
-
-class TLSampleManager
+class UpdateListener
 {
 	public:
-		TLSampleManager();
-		~TLSampleManager();
-		TLSample *GetSample(wxString filename, UpdateListener* updateListener=NULL);
-		TLSample *GetSample(int id); /*Fürs XML laden*/
-		TLSample *AddSample(wxString filename, int id, UpdateListener* updateListener=NULL);
-		void addXmlData(TiXmlElement *samples);
-		void Clear(TLSample* tlSample);
-		void ClearAll();
-		TLColourManager *GetColourManager();
-	private:
-		wxString NormalizePath(wxString filename);
-		TLSampleList m_sampleList;
-		int m_MaxId;
-		TLColourManager *m_colourMan;
+		virtual bool Update(int status)=0;
+		virtual void StartUpdateProcess()=0;
+		virtual void EndUpdateProcess()=0;
 };
 
-#endif /*_TLSAMPLEMANAGER_H_*/
+class SimpleUpdateListener: public UpdateListener
+{
+	public:
+		virtual bool Update(int status);
+		virtual void StartUpdateProcess();
+		virtual void EndUpdateProcess();
+};
+
+class RecursiveUpdateListener: public UpdateListener
+{
+	public:
+		RecursiveUpdateListener(UpdateListener *updateListener, int start, int stop);
+		virtual bool Update(int status);
+		virtual void StartUpdateProcess();
+		virtual void EndUpdateProcess();
+	private:
+		int m_start;
+		int m_stop;
+		UpdateListener *m_updateListener;
+};
+#endif /*_UPDATELISTENER_H_*/
