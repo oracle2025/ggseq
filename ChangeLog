@@ -1,3 +1,7 @@
+2003-11-26  Richard Spindler <oracle2025@gmx.de>
+
+ *  fixed nasty Bug in TLTrack.cpp when sorting the List
+
 2003-11-22  Richard Spindler <oracle2025@gmx.de>
 
  *  added Ruler.cpp .h

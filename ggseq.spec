@@ -1,4 +1,4 @@
-Summary : Gun Girl Sequenser NOT a midi seqenser
+Summary : Gungirl Sequencer NOT a midi seqenser
 Name: ggseq
 Version: 0.1
 Release: 1
@@ -13,7 +13,7 @@ Provides: ggseq
 Requires: portaudio libsndfile wxGTK>=2.4.0
 
 %description
-Gun Girl Sequenser is NOT a midi seqenser. 
+Gungirl Sequencer is NOT a midi seqenser. 
 But its helpfull to sample different
 audio-files (at the moment just 44100 kHz wav -files)
 
