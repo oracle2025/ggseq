@@ -53,6 +53,12 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 	m_infoFrames=sfinfo.frames;
 	m_infoSampleRate=sfinfo.samplerate;
 	m_infoChannels=sfinfo.channels;
+	
+	if (sfinfo.frames>65000000) {
+		wxLogError(wxT("This Soundfile ist to big!\nGungirl Sequencer loads Soundfiles\nonly up to the length of 24 minutes"));
+		sf_close(sndfile);
+		return;
+	}
 
 	if (sfinfo.channels!=2 && sfinfo.channels!=1) {
 		wxLogError(wxT("Wrong number of channels!\n(Only mono and stereo allowed)"));
@@ -76,12 +82,13 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 		factors=50;
 	}
 	/*dieser aufruf ist zeitkritisch*/
-	for(int i=0;i<=sfinfo.frames;i+=100000) {//i sind frames ?
-		if (updateListener)
+	for(gg_tl_dat i=0;i<=sfinfo.frames;i+=100000) {//i sind frames ?
+		if (updateListener) {
 			if(updateListener->Update((i*factors)/sfinfo.frames)==false) {
 				sf_close(sndfile);
 				return;
 			}
+		}
 		int cnt;
 		if (i+100000>sfinfo.frames)
 			cnt=sfinfo.frames-i;

@@ -1,3 +1,8 @@
+2004-02-05  Richard Spindler <oracle2025@gmx.de>
+
+ * Fixed a Bug that made at Progress-Bar stop at too big files
+ * Added a limitation of 24 minutes for Soundfile-Import.
+
 2004-02-03  Richard Spindler <oracle2025@gmx.de>
 
  * Fixed a Bug that caused a floatingpoint exception in the scrollbar

@@ -23,6 +23,7 @@
 #include "UpdateListener.h"
 #include "StatusProgressBar.h"
 #include "DisableListener.h"
+#include <iostream>
 
 enum
 {
