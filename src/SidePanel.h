@@ -25,7 +25,7 @@ class wxStaticLine;
 class SidePanel : public wxPanel
 {
 	public:
-		SidePanel(wxWindow* parent,wxPanel* panel, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("panel"));
+		SidePanel(wxWindow* parent,wxPanel* panel/*, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = wxT("panel")*/);
 		void OnButton(wxCommandEvent& event);
 	private:
 		void Hide(bool hide=true);

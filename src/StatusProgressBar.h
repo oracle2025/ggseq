@@ -23,7 +23,7 @@ class DisableListener;
 class StatusProgressBar: public wxStatusBar, public UpdateListener
 {
 	public:
-		StatusProgressBar(wxWindow* parent, wxWindowID id, long style = wxST_SIZEGRIP, const wxString& name = wxT("statusBar"));
+		StatusProgressBar(wxWindow* parent/*, wxWindowID id, long style = wxST_SIZEGRIP, const wxString& name = wxT("statusBar")*/);
 		~StatusProgressBar();
 		virtual bool Update(int status);
 		virtual void StartUpdateProcess();

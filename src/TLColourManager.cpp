@@ -39,19 +39,20 @@ TLColourManager::TLColourManager()
 {
 	m_colourList.DeleteContents(true);
 	TLDirColour *tdc1;
-	wxConfig config(wxT("ggseq"));
-	config.SetPath(wxT("/Colours"));
+	wxConfigBase *conf=wxConfigBase::Get();
+	//wxConfig config(wxT("ggseq"));
+	conf->SetPath(wxT("/Colours"));
 	wxArrayString aNames;
 	wxString str;
 	long dummy;
-	bool bCont = config.GetFirstEntry(str, dummy);
+	bool bCont = conf->GetFirstEntry(str, dummy);
 	while ( bCont ) {
 		aNames.Add(str);
-		bCont = config.GetNextEntry(str, dummy);
+		bCont = conf->GetNextEntry(str, dummy);
 	}
 	for (unsigned int i=0;i<aNames.Count();i++) {
 		wxString str1=aNames.Item(i);
-		long d = config.Read(str1,-1);
+		long d = conf->Read(str1,-1);
 #ifndef __WXMSW__
 		str1.Replace(wxT("\\"),wxT("/"));
 #endif
@@ -64,12 +65,13 @@ TLColourManager::TLColourManager()
 }
 TLColourManager::~TLColourManager()
 {
-	wxConfig config(wxT("ggseq"));
-	if (config.Exists(wxT("/Colours"))) {
-		config.DeleteGroup(wxT("/Colours"));
+	//wxConfig config(wxT("ggseq"));
+	wxConfigBase *conf=wxConfigBase::Get();
+	if (conf->Exists(wxT("/Colours"))) {
+		conf->DeleteGroup(wxT("/Colours"));
 	}
-	config.Flush();
-	config.SetPath(wxT("/Colours"));
+	//config.Flush();
+	conf->SetPath(wxT("/Colours"));
 	for ( TLDirColourList::Node *node = m_colourList.GetFirst(); node; node = node->GetNext() ) {
 		TLDirColour *current = node->GetData();
 		unsigned long var = current->m_colour.Blue();
@@ -79,9 +81,10 @@ TLColourManager::~TLColourManager()
 		var +=current->m_colour.Red();
 		wxString str = current->m_directory;
 		str.Replace(wxT("/"),wxT("\\"));
-		config.Write(str,(long)var);
+		conf->Write(str,(long)var);
 	}
 	m_colourList.Clear();
+	//config.Flush();
 }
 wxColour TLColourManager::GetColour(wxString dirname)
 {

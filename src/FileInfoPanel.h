@@ -30,7 +30,6 @@ class FileInfoPanel : public wxPanel, public FileInfoListener
 {
 	public:
 		FileInfoPanel(wxWindow* parent);
-		~FileInfoPanel();
 		void SetInfo(const wxString &filename, long frames, long channels, long sampleRate);
 	private:
 		wxString GenerateLengthString(long frames, long sampleRate);
@@ -40,7 +39,6 @@ class FileInfoPanel : public wxPanel, public FileInfoListener
 		wxTextCtrl *m_framesTC;
 		wxTextCtrl *m_channelsTC;
 		wxTextCtrl *m_sampleRateTC;
-	//	wxEvtHandler *m_noBgHandler;
 };
 
 #endif /* _FILE_INFO_PANEL_H_ */

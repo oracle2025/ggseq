@@ -27,20 +27,26 @@ class TLSetSnapDialog: public wxDialog
 	public:
 		TLSetSnapDialog(wxWindow* parent, wxWindowID id,int SnapPosition, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 		~TLSetSnapDialog();
-		void OnSpin(wxSpinEvent &event);
 //		void OnHipHopButton(wxCommandEvent &event);
 //		void OnOldSkoolButton(wxCommandEvent &event);
 //		void OnFunkButton(wxCommandEvent &event);
+		void OnSpin(wxSpinEvent &event);
 		void OnSecondsText(wxCommandEvent &event);
+		void OnBpmText(wxCommandEvent &event);
+
 		void OnAddButton(wxCommandEvent &event);
 		void OnDeleteButton(wxCommandEvent &event);
 		void OnPresetNameText(wxCommandEvent &event);
+		
 		void OnPresetsList(wxCommandEvent &event);
+		
 		void OnClose(wxCloseEvent &event);
 		wxString m_SnapSize;
-		int m_SnapPosition;
+		wxString m_bpmValue;
+		int m_SnapPosition; //int m_frameSnapValue; /*Als Zentraler Wert*/
 		wxSpinCtrl *m_FramesSpinCtrl;
 		wxTextCtrl *m_SecondsTextCtrl;
+		wxTextCtrl *m_bpmTextCtrl;
 		wxListBox *m_presetsListBox;
 		wxTextCtrl *m_presetNameText;
 	private:
@@ -51,6 +57,12 @@ class TLSetSnapDialog: public wxDialog
 		void Modify(int length);
 		bool m_Lock;
 		void FromFramesToSeconds(int Frames=-1);
+		void FromFramesToBpm();
+		//void UpdateDisplaySeconds();
+		//void UpdateDisplayFrames(int Frames); ??
+		//void UpdateDisplayBpm();
+		//void SetFrameSnapFromSeconds(double Seconds)
+		//void SetFrameSnapFromBpm(double Bpm)
 		DECLARE_EVENT_TABLE()
 
 };

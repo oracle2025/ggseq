@@ -32,8 +32,9 @@ BEGIN_EVENT_TABLE(SidePanel, wxPanel)
     EVT_BUTTON(ID_Button, SidePanel::OnButton)
 END_EVENT_TABLE()
 
-SidePanel::SidePanel(wxWindow* parent,wxPanel* panel, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
-	: wxPanel(parent,id,pos,size,style|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN,name)
+SidePanel::SidePanel(wxWindow* parent,wxPanel* panel/*, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name*/)
+//	: wxPanel(parent,id,pos,size,style|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN,name)
+	: wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN)
 {
 	m_hidden = true;
 	m_contentPanel = panel;

@@ -207,7 +207,7 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 //	panel1->Enable(false);
 
 
-	StatusProgressBar *cc = new StatusProgressBar(this,-1);
+	StatusProgressBar *cc = new StatusProgressBar(this/*,-1*/);
 	SetStatusBar(cc);
 	m_updateListener=cc;
 
@@ -250,9 +250,13 @@ void TestFrame1::MakeShortcuts()
 }
 TestFrame1::~TestFrame1()
 {
-	wxConfig config(wxT("ggseq"));
-	config.Write(wxT("MiniFilerDirectory"),m_DirTree->GetPath());
+	wxConfigBase *conf=wxConfigBase::Get();
+	
+//	wxConfig config(wxT("ggseq"));
+	conf->SetPath(wxT("/"));
+	conf->Write(wxT("MiniFilerDirectory"),m_DirTree->GetPath());
 	delete m_dragImage;
+//	config.Flush();
 //	delete m_noBgHandler;
 }
 void TestFrame1::OnA_Test(wxCommandEvent& event)
@@ -360,8 +364,9 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 #ifdef __WXMSW__
 	m_DirTree->PushEventHandler(new NoBgEvtHandler());
 #endif
-	wxConfig config(wxT("ggseq"));
-	m_DirTree->SetPath(config.Read(wxT("MiniFilerDirectory"), wxT("/")));
+	wxConfigBase *conf=wxConfigBase::Get();
+	//wxConfig config(wxT("ggseq"));
+	m_DirTree->SetPath(conf->Read(wxT("MiniFilerDirectory"), wxT("/")));
 
 	SplitView->SplitVertically(m_DirTree,SplitView2);
 	SplitV2Sizer->Fit(SplitView2);

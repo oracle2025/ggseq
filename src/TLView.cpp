@@ -137,8 +137,9 @@ TLView::TLView(TLData *TlData)
 	m_TlData=TlData;
 	m_TrackDrawDist=5;
 	m_selectionSet=new TLSelectionSet();
-	wxConfig config(wxT("ggseq"));
-	m_TlData->SetSnapValue(config.Read(wxT("SnapPosition"), SNAP_POSITION));
+	wxConfigBase *conf=wxConfigBase::Get();
+//	wxConfig config(wxT("ggseq"));
+	m_TlData->SetSnapValue(conf->Read(wxT("SnapPosition"), SNAP_POSITION));
 	m_gungirl=new wxIcon(gun_girl_xpm);	
 	m_SnapSuspended=false;
 }
@@ -146,8 +147,9 @@ void TLView::SuspendSnap() { m_SnapSuspended=true; }
 void TLView::ResumeSnap() { m_SnapSuspended=false; }
 TLView::~TLView()
 {
-	wxConfig config(wxT("ggseq"));
-	config.Write(wxT("SnapPosition"),m_TlData->GetSnapValue()/*m_SnapPosition*/);
+	wxConfigBase *conf=wxConfigBase::Get();
+//	wxConfig config(wxT("ggseq"));
+	conf->Write(wxT("SnapPosition"),m_TlData->GetSnapValue()/*m_SnapPosition*/);
 	delete m_selectionSet;
 	delete m_TlData;
 	delete m_gungirl;

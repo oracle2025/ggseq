@@ -37,12 +37,7 @@ class MiniPlayer : public wxPanel, public MiniPlayerInterface
 {
 	public:
 		MiniPlayer(wxWindow* parent, SoundManager *soundManager,
-				UpdateListener *updateListener=NULL, FileInfoListener *fiListener=NULL/*,
-				wxWindowID id = -1,
-				const wxPoint& pos = wxDefaultPosition,
-				const wxSize& size = wxDefaultSize,
-				long style = wxTAB_TRAVERSAL,
-				const wxString& name = wxT("panel")*/);
+				UpdateListener *updateListener=NULL, FileInfoListener *fiListener=NULL);
 		~MiniPlayer();
 		void MakeMiniPlayerWindow(wxWindow *parent);
 		void SetFilename(wxString filename);
@@ -56,7 +51,6 @@ class MiniPlayer : public wxPanel, public MiniPlayerInterface
 		void SetPosition(gg_tl_dat position);
 		wxButton *m_playButton;
 		wxButton *m_stopButton;
-//		wxGauge *m_gauge;
 		wxSlider *m_slider;
 		wxTimer *m_timer;
 		wxString m_filename;
@@ -65,7 +59,6 @@ class MiniPlayer : public wxPanel, public MiniPlayerInterface
 		SoundManager *m_soundManager;
 		UpdateListener *m_updateListener;
 		FileInfoListener *m_fileInfoListener;
-//		wxEvtHandler *m_noBgHandler;
 		DECLARE_EVENT_TABLE()
 
 };

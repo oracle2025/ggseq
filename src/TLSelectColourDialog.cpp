@@ -49,7 +49,8 @@ TLSelectColourDialog::TLSelectColourDialog(wxWindow* parent, wxWindowID id,TLCol
 	wxBoxSizer *MainSizer = new wxBoxSizer( wxVERTICAL );
 
 	wxStaticText *item1 = new wxStaticText( this, -1, wxT("Colours"), wxDefaultPosition, wxDefaultSize, 0 );
-	item1->SetFont( wxFont( 20, wxDEFAULT, wxNORMAL, wxBOLD ) );
+//	item1->SetFont( wxFont( 20, wxDEFAULT, wxNORMAL, wxBOLD ) );
+	item1->SetFont( wxFont( 20, wxSWISS, wxNORMAL, wxBOLD ) );
 	MainSizer->Add( item1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
     
 	wxBoxSizer *Sizer1 = new wxBoxSizer( wxHORIZONTAL );
@@ -147,24 +148,25 @@ void TLSelectColourDialog::OnColourButtonClick(wxCommandEvent& event)
 	if (m_dirListBox->GetSelection()<0)
 		return;
 	if (1) {
-		wxConfig config(wxT("ggseq"));
-		config.SetPath(wxT("/ColourDialog"));
-		retData.SetCustomColour(0,wxColour(config.Read(wxT("colour0"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(1,wxColour(config.Read(wxT("colour1"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(2,wxColour(config.Read(wxT("colour2"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(3,wxColour(config.Read(wxT("colour3"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(4,wxColour(config.Read(wxT("colour4"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(5,wxColour(config.Read(wxT("colour5"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(6,wxColour(config.Read(wxT("colour6"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(7,wxColour(config.Read(wxT("colour7"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(8,wxColour(config.Read(wxT("colour8"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(9,wxColour(config.Read(wxT("colour9"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(10,wxColour(config.Read(wxT("colour10"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(11,wxColour(config.Read(wxT("colour11"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(12,wxColour(config.Read(wxT("colour12"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(13,wxColour(config.Read(wxT("colour13"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(14,wxColour(config.Read(wxT("colour14"),GetColourValue(*wxWHITE))));
-		retData.SetCustomColour(15,wxColour(config.Read(wxT("colour15"),GetColourValue(*wxWHITE))));
+		wxConfigBase *conf=wxConfigBase::Get();
+//		wxConfig config(wxT("ggseq"));
+		conf->SetPath(wxT("/ColourDialog"));
+		retData.SetCustomColour(0,wxColour(conf->Read(wxT("colour0"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(1,wxColour(conf->Read(wxT("colour1"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(2,wxColour(conf->Read(wxT("colour2"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(3,wxColour(conf->Read(wxT("colour3"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(4,wxColour(conf->Read(wxT("colour4"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(5,wxColour(conf->Read(wxT("colour5"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(6,wxColour(conf->Read(wxT("colour6"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(7,wxColour(conf->Read(wxT("colour7"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(8,wxColour(conf->Read(wxT("colour8"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(9,wxColour(conf->Read(wxT("colour9"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(10,wxColour(conf->Read(wxT("colour10"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(11,wxColour(conf->Read(wxT("colour11"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(12,wxColour(conf->Read(wxT("colour12"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(13,wxColour(conf->Read(wxT("colour13"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(14,wxColour(conf->Read(wxT("colour14"),GetColourValue(*wxWHITE))));
+		retData.SetCustomColour(15,wxColour(conf->Read(wxT("colour15"),GetColourValue(*wxWHITE))));
 	}
 	wxColourDialog dialog(this, &retData);
 	if (dialog.ShowModal() == wxID_OK)
@@ -174,24 +176,25 @@ void TLSelectColourDialog::OnColourButtonClick(wxCommandEvent& event)
 		wxColour *col2 = (wxColour*)m_dirListBox->GetClientData(m_dirListBox->GetSelection());
 		*col2 = col;
 		m_colourButton->SetBackgroundColour(*col2);
-		wxConfig config(wxT("ggseq"));
-		config.SetPath(wxT("/ColourDialog"));
-		config.Write(wxT("colour0"),(long)GetColourValue(retData.GetCustomColour(0)));
-		config.Write(wxT("colour1"),(long)GetColourValue(retData.GetCustomColour(1)));
-		config.Write(wxT("colour2"),(long)GetColourValue(retData.GetCustomColour(2)));
-		config.Write(wxT("colour3"),(long)GetColourValue(retData.GetCustomColour(3)));
-		config.Write(wxT("colour4"),(long)GetColourValue(retData.GetCustomColour(4)));
-		config.Write(wxT("colour5"),(long)GetColourValue(retData.GetCustomColour(5)));
-		config.Write(wxT("colour6"),(long)GetColourValue(retData.GetCustomColour(6)));
-		config.Write(wxT("colour7"),(long)GetColourValue(retData.GetCustomColour(7)));
-		config.Write(wxT("colour8"),(long)GetColourValue(retData.GetCustomColour(8)));
-		config.Write(wxT("colour9"),(long)GetColourValue(retData.GetCustomColour(9)));
-		config.Write(wxT("colour10"),(long)GetColourValue(retData.GetCustomColour(10)));
-		config.Write(wxT("colour11"),(long)GetColourValue(retData.GetCustomColour(11)));
-		config.Write(wxT("colour12"),(long)GetColourValue(retData.GetCustomColour(12)));
-		config.Write(wxT("colour13"),(long)GetColourValue(retData.GetCustomColour(13)));
-		config.Write(wxT("colour14"),(long)GetColourValue(retData.GetCustomColour(14)));
-		config.Write(wxT("colour15"),(long)GetColourValue(retData.GetCustomColour(15)));
+		wxConfigBase *conf=wxConfigBase::Get();
+//		wxConfig config(wxT("ggseq"));
+		conf->SetPath(wxT("/ColourDialog"));
+		conf->Write(wxT("colour0"),(long)GetColourValue(retData.GetCustomColour(0)));
+		conf->Write(wxT("colour1"),(long)GetColourValue(retData.GetCustomColour(1)));
+		conf->Write(wxT("colour2"),(long)GetColourValue(retData.GetCustomColour(2)));
+		conf->Write(wxT("colour3"),(long)GetColourValue(retData.GetCustomColour(3)));
+		conf->Write(wxT("colour4"),(long)GetColourValue(retData.GetCustomColour(4)));
+		conf->Write(wxT("colour5"),(long)GetColourValue(retData.GetCustomColour(5)));
+		conf->Write(wxT("colour6"),(long)GetColourValue(retData.GetCustomColour(6)));
+		conf->Write(wxT("colour7"),(long)GetColourValue(retData.GetCustomColour(7)));
+		conf->Write(wxT("colour8"),(long)GetColourValue(retData.GetCustomColour(8)));
+		conf->Write(wxT("colour9"),(long)GetColourValue(retData.GetCustomColour(9)));
+		conf->Write(wxT("colour10"),(long)GetColourValue(retData.GetCustomColour(10)));
+		conf->Write(wxT("colour11"),(long)GetColourValue(retData.GetCustomColour(11)));
+		conf->Write(wxT("colour12"),(long)GetColourValue(retData.GetCustomColour(12)));
+		conf->Write(wxT("colour13"),(long)GetColourValue(retData.GetCustomColour(13)));
+		conf->Write(wxT("colour14"),(long)GetColourValue(retData.GetCustomColour(14)));
+		conf->Write(wxT("colour15"),(long)GetColourValue(retData.GetCustomColour(15)));
 	}
 }
 void TLSelectColourDialog::OnDirListClick(wxCommandEvent& event)

@@ -119,7 +119,7 @@ TLSample::TLSample(const wxString &filename, int id,TLColourManager *colourMan, 
 		SRC_DATA src_data;
 		src_data.src_ratio=44100.0/sfinfo.samplerate; /*output_sample_rate / input_sample_rate*/
 		src_data.input_frames=100000;//m_length/2;
-		src_data.output_frames=((m_bufferLength/2)*src_data.src_ratio)+25;
+		src_data.output_frames=((m_bufferLength/2)*(long)src_data.src_ratio)+25;
 		src_data.data_in=m_buffer;
 		float *out_buffer=new float[src_data.output_frames*2];
 		src_data.data_out=out_buffer;

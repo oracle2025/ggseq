@@ -41,12 +41,12 @@ class BigScrollBar;
 class TLPanel : public wxPanel
 {
 	public:
-		TLPanel(wxWindow* parent, BigScrollBar *scrollbar,
+		TLPanel(wxWindow* parent, BigScrollBar *scrollbar/*,
 				wxWindowID id = -1,
 				const wxPoint& pos = wxDefaultPosition,
 				const wxSize& size = wxDefaultSize,
 				long style = wxTAB_TRAVERSAL,
-				const wxString& name = wxT("panel"));
+				const wxString& name = wxT("panel")*/);
 		~TLPanel();
 
 		void OnPaint(wxPaintEvent& event);
@@ -59,7 +59,6 @@ class TLPanel : public wxPanel
 		void OnScroll(wxScrollEvent& event);
 
 		void ResetScrollBar();
-//		void EndPopupWindowDrag(int x, int y);
 		void DropFileAt(int x, int y, wxString filename);
 
 		bool New();
@@ -71,7 +70,6 @@ class TLPanel : public wxPanel
 		void Rewind();
 		void Play();
 		void Stop();
-//		void PlaySample(wxString filename, long &length);
 		void StopAll();
 		void WavExport();
 		bool UpdateCaret();
@@ -135,11 +133,6 @@ class TLPanel : public wxPanel
 		bool m_CaretVisible;
 		int FromTLtoSB(gg_tl_dat x);
 		gg_tl_dat FromSBtoTL(int x);
-		/*
-		m_position 0<= x <= 1000    -  position*1000 /length
-		m_scrollBarRange = 1000
-		m_thumbSize = ?             -  thumbSize*1000 /length
-		*/
 		DECLARE_EVENT_TABLE()
 };
 

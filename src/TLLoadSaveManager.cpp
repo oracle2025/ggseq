@@ -62,8 +62,9 @@ bool TLLoadSaveManager::Save() /*return true on success*/
 }
 bool TLLoadSaveManager::SaveAs()/*Datei auf existenz prüfen*/
 {
-	wxConfig config(wxT("ggseq"));
-	wxString lastFolder = config.Read(wxT("LastSaveFolder"), wxT(""));
+	//wxConfig config(wxT("ggseq"));
+	wxConfigBase *conf=wxConfigBase::Get();
+	wxString lastFolder = conf->Read(wxT("LastSaveFolder"), wxT(""));
 	
 	wxString filename = wxFileSelector(wxT("Save File as"),lastFolder,wxT(""),wxT("ggseq"),GG_FILE_EXTS,wxSAVE,m_parent);
 	if ( !filename.empty() ) {
@@ -74,7 +75,7 @@ bool TLLoadSaveManager::SaveAs()/*Datei auf existenz prüfen*/
 		}
 		wxString dir;
 		wxFileName::SplitPath(filename, &dir, NULL, NULL);
-		config.Write(wxT("LastSaveFolder"),dir);
+		conf->Write(wxT("LastSaveFolder"),dir);
 		return m_data->Save(filename);
 
 	}
@@ -97,14 +98,15 @@ void TLLoadSaveManager::Load()
 				break;
 		}
 	}
-	wxConfig config(wxT("ggseq"));
-	wxString lastFolder = config.Read(wxT("LastLoadFolder"), wxT(""));
+	wxConfigBase *conf=wxConfigBase::Get();
+	//wxConfig config(wxT("ggseq"));
+	wxString lastFolder = conf->Read(wxT("LastLoadFolder"), wxT(""));
 
 	wxString filename = wxFileSelector(wxT("Open File"),lastFolder,wxT(""),wxT("ggseq"),GG_FILE_EXTS,wxOPEN|wxHIDE_READONLY,m_parent);
 	if ( !filename.empty() ) {
 		wxString dir;
 		wxFileName::SplitPath(filename, &dir, NULL, NULL);
-		config.Write(wxT("LastLoadFolder"),dir);
+		conf->Write(wxT("LastLoadFolder"),dir);
 		m_data->Load(filename);
 		m_data->SetPlaybackPosition(0);
 	}

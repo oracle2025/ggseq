@@ -57,6 +57,7 @@ void Ruler::OnPaint(wxPaintEvent& event)
 	long index= m_position/m_snap;
 	long offs=m_position%m_snap;
 	wxString index_str;
+	dc.SetFont(*wxNORMAL_FONT);
 	for (int i=0;m_snap*i-offs<GetSize().GetWidth();i++) {
 		index_str << index;
 		dc.DrawText(index_str,m_snap*i-offs-3,-2);

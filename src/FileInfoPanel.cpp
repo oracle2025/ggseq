@@ -33,12 +33,7 @@ enum
 
 FileInfoPanel::FileInfoPanel(wxWindow* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN)
 {
-//	m_noBgHandler=new NoBgEvtHandler();
 	InfoPanel(this);
-}
-FileInfoPanel::~FileInfoPanel()
-{
-//	delete m_noBgHandler;
 }
 void FileInfoPanel::SetInfo(const wxString &filename, long frames, long channels, long sampleRate)
 {

@@ -46,12 +46,7 @@ BEGIN_EVENT_TABLE(MiniPlayer, wxPanel)
 	EVT_TIMER(-1,MiniPlayer::OnTimer)
 END_EVENT_TABLE()
 
-MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListener *updateListener, FileInfoListener *fiListener/*,
-		wxWindowID id,
-		const wxPoint& pos,
-		const wxSize& size,
-		long style,
-		const wxString& name*/)
+MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListener *updateListener, FileInfoListener *fiListener)
 		:wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN)
 {
 	MakeMiniPlayerWindow(this);
@@ -61,7 +56,6 @@ MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListe
 	m_fileInfoListener = fiListener;
 	m_sample=NULL;
 	m_length=100;
-//	m_noBgHandler=new NoBgEvtHandler();
 }
 MiniPlayer::~MiniPlayer()
 {
