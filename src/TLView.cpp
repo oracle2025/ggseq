@@ -35,6 +35,7 @@
 #include "TLItem.h"
 #include "TLSample.h"
 #include "TLSelectionSet.h"
+#include "GgseqDocManager.h"
 #include "gun_girl.xpm"
 
 #define SNAP_POSITION 117600
@@ -143,6 +144,7 @@ TLView::TLView(TLData *TlData)
 	m_TlData->SetSnapValue(conf->Read(wxT("SnapPosition"), SNAP_POSITION));
 	m_gungirl=new wxIcon(gun_girl_xpm);	
 	m_SnapSuspended=false;
+	m_docManager = new GgseqDocManager( m_TlData );
 }
 void TLView::SuspendSnap() { m_SnapSuspended=true; }
 void TLView::ResumeSnap() { m_SnapSuspended=false; }
@@ -154,6 +156,7 @@ TLView::~TLView()
 	delete m_selectionSet;
 	delete m_TlData;
 	delete m_gungirl;
+	delete m_docManager;
 }
 void TLView::SetVisibleFrame(long width, long height, long x, long y)
 {
@@ -370,10 +373,12 @@ void TLView::AddItem(wxString filename, long position, long trackNr)
 {
 	if (m_TlData->IsBlocked())
 		return;
-	TLItem *item=m_TlData->AddItem(filename,FromScreenXtoTL(position),trackNr);
+	m_docManager->SubmitCommand( new GgseqAddItemCommand( m_TlData, filename,
+		FromScreenXtoTL(position),trackNr ) );
+/*	TLItem *item=m_TlData->AddItem(filename,FromScreenXtoTL(position),trackNr);
 	if (!item)
 		return;
-	SnapItem(item);
+	SnapItem(item);*/
 }
 
 void TLView::DeleteItem(TLItem *item, long trackNr)

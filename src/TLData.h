@@ -39,7 +39,7 @@ class TLData: public LoopSetupListener
 		TLTrackList::Node *GetFirst(); /*Soll weg*/
 		int GetTrackCount();
 		void AddTrack();
-		virtual void SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2);
+		void SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2);
 
 		TLItem *AddItem(TLSample *sample,gg_tl_dat  Position, int TrackNr);
 		TLItem *AddItem(wxString& filename, gg_tl_dat Position, int TrackNr);

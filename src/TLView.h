@@ -26,6 +26,7 @@ class TLSample;
 class TLTrack;
 class TLSelectionSet;
 //class DnDData;
+class GgseqDocManager;
 
 class TLView
 {
@@ -76,6 +77,7 @@ class TLView
 		void SuspendSnap();
 		void ResumeSnap();
 	private:
+		GgseqDocManager *m_docManager;
 		gg_tl_dat GetSnap(gg_tl_dat x);
 		void SnapItem(TLItem *item);/*kommt evtl. nach TLData*/
 		long DrawTrack(wxDC& dc_screen, long yoffset, TLTrack* track);

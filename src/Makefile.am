@@ -53,6 +53,8 @@ ggseq_SOURCES = MiniFilerTest.cpp\
 		ggEvtHandler.cpp\
 		BigScrollBar.cpp\
 		BigScrollBar.h\
+		GgseqDocManager.cpp\
+		GgseqDocManager.h\
                 SoundManager.h\
                 tinystr.h\
                 tinyxml.h\

@@ -22,6 +22,7 @@
 class LoopSetupListener
 {
 	public:
+		virtual ~LoopSetupListener() {}
 		virtual void SetLoopSnaps(gg_tl_dat pos1, gg_tl_dat pos2)=0;
 };
 

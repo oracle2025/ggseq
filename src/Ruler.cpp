@@ -82,6 +82,7 @@ void Ruler::OnPaint(wxPaintEvent& event)
 void Ruler::OnLeftDown(wxMouseEvent& event)
 {
 	m_pos1=event.GetX()+m_position;
+	CaptureMouse();
 }
 void Ruler::GetLoop(int* pos1, int* pos2)
 {
@@ -90,6 +91,7 @@ void Ruler::GetLoop(int* pos1, int* pos2)
 }
 void Ruler::OnLeftUp(wxMouseEvent& event)
 {
+	ReleaseMouse();
 	m_pos2=event.GetX()+m_position;
 	if (m_listener)
 		m_listener->SetLoopSnaps((m_pos1*117600)/31, (m_pos2*117600)/31);
