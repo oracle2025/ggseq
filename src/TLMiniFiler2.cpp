@@ -35,7 +35,7 @@
 
 //DEFINE_EVENT_TYPE(wxEVT_MF_ACTIVATE_COMMAND)
 FileList::FileList(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-	:wxListCtrl(parent,id,pos,size,style|wxSUNKEN_BORDER)
+	:wxListCtrl(parent,id,pos,size,style|wxSUNKEN_BORDER|wxNO_FULL_REPAINT_ON_RESIZE)
 {}
 void FileList::SetDirectory(const wxString& dirname)
 {

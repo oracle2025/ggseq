@@ -215,7 +215,7 @@ bool TLData::printXML(wxString filename)
 	doc.LinkEndChild(dec);
 	TiXmlElement *el = new TiXmlElement("song");
 	doc.LinkEndChild(el);
-	el->SetAttribute("version","0.1");
+	el->SetAttribute("version",GG_VERSION);
 	el->SetAttribute("snap", m_snapValue);
 
 	TiXmlElement *samples = new TiXmlElement("samples");
@@ -225,6 +225,7 @@ bool TLData::printXML(wxString filename)
 
 	TiXmlElement *tracks = new TiXmlElement("tracks");
 	el->LinkEndChild(tracks);
+	tracks->SetAttribute("count",8);
 
 	for ( TLTrackList::Node *node = m_trackList.GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();

@@ -1,3 +1,23 @@
+2004-02-11  Richard Spindler <oracle2025@gmx.de>
+
+ * Fixed Bug that coused loading an empty arrangement to throw an error-message
+ * added help.xpm
+ * Various stuff to provide an integrated help-system (not finished though)
+
+2004-02-10  Richard Spindler <oracle2025@gmx.de>
+
+ * Fixed some Stuff in the SetSnap Dialog
+ * Fixed the Application Icon on win32
+ * increased snap limit to 500000
+ * Created an NSIS Script (for win32 Installer)
+
+2004-02-07  Richard Spindler <oracle2025@gmx.de>
+
+ * Fixed some Redraw Errors on Windows XP, tried to reduce "Flicker" on win32
+ * Programming in a the MS Windows Enviornment is Hell!
+ * Fixed loading of Files saved with version 0.1
+ * Added Version Information at various places
+
 2004-02-05  Richard Spindler <oracle2025@gmx.de>
 
  * Fixed a Bug that made at Progress-Bar stop at too big files

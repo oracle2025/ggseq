@@ -27,6 +27,7 @@
 #include <iostream>
 
 #include "TLSetSnapDialog.h"
+#include "ggEvtHandler.h"
 
 #define SAMPLE_RATE 44100
 #define HIP_HOP 117600
@@ -46,7 +47,7 @@ enum
 	ID_PresetsList,
 };
 BEGIN_EVENT_TABLE(TLSetSnapDialog, wxDialog)
-	//EVT_TEXT(ID_FramesCtrl, TLSetSnapDialog::OnSpin) /* den */ /*unter GTK2 notwendig?*/
+	EVT_TEXT(ID_FramesCtrl, TLSetSnapDialog::OnSpin) /* den */ /*unter GTK2 notwendig? unter win32 auf jeden Fall*/
 	EVT_SPINCTRL(ID_FramesCtrl, TLSetSnapDialog::OnSpin) /* den */
 	EVT_TEXT(ID_SecondsCtrl,TLSetSnapDialog::OnSecondsText) /* und den */
 	EVT_TEXT(ID_BpmCtrl,TLSetSnapDialog::OnBpmText) /* und den */
@@ -161,14 +162,18 @@ class NoChangeEvtHandler : public wxEvtHandler
 		DECLARE_EVENT_TABLE()
 };
 BEGIN_EVENT_TABLE(NoChangeEvtHandler, wxEvtHandler)
+	EVT_TEXT(ID_FramesCtrl, NoChangeEvtHandler::OnSpin)
 	EVT_SPINCTRL(ID_FramesCtrl, NoChangeEvtHandler::OnSpin) /* den */
 	EVT_TEXT(ID_SecondsCtrl,NoChangeEvtHandler::OnSecondsText) /* und den */
 	EVT_TEXT(ID_BpmCtrl,NoChangeEvtHandler::OnBpmText) /* und den */
 END_EVENT_TABLE()
 
+#ifdef __WXMSW__
+#define wxRESIZE_BORDER 0
+#endif
 
 TLSetSnapDialog::TLSetSnapDialog(wxWindow* parent, wxWindowID id,int SnapPosition, const wxString& title, const wxPoint& pos, const wxSize& size)
-	:wxDialog(parent, -1, title, pos, size, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER   )
+	:wxDialog(parent, -1, title, pos, size, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN   )
 {
 	MyDialogFunc(this,true);
 
@@ -250,7 +255,11 @@ TLSetSnapDialog::~TLSetSnapDialog()
 }
 void TLSetSnapDialog::OnSpin(wxSpinEvent &event)
 {
-	m_frameSnapValue=event.GetPosition();
+	
+	m_frameSnapValue=m_FramesSpinCtrl->GetValue();
+	//m_frameSnapValue=event.GetPosition();
+	//std::cout << m_frameSnapValue << std::endl;
+	//std::cout << m_FramesSpinCtrl->GetValue() << std::endl;
 	Modify(m_frameSnapValue);
 	UpdateDisplaySeconds();
 	UpdateDisplayBpm();
@@ -274,6 +283,9 @@ void TLSetSnapDialog::OnDeleteButton(wxCommandEvent &event)
 		delete t;
 		m_presetsListBox->Delete(index);
 	}
+	m_presetsListBox->SetSelection(0);
+	event.SetString(wxT("Custom ..."));
+	OnPresetsList(event);
 }
 void TLSetSnapDialog::OnPresetNameText(wxCommandEvent &event)
 {
@@ -363,7 +375,7 @@ wxSizer *MyDialogFunc( TLSetSnapDialog *parent, bool call_fit, bool set_sizer )
 {
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
-    wxStaticText *item1 = new wxStaticText( parent, ID_TEXT, wxT("Snap Position"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText *item1 = new wxStaticText( parent, ID_TEXT, wxT("Snap Position"), wxDefaultPosition, wxDefaultSize, 0 ,wxT("BigLabel"));
 //    item1->SetFont( wxFont( 20, wxDEFAULT, wxNORMAL, wxBOLD ) );
     item1->SetFont( wxFont( 20, wxSWISS, wxNORMAL, wxBOLD ) );
 #if defined(__WXMSW__) && !(wxCHECK_VERSION(2,3,0))
@@ -381,7 +393,7 @@ wxSizer *MyDialogFunc( TLSetSnapDialog *parent, bool call_fit, bool set_sizer )
     wxStaticText *item6 = new wxStaticText( parent, ID_TEXT, wxT("Frames"), wxDefaultPosition, wxDefaultSize, 0 );
     item5->Add( item6, 0,wxALIGN_LEFT, 5 );
 
-    parent->m_FramesSpinCtrl = new wxSpinCtrl( parent, ID_FramesCtrl, wxT("117600"), wxDefaultPosition, wxDefaultSize, 0, 0, 200000, 117600 );
+    parent->m_FramesSpinCtrl = new wxSpinCtrl( parent, ID_FramesCtrl, wxT("117600"), wxDefaultPosition, wxDefaultSize, 0, 0, 500000, 117600 );
     item5->Add( parent->m_FramesSpinCtrl, 0, wxALIGN_CENTRE, 5 );
 
     wxStaticText *item8 = new wxStaticText( parent, ID_TEXT, wxT("Seconds"), wxDefaultPosition, wxDefaultSize, 0 );

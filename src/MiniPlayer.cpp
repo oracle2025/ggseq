@@ -25,9 +25,7 @@
 #include "SoundManager.h"
 #include "MiniPlayer.h"
 #include "TLSample.h"
-#ifdef __WXMSW__
 #include "ggEvtHandler.h"
-#endif
 #include "FileInfoPanel.h"
 #include <iostream>
 
@@ -47,7 +45,7 @@ BEGIN_EVENT_TABLE(MiniPlayer, wxPanel)
 END_EVENT_TABLE()
 
 MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListener *updateListener, FileInfoListener *fiListener)
-		:wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN)
+		:wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN,wxT("MiniPlayer"))
 {
 	MakeMiniPlayerWindow(this);
 	m_soundManager=soundManager;
@@ -60,6 +58,11 @@ MiniPlayer::MiniPlayer(wxWindow* parent, SoundManager *soundManager, UpdateListe
 MiniPlayer::~MiniPlayer()
 {
 //	delete m_noBgHandler;
+#ifdef __WXMSW__
+	FindWindow(wxT("item3"))->PopEventHandler(true);
+	FindWindow(ID_Play)->PopEventHandler(true);
+	FindWindow(ID_Stop)->PopEventHandler(true);
+#endif
 }
 	
 void MiniPlayer::MakeMiniPlayerWindow(wxWindow *parent)
@@ -72,7 +75,7 @@ void MiniPlayer::MakeMiniPlayerWindow(wxWindow *parent)
 	wxStaticBox *item2 = new wxStaticBox( parent, ID_StaticBox, wxT("") ,wxDefaultPosition, wxDefaultSize, wxNO_FULL_REPAINT_ON_RESIZE);
 	wxStaticBoxSizer *item1 = new wxStaticBoxSizer( item2, wxHORIZONTAL );
 #endif
-	wxStaticText *item3 = new wxStaticText( parent, -1, wxT("Miniplayer"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText *item3 = new wxStaticText( parent, -1, wxT("Miniplayer"), wxDefaultPosition, wxDefaultSize, 0,wxT("item3") );
 #ifdef __WXMSW__
 	item3->PushEventHandler(new NoBgEvtHandler());
 #endif
@@ -150,6 +153,7 @@ void MiniPlayer::OnTimer(wxTimerEvent &event)
 		SetPosition(m_soundManager->GetPosition());
 	}
 }
+
 void MiniPlayer::OnPlay(wxCommandEvent *event)
 {
 	if (m_filename!=wxT(""))

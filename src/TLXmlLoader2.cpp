@@ -39,6 +39,7 @@ TLXMLLoader2::TLXMLLoader2(TLData *data, TLSampleManager *sm)
 
 void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 {
+	wxString version_string = wxT("0.0");
 	TiXmlDocument doc(filename.mb_str());
 	if(!doc.LoadFile()) {
 		wxLogError(wxT("Konnte Datei \"%s\" nicht laden"),filename.c_str());
@@ -54,21 +55,44 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 	if (element->Attribute("snap",&snap)) {
 		m_data->SetSnapValue(snap);
 	}
+	const char *ver;
+	ver=element->Attribute("version");
+	if (ver) {
+/*-*/
+		wchar_t out[strlen(ver)];
+		wxEncodingConverter conv;
+		conv.Init(wxFONTENCODING_ISO8859_2,wxFONTENCODING_UNICODE);
+		conv.Convert(ver,out);
+		wxString tt; 
+		tt << out;
+/*-*/
+		version_string=tt;
+		if (version_string!=wxT("0.1") && version_string!=wxT("0.1.1") && version_string!=wxT(GG_VERSION)) {
+			wxLogError(wxT("Couldn't load file \"%s\"\nSaved with wrong Program Version"),filename.c_str());
+			m_data->Clear();
+			return;
+		}
+	}
 	TiXmlNode *node = element->FirstChild("samples");
 	if (node==NULL) {
 		Error(filename);
 		return;
 	}
 
-	int sampleNum;
+	int sampleNum=1;
 	if (node->ToElement()->Attribute("count",&sampleNum)==NULL) {
-		Error(filename);
-		return;
+		/**/
+		if (version_string!=wxT("0.0")) {
+			Error(filename);
+			return;
+		} else {
+			sampleNum=1;
+		}
 	}
 	
 	node = node->FirstChild("sample");
 	if (node==NULL) {
-		Error(filename);
+		//Error(filename);
 		return;
 	}
 	element = node->ToElement();
@@ -163,6 +187,6 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 void TLXMLLoader2::Error(wxString msg)
 {
 //	wxLogError(msg);
-	wxLogError(wxT("Konnte Datei \"%s\" nicht laden"),msg.c_str());
+	wxLogError(wxT("Couldn't load file \"%s\""),msg.c_str());
 	m_data->Clear();
 }

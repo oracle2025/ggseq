@@ -50,6 +50,16 @@ void FileInfoPanel::SetInfo(const wxString &filename, long frames, long channels
 	ab << sampleRate;
 	m_sampleRateTC->SetValue(ab);
 }
+FileInfoPanel::~FileInfoPanel()
+{
+#ifdef __WXMSW__
+    FindWindow("item4")->PopEventHandler(true);
+    FindWindow("item6")->PopEventHandler(true);
+    FindWindow("item8")->PopEventHandler(true);
+    FindWindow("item10")->PopEventHandler(true);
+    FindWindow("item12")->PopEventHandler(true);
+#endif
+}
 wxString FileInfoPanel::GenerateLengthString(long frames, long sampleRate)
 {
 	wxString result;
@@ -96,31 +106,31 @@ wxSizer *FileInfoPanel::InfoPanel( wxWindow *parent, bool call_fit, bool set_siz
     wxFlexGridSizer *item3 = new wxFlexGridSizer( 2, 5, 5 );
     item3->AddGrowableCol( 1 );
 
-    wxStaticText *item4 = new wxStaticText( parent, ID_TEXT, wxT("Filename"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText *item4 = new wxStaticText( parent, ID_TEXT, wxT("Filename"), wxDefaultPosition, wxDefaultSize, 0 ,wxT("item4"));
     item3->Add( item4, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
     m_fileNameTC = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), wxTE_READONLY );
     item3->Add( m_fileNameTC, 0, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
 
-    wxStaticText *item6 = new wxStaticText( parent, ID_TEXT, wxT("Length"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText *item6 = new wxStaticText( parent, ID_TEXT, wxT("Length"), wxDefaultPosition, wxDefaultSize, 0 ,wxT("item6"));
     item3->Add( item6, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
     m_lengthTC = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), wxTE_READONLY );
     item3->Add( m_lengthTC, 0, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
 
-    wxStaticText *item8 = new wxStaticText( parent, ID_TEXT, wxT("Frames"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText *item8 = new wxStaticText( parent, ID_TEXT, wxT("Frames"), wxDefaultPosition, wxDefaultSize, 0 ,wxT("item8"));
     item3->Add( item8, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
     m_framesTC = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), wxTE_READONLY );
     item3->Add( m_framesTC, 0, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
 
-    wxStaticText *item10 = new wxStaticText( parent, ID_TEXT, wxT("Channels"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText *item10 = new wxStaticText( parent, ID_TEXT, wxT("Channels"), wxDefaultPosition, wxDefaultSize, 0 ,wxT("item10"));
     item3->Add( item10, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
     m_channelsTC = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), wxTE_READONLY );
     item3->Add( m_channelsTC, 0, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
 
-    wxStaticText *item12 = new wxStaticText( parent, ID_TEXT, wxT("Sample Rate"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText *item12 = new wxStaticText( parent, ID_TEXT, wxT("Sample Rate"), wxDefaultPosition, wxDefaultSize, 0 ,wxT("item12"));
     item3->Add( item12, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
     m_sampleRateTC = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), wxTE_READONLY );

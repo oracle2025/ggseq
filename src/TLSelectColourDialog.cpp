@@ -28,6 +28,7 @@
 
 #include "TLColourManager.h"
 #include "TLSelectColourDialog.h"
+#include "ggEvtHandler.h"
 
 enum
 {
@@ -44,11 +45,15 @@ BEGIN_EVENT_TABLE(TLSelectColourDialog, wxDialog)
 END_EVENT_TABLE()
 
 TLSelectColourDialog::TLSelectColourDialog(wxWindow* parent, wxWindowID id,TLColourManager* cm, const wxString& title, const wxPoint& pos, const wxSize& size)
-	:wxDialog(parent, -1, title, pos, size, wxDEFAULT_DIALOG_STYLE |wxRESIZE_BORDER  )
+	:wxDialog(parent, -1, title, pos, size, wxDEFAULT_DIALOG_STYLE |wxRESIZE_BORDER |wxNO_FULL_REPAINT_ON_RESIZE |wxCLIP_CHILDREN  )
 {
 	wxBoxSizer *MainSizer = new wxBoxSizer( wxVERTICAL );
 
-	wxStaticText *item1 = new wxStaticText( this, -1, wxT("Colours"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText *item1 = new wxStaticText( this, -1, wxT("Colours"), wxDefaultPosition, wxDefaultSize, 0,wxT("BigLabel") );
+#ifdef __WXMSW__
+	item1->PushEventHandler(new NoBgEvtHandler());/*Windows only*/
+#endif
+
 //	item1->SetFont( wxFont( 20, wxDEFAULT, wxNORMAL, wxBOLD ) );
 	item1->SetFont( wxFont( 20, wxSWISS, wxNORMAL, wxBOLD ) );
 	MainSizer->Add( item1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
@@ -72,13 +77,13 @@ TLSelectColourDialog::TLSelectColourDialog(wxWindow* parent, wxWindowID id,TLCol
 	ButtonSizer->Add(button1,0,wxALIGN_RIGHT|wxRIGHT,5);
 	ButtonSizer->Add(button2);
 #endif	
-	m_dirTreeCtrl = new wxGenericDirCtrl(this,-1,wxDirDialogDefaultFolderStr,wxDefaultPosition,wxDefaultSize,wxDIRCTRL_DIR_ONLY|wxSUNKEN_BORDER );
+	m_dirTreeCtrl = new wxGenericDirCtrl(this,-1,wxDirDialogDefaultFolderStr,wxDefaultPosition,wxDefaultSize,wxDIRCTRL_DIR_ONLY|wxSUNKEN_BORDER |wxNO_FULL_REPAINT_ON_RESIZE);
 	Sizer1->Add(m_dirTreeCtrl,1,wxEXPAND|wxALL,5);
 	
 	wxBoxSizer *Sizer2 = new wxBoxSizer( wxVERTICAL );
 	Sizer1->Add(Sizer2,1,wxEXPAND|wxRIGHT|wxTOP|wxBOTTOM,5);
 	
-	m_dirListBox = new wxListBox(this,ID_DirListBox);
+	m_dirListBox = new wxListBox(this,ID_DirListBox,wxDefaultPosition, wxDefaultSize, 0, NULL, wxNO_FULL_REPAINT_ON_RESIZE);
 //	lb->Append(wxT("/usr/local/"));
 	for ( TLDirColourList::Node *node = cm->GetColours(); node; node = node->GetNext() ) {
 		TLDirColour *current = node->GetData();
@@ -95,19 +100,33 @@ TLSelectColourDialog::TLSelectColourDialog(wxWindow* parent, wxWindowID id,TLCol
 	
 	m_addButton = new wxButton(this,ID_AddButton,wxT("+"));
 	m_removeButton = new wxButton(this,ID_RemoveButton,wxT("-"));
+#ifdef __WXMSW__
+	m_addButton->PushEventHandler(new NoBgEvtHandler());
+	m_removeButton->PushEventHandler(new NoBgEvtHandler());
+#endif
 	Sizer3->Add(m_addButton,1,wxRIGHT,5);
 	Sizer3->Add(m_removeButton,1);
 	
 	m_colourButton = new wxButton(this,ID_ColourButton,wxT("Colour"));
+#ifdef __WXMSW__
+	m_colourButton->PushEventHandler(new NoBgEvtHandler());
+#endif
 //	m_colourButton->SetBackgroundColour(*wxRED);
 	Sizer2->Add(m_colourButton,0,wxEXPAND);
 	
 	SetSizer( MainSizer );
 	MainSizer->SetSizeHints(this);
 	SetButtonStates();
+	m_dirTreeCtrl->SetFocus();
 }
 TLSelectColourDialog::~TLSelectColourDialog()
 {
+#ifdef __WXMSW__
+	FindWindow(wxT("BigLabel"))->PopEventHandler(true);/*Nur für Windows*/
+	FindWindow(ID_AddButton)->PopEventHandler(true);
+	FindWindow(ID_RemoveButton)->PopEventHandler(true);
+	FindWindow(ID_ColourButton)->PopEventHandler(true);
+#endif
 	for (int i=0; i<m_dirListBox->GetCount();i++) {
 		wxColour *colour = (wxColour*)m_dirListBox->GetClientData(i);
 		delete colour;	

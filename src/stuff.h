@@ -6,6 +6,7 @@
 #define ID_PLAY    8000
 #define ID_STOP    8001
 #define ID_REWIND  8002
+#define GG_VERSION "0.1.1"
 
 typedef long long gg_tl_dat;
 

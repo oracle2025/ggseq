@@ -29,7 +29,12 @@
 #include <wx/config.h>
 #include <wx/dragimag.h>
 #include <wx/cmdline.h>
-#include<wx/dnd.h>
+#include <wx/dnd.h>
+#include <wx/html/helpctrl.h>
+#include <wx/filesys.h>
+#include <wx/fs_zip.h>
+#include <wx/image.h>
+//#include <iostream>
 
 #include "stuff.h"
 #define _DISABLE_CONFIG_SHORTCUTS_
@@ -42,9 +47,7 @@
 #include "DisableListener.h"
 #include "SidePanel.h"
 #include "FileInfoPanel.h"
-#ifdef __WXMSW__
 #include "ggEvtHandler.h"
-#endif
 #ifndef _DISABLE_CONFIG_SHORTCUTS_
 	#include "ShortcutsDialog.h"
 #endif
@@ -62,6 +65,7 @@
 #include "dndfile.xpm"
 #include "snap.xpm"
 #include "ggseq_32.xpm"
+#include "help.xpm"
 //#include "prefs_misc.xpm"
 
 
@@ -108,6 +112,7 @@ class TestFrame1: public wxFrame
 		void OnSave(wxCommandEvent& event);
 		void OnLoad(wxCommandEvent& event);
 		void OnNew(wxCommandEvent& event);
+		void OnHelp(wxCommandEvent& event);
 		void OnClose(wxCloseEvent& event);
 		void OnWavExport(wxCommandEvent& event);
 		void OnSetColours(wxCommandEvent& event);
@@ -123,6 +128,7 @@ class TestFrame1: public wxFrame
 		void LoadFile(wxString& filename);
 		void OnMasterVolume(wxScrollEvent& event);
 		void OnQuit(wxCommandEvent& event);
+		void OnSize(wxSizeEvent &event); /*Nur für Windows*/
 	private:
 		void MakeToolBar();
 		void MakeTlPanel(wxWindow *parent);
@@ -139,6 +145,7 @@ class TestFrame1: public wxFrame
 		UpdateListener *m_updateListener;
 		bool m_DraggingFile;
 		wxDragImage *m_dragImage;
+		wxHtmlHelpController *m_help;
 		DECLARE_EVENT_TABLE()
 //		wxEvtHandler *m_noBgHandler;
 };
@@ -153,6 +160,7 @@ class DropFiles: public wxFileDropTarget
 };
 
 BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
+	EVT_SIZE(TestFrame1::OnSize)
 	EVT_TOOL(ID_PLAY,TestFrame1::OnPlay)
 	EVT_TOOL(ID_REWIND,TestFrame1::OnRewind)
 	EVT_TOOL(ID_STOP,TestFrame1::OnStop)
@@ -164,6 +172,7 @@ BEGIN_EVENT_TABLE(TestFrame1, wxFrame)
 	EVT_TOOL(ID_SetColours,TestFrame1::OnSetColours)
 	EVT_TOOL(ID_SetSnap,TestFrame1::OnSetSnap)
 	EVT_TOOL(ID_Preferences,TestFrame1::OnPreferences)
+	EVT_TOOL(wxID_HELP,TestFrame1::OnHelp)
 
 	EVT_MENU(wxID_OPEN, TestFrame1::OnLoad)
 	EVT_MENU(wxID_SAVE, TestFrame1::OnSave)
@@ -192,6 +201,7 @@ END_EVENT_TABLE()
 TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& size)
 	:wxFrame((wxFrame *)NULL, -1, title, pos, size,wxDEFAULT_FRAME_STYLE|GG_WINDOW_FLAGS)
 {
+	m_help = new wxHtmlHelpController(wxHF_FLAT_TOOLBAR | wxHF_CONTENTS | wxHF_INDEX | wxHF_SEARCH | wxHF_BOOKMARKS | wxHF_PRINT );
 //	m_noBgHandler=new NoBgEvtHandler();
 	MakeToolBar();
 	wxPanel *panel1=new wxPanel(this,-1,wxDefaultPosition,wxDefaultSize, wxTAB_TRAVERSAL|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN); /*Für richtige Hintergrundfarbe in osx und win32*/
@@ -233,6 +243,14 @@ TestFrame1::TestFrame1(const wxString& title, const wxPoint& pos, const wxSize& 
 	SetSize(size);
 	SetDropTarget (new DropFiles (this));
 }
+void TestFrame1::OnHelp(wxCommandEvent& event)
+{
+	wxFileName filename = wxFileName(wxT("ggseq.htb"));
+	filename.Normalize();
+	//wxMessageDialog(this, wxGetCwd()).ShowModal();
+	m_help->Initialize(filename.GetFullPath());
+	m_help->DisplayContents();
+}
 
 void TestFrame1::MakeShortcuts()
 {
@@ -251,11 +269,17 @@ void TestFrame1::MakeShortcuts()
 TestFrame1::~TestFrame1()
 {
 	wxConfigBase *conf=wxConfigBase::Get();
-	
+#ifdef __WXMSW__
+	FindWindow(ID_ScrollBar)->PopEventHandler(true);
+	FindWindow(ID_DirTree)->PopEventHandler(true);
+#endif
 //	wxConfig config(wxT("ggseq"));
 	conf->SetPath(wxT("/"));
 	conf->Write(wxT("MiniFilerDirectory"),m_DirTree->GetPath());
+	conf->Write(wxT("Version"), wxT(GG_VERSION));
+	conf->Write(wxT("LastProject"),m_tp->GetFilename());
 	delete m_dragImage;
+	delete m_help;
 //	config.Flush();
 //	delete m_noBgHandler;
 }
@@ -303,7 +327,7 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 	BigScrollBar *sb =  new BigScrollBar(panel1,ID_ScrollBar);
 #ifdef __WXMSW__
 	sb->SetSize(0,0,10,wxSystemSettings::GetMetric(wxSYS_HTHUMB_X));
-	sb->PushEventHandler(new NoBgEvtHandler());
+	//sb->PushEventHandler(new NoBgEvtHandler());
 	sb->PushEventHandler(new ttEvtHandler());
 #endif
 	m_tp = new TLPanel(panel1,sb);
@@ -332,7 +356,7 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 	wxPanel *miniplayerPanel = new wxPanel(SplitView2,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
 	SplitV2Sizer->Add(miniplayerPanel,1,wxEXPAND);
 	
-	wxPanel *sidePanelHolder = new wxPanel(miniplayerPanel,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN);
+	wxPanel *sidePanelHolder = new wxPanel(miniplayerPanel,-1,wxDefaultPosition,wxDefaultSize,wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN,wxT("SidePanelHolder"));
 
 	
 	
@@ -377,6 +401,17 @@ void TestFrame1::MakeMainWindow(wxWindow *parent)
 //	SplitView2->SetSashPosition(280);
 	
 }
+void TestFrame1::OnSize(wxSizeEvent &event)
+{
+		wxWindow *w = FindWindow(wxT("MiniPlayer"));/*Nur für Windows*/
+		w->Refresh(false);
+		w = FindWindow(wxT("SidePanelHolder"));
+		w->Refresh(false);
+		w = FindWindow(ID_MasterVolume);
+		w->Refresh(false);
+		event.Skip();
+}
+
 void TestFrame1::OnScroll(wxScrollEvent& event)
 {
 	m_tp->OnScroll(event);
@@ -475,6 +510,10 @@ void TestFrame1::MakeToolBar()
 	m_toolBar->AddSeparator();
 	m_toolBar->AddTool(ID_SetColours,wxT("Setup Colours..."),wxBitmap(colours2_xpm),wxT("Setup Colours..."));
 	m_toolBar->AddTool(ID_SetSnap,wxT("Set Snap Width"),wxBitmap(snap_xpm),wxT("Set Snap Width"));
+#if 0
+	m_toolBar->AddSeparator();
+	m_toolBar->AddTool(wxID_HELP,wxT("Help"),wxBitmap(help_xpm),wxT("Show Help"));
+#endif	
 	//m_toolBar->AddTool(ID_Preferences,wxT("Preferences"),wxBitmap(prefs_misc_xpm),wxT("Preferences"));
 //	m_toolBar->AddTool(ID_Preferences,wxT("Load last Project on Startup"),wxBitmap(prefs_misc_xpm),wxT("Load last Project on Startup"),wxITEM_CHECK);
 	m_toolBar->Realize();
@@ -580,6 +619,8 @@ void TestFrame1::OnClose(wxCloseEvent& event)
 	} else {
 		m_Timer->Stop();
 		m_tp->StopAll();
+		//std::cout << m_tp->GetFilename().mb_str() << std::endl;
+		/*Save Last Filename?*/
 		this->Destroy();
 	}
 }
@@ -653,6 +694,8 @@ bool Test::OnInit()
 
 {
 	SetAppName(wxT("ggseq"));
+	wxInitAllImageHandlers();
+	wxFileSystem::AddHandler(new wxZipFSHandler);
 
 	ProcessCmdLine (argv, argc);
 	
@@ -662,7 +705,7 @@ bool Test::OnInit()
 	SetTopWindow( frame );
 	if (m_fnames.GetCount()>0) {
 		frame->LoadFile(m_fnames[0]);
-	}
+	}/* else LoadLastProject? */
 	
 //	wxMessageDialog dlg(frame, wxT("Abc"));
 //	dlg.ShowModal();
