@@ -602,6 +602,7 @@ void TLPanel::UpdateButtons()
 		current->m_muteButton->SetMute( current->IsMuted() );
 		current->m_volumeDial->SetValue( (int)( current->GetVolume() * 100 ) );
 	}
+	m_view->UpdateDialsAndButtons();
 }
 void TLPanel::SetUpdateListener( UpdateListener *updateListener )
 {

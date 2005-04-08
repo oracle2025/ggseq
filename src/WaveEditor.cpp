@@ -147,11 +147,18 @@ void WaveEditor::OnPaint( wxPaintEvent& event )
 	dc.DrawRectangle( 0, 0, width, height );
 	dc.SetPen( *wxBLACK_PEN );
 	int inc = m_len / ( width + 4 );
+	if ( inc%2 == 1 )
+		inc = inc - 1;
 	for ( int i=0; i < width; i ++ ) {
-		int h = ( get_average( &m_buffer[i * inc], inc * 4 ) * float( height  ) /* * 2 */ );
-		dc.DrawLine( i, ( height / 2 ) - h, i, ( height / 2 ) + h );
+		int h = ( get_average( &m_buffer[i * inc], inc * 4 ) * float( height / 2  ) /* * 2 */ );
+		dc.DrawLine( i, ( height / 4 ) - h, i, ( height / 4 ) + h );
 	}
-	dc.DrawLine( 0, height / 2, width, height / 2 );
+	for ( int i = 0; i < width; i++ ) {
+		int h = ( get_average( &m_buffer[i * inc + 1], inc * 4 ) * float( height / 2 ) );
+		dc.DrawLine( i, ( 3 * height / 4 ) - h, i, ( 3 * height / 4 ) + h );
+	}
+	dc.DrawLine( 0, 3 * height / 4, width, 3 * height / 4 );
+	dc.DrawLine( 0, height / 4, width, height / 4 );
 	dc.SetPen( *wxRED_PEN );
 	m_marker[0].x = TrimToMark( m_leftTrim );
 	m_marker[1].x = TrimToMark( m_rightTrim );
