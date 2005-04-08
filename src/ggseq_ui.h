@@ -36,11 +36,11 @@ class FileList;
 class TLPanel;
 class MiniPlayer;
 class UpdateListener;
-#ifdef __WXMSW__ 
-class wxGenericDragImage;
-#else
+//#ifdef __WXMSW__ 
+//class wxGenericDragImage;
+//#else
 class wxDragImage;
-#endif
+//#endif
 
 
 // WDR: class declarations
@@ -82,11 +82,11 @@ private:
 private:
     // WDR: member variable declarations for MyFrame
     UpdateListener *m_updateListener;
-#ifdef __WXMSW__ 
-    wxGenericDragImage *m_dragImage;
-#else
+//#ifdef __WXMSW__ 
+//    wxGenericDragImage *m_dragImage;
+//#else
     wxDragImage *m_dragImage;
-#endif
+//#endif
     bool m_DraggingFile;
     wxTimer *m_timer;
     wxHtmlHelpController     m_HtmlHelp;

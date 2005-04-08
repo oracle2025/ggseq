@@ -1,5 +1,8 @@
 import os
 
+#D:\ggseq\ggseq\src>windres -iggseq.rc -oggseq_rc.o   --define __WXMSW__    --include-dir .  --include-dir C:\wxWidgets-2.5.4\include
+
+
 #windres -i../../samples/sample.rc -ominimal_sample_rc.o   --define __WXMSW__    --include-dir .  --include-dir ./../../samples --include-dir ../../include
 
 #../.././bk-deps g++ -c -o minimal_minimal.o -D__WXMSW__  -I.  -I./../../samples -DNO_GCC_PRAGMA -I../../lib/wx/include/msw-unicode-release-static-2.5 -I../../include -O2 -mthreads -Wall -Wno-ctor-dtor-privacy ./minimal.cpp
@@ -10,6 +13,11 @@ env = Environment(CC = 'g++',
 		CCFLAGS='-D__WXMSW__ -DNI_GCC_PRAGMA -IC:\\wxWidgets-2.5.4\\lib\\wx\\include\\msw-unicode-release-static-2.5 -IC:\\wxWidgets-2.5.4\\include -O2 -mthreads -Wall -Wno-ctor-dtor-privacy -Iportaudio_win32 -ID:\\ggseq\\ggseq_win32_tools\\libsamplerate-0.1.2\\src -ID:\\ggseq\\ggseq_win32_tools\\libsndfile-1.0.11\\src -ID:\\ggseq\\ggseq_win32_tools\\SoundTouch-1.3.0\\include -I../icons',
 	LINKFLAGS = '-mwindows -mthreads',
 	ENV = {'PATH' : os.environ['PATH']}, tools=['mingw'])
+
+env['BUILDERS']['RES'] = Builder(
+        action = 'windres --define __WXMSW__ -i $SOURCE -o $TARGET --include-dir . --include-dir C:\\wxWidgets-2.5.4\\include')
+
+
 #env = Environment(CC = 'g++',
 #		CCFLAGS='-D_WIN32_IE=0x400 -D__WXMSW__ -mthreads  -fno-pcc-struct-return -O2 -MMD -mthreads -IC:\\wxWidgets-2.5.4\\lib\\wx\\include\\msw-unicode-release-static-2.5 -IC:\\wxWidgets-2.5.4\\include -Iportaudio_win32 -ID:\\ggseq\\ggseq_win32_tools\\libsamplerate-0.1.2\\src -ID:\\ggseq\\ggseq_win32_tools\\libsndfile-1.0.11\\src -ID:\\ggseq\\ggseq_win32_tools\\SoundTouch-1.3.0\\include -I../icons',
 #	LINKFLAGS = '-Wl,--subsystem,windows -mwindows -mthreads',
@@ -65,7 +73,8 @@ src_list = Split("""BigScrollBar.cpp
 	UpdateListener.cpp
 	WaveEditor.cpp
 	#portaudio_win32/pa_lib.o
-	#portaudio_win32/pa_win_wmme.o""")
+	#portaudio_win32/pa_win_wmme.o
+	#ggseq_rc.o""")
 
 #wxmsw242u
 lib_list = Split("""
@@ -127,6 +136,8 @@ lib_list = Split("""
 
 cenv.Object('#portaudio_win32/pa_lib.c')
 cenv.Object('#portaudio_win32/pa_win_wmme.c')
+
+env.RES('ggseq_rc.o', 'ggseq.rc')
 
 env.Program('ggseq', src_list,
 	LIBS = lib_list,

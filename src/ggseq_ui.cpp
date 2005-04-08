@@ -31,11 +31,11 @@
     #pragma hdrstop
 #endif
 
-#ifdef __WXMSW__ 
-#include <wx/generic/dragimgg.h>
-#else
+//#ifdef __WXMSW__ 
+//#include <wx/generic/dragimgg.h>
+//#else
 #include <wx/dragimag.h>
-#endif
+//#endif
 
 #include <wx/dirctrl.h>
 #include <wx/filename.h>
@@ -150,11 +150,11 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     // insert main window here
     wxPanel *panel1 = new wxPanel(this, -1);
     MainFrameFunc(panel1);
-#ifdef __WXMSW__
-    m_dragImage = new wxGenericDragImage(wxBitmap(dndfile_xpm));
-#else
+//#ifdef __WXMSW__
+//    m_dragImage = new wxGenericDragImage(wxBitmap(dndfile_xpm));
+//#else
     m_dragImage = new wxDragImage(wxBitmap(dndfile_xpm));
-#endif
+//#endif
     m_DraggingFile=false;
 
 
@@ -354,10 +354,16 @@ void MyFrame::OnTimer(wxTimerEvent& event)
         Stop();
     }
 }
+#ifdef __WXMSW__
+#define DRAG_IMG_OFFSET 40
+#else
+#define DRAG_IMG_OFFSET 0
+#endif
 void MyFrame::OnFLStartDrag(wxListEvent& event)
 {
     m_dragImage->BeginDrag(wxPoint(0,0),this);
-    m_dragImage->Move(ScreenToClient(GetFilelist()->ClientToScreen(event.GetPoint())));
+    wxPoint p = ScreenToClient(GetFilelist()->ClientToScreen(event.GetPoint()));
+    m_dragImage->Move(wxPoint(p.x, p.y + DRAG_IMG_OFFSET));
     m_dragImage->Show();
     m_DraggingFile=true;
 }
@@ -378,7 +384,7 @@ void MyFrame::OnMouseDragging(wxMouseEvent& event)
 {
     if (!m_DraggingFile)
         return;
-    m_dragImage->Move(wxPoint(event.m_x,event.m_y));
+    m_dragImage->Move(wxPoint(event.m_x,event.m_y+DRAG_IMG_OFFSET));
 }
 
 void MyFrame::OnFLItemActivated(wxListEvent& event)
