@@ -159,7 +159,7 @@ void TLPanel::OnPaint( wxPaintEvent& event )
 	dc.DrawRectangle( 0, 0, width, height );
 	m_view->Draw( dc );
 	DrawCaret( dc );
-#ifndef __WXMSW__
+#ifdef __WXMSW__
 	static bool once = true;
 	if (once) {
 		for ( wxWindowList::Node *node = GetChildren().GetFirst(); node; node = node->GetNext() ) {
