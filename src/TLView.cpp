@@ -67,6 +67,9 @@ TLView::TLView(TLData *TlData)
 	m_gungirl         = new wxIcon( gun_girl_xpm );
 	m_drop_down_mini  = new wxIcon( drop_down_mini_xpm );
 	m_docManager      = new GgseqDocManager( m_TlData );
+	m_PositionVisible = 0;
+	m_width           = 200;
+	m_height          = 200;
 	m_TlData->SetDocManager( m_docManager );
 	{
 		wxConfigBase *conf = wxConfigBase::Get();

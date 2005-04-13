@@ -191,6 +191,7 @@ void MyFrame::OnActivate( wxActivateEvent &event ) //Evil and Ugly Hack, but nec
     static bool not_activated = true;
     if (not_activated) {
         GetTimelineSplitter()->SetSashPosition(290);
+	not_activated = false;
     }
 }
 MyFrame::~MyFrame()
