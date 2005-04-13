@@ -305,7 +305,7 @@ void TLPanel::OnScroll2( wxScrollEvent& event )
 	this->Freeze();
 #endif
 	m_view->UpdateDialsAndButtons();
-	Refresh();
+	Refresh(true);
 #ifndef __WXMSW__
 	this->Thaw();
 #endif
