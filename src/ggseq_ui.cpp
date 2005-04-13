@@ -506,9 +506,46 @@ IMPLEMENT_APP(GgseqApp)
 GgseqApp::GgseqApp()
 {
 }
+wxString app_path;
+wxString wxFindAppPath(const wxString& argv0, const wxString& cwd)
+{
+ 
+#if defined(__WXMAC__) && !defined(__DARWIN__)
+    // On Mac, the current directory is the relevant one when
+    // the application starts.
+    return cwd;
+#endif
+
+    if (wxIsAbsolutePath(argv0))
+        return wxPathOnly(argv0);
+    else
+    {
+        // Is it a relative path?
+        wxString currentDir(cwd);
+        if (currentDir.Last() != wxFILE_SEP_PATH)
+            currentDir += wxFILE_SEP_PATH;
+
+        str = currentDir + argv0;
+        if (wxFileExists(str))
+            return wxPathOnly(str);
+    }
+
+    // OK, it's neither an absolute path nor a relative path.
+    // Search PATH.
+
+    wxPathList pathList;
+    pathList.AddEnvList(wxT("PATH"));
+    str = pathList.FindAbsoluteValidPath(argv0);
+    if (!str.IsEmpty())
+        return wxPathOnly(str);
+
+    // Failed
+    return wxEmptyString;
+}
 
 bool GgseqApp::OnInit()
 {
+    app_path = wxFindAppPath(argv[0], wxGetCwd());
     SetAppName(wxT("ggseq"));
     wxInitAllImageHandlers();
     wxFileSystem::AddHandler(new wxZipFSHandler);

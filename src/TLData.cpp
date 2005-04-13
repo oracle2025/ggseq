@@ -303,7 +303,17 @@ void TLData::Clear() //TODO: auch wieder 8 Tracks herstellen.
 	m_changed=false;
 	m_filename=wxT("");
 }
-
+void remove_dir(const wxString &dir)
+{
+	wxString f = wxFindFirstFile(dir+wxT("/*.*"), wxFILE);
+	while ( !f.IsEmpty() )
+	{
+		wxRemoveFile(f);
+		f = wxFindNextFile();
+	}
+	wxRmdir(dir);
+}
+extern wxString app_path;
 bool TLData::ExportPackage(wxString filename)//TODO: Konflikte bei gleichnamigen Dateien vermeiden.
 {
 //Liste vom SampleManager kriegen, addXmlData ein Flag hinzufügen, das die dateien nach /tmp kopiert, und relative Pathnames vergibt.
@@ -318,8 +328,13 @@ bool TLData::ExportPackage(wxString filename)//TODO: Konflikte bei gleichnamigen
 	// Zip Up
 	wxSetWorkingDirectory(tmp_dir);
 	// system('zip ' + filename + ' -r .' )
-	wxExecute(wxString(wxT("zip ")) + filename + wxT(" -r ."), wxEXEC_SYNC);
-	wxExecute(wxString(wxT("rm -R ")) + tmp_dir, wxEXEC_SYNC);
+	wxString cmd = wxString(wxT("zip ")) + filename + wxT(" -r .");
+#ifdef __WXMSW__
+	cmd = app_path + wxFILE_SEP_PATH + "bin" + wxFILE_SEP_PATH + cmd;
+#endif
+	wxExecute(cmd, wxEXEC_SYNC);
+//	wxExecute(wxString(wxT("rm -R ")) + tmp_dir, wxEXEC_SYNC);
+	remove_dir(tmp_dir);
 	return true;
 }
 

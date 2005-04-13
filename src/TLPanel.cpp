@@ -453,7 +453,11 @@ void TLPanel::ImportPackage( wxString package, wxString contents )
 	wxString cont_path = contents + wxFileName::GetPathSeparator() + fn.GetName();
 	wxMkdir( cont_path );
 	wxSetWorkingDirectory( cont_path );
-	wxExecute( wxString( wxT("unzip ") ) + package, wxEXEC_SYNC );
+	wxString cmd = wxString( wxT("unzip ") ) + package;
+#ifdef __WXMSW__
+	cmd = app_path + wxFILE_SEP_PATH + "bin" + wxFILE_SEP_PATH + cmd;
+#endif
+	wxExecute( cmd, wxEXEC_SYNC );
 	wxArrayString files;
 	wxDir::GetAllFiles( cont_path, &files, wxT("*.ggseq") );
 	wxString ggseq_file = files[0];

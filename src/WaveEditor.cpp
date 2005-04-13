@@ -51,6 +51,9 @@ BEGIN_EVENT_TABLE(WaveEditor, wxPanel)
 	EVT_SIZE(WaveEditor::OnSize)
 END_EVENT_TABLE()
 
+#ifndef __WXMSW__
+	#define wxFULL_REPAINT_ON_RESIZE 0
+#endif
 
 WaveEditor::WaveEditor( wxWindow* parent,
 		float *buffer, gg_tl_dat len,

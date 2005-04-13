@@ -53,7 +53,7 @@
 #define VIEW_RIGHT_BORDER  5
 #define VIEW_TOP_BORDER    3
 
-wxIcon dropDownIcon(drop_down_mini_xpm);
+wxIcon *dropDownIcon;
 
 TLView::TLView(TLData *TlData)
 {
@@ -76,6 +76,7 @@ TLView::TLView(TLData *TlData)
 		conf->SetPath( wxT("/") );
 		m_TlData->SetSnapValue( conf->Read( wxT("SnapPosition"), SNAP_POSITION ) );
 	}
+	dropDownIcon = new wxIcon(drop_down_mini_xpm);
 }
 TLView::~TLView()
 {
@@ -88,6 +89,7 @@ TLView::~TLView()
 	delete m_gungirl;
 	delete m_drop_down_mini;
 	delete m_docManager;
+	delete dropDownIcon;
 }
 
 
@@ -182,7 +184,7 @@ void TLView::DrawItem(wxDC& dc, TLItem* item, long left, long delta_left, long t
 		if ( item->m_toggleEnvelope ) {
 			item->DrawEnvelope( dc, left + delta_left, top );
 		}
-		dc.DrawIcon(dropDownIcon, left+delta_left+(item->GetLen()/GetRealZoom())-7,top+height-7);
+		dc.DrawIcon(*dropDownIcon, left+delta_left+(item->GetLen()/GetRealZoom())-7,top+height-7);
 		dc.DestroyClippingRegion();
 	}
 //	dc.DrawRectangle( left + item->m_x_test, top+item->m_y_test, 10, 10);
