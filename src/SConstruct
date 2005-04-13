@@ -1,5 +1,7 @@
 import os
 
+WX_PATH = "C:\\wxWidgets-2.5.4\\"
+
 #D:\ggseq\ggseq\src>windres -iggseq.rc -oggseq_rc.o   --define __WXMSW__    --include-dir .  --include-dir C:\wxWidgets-2.5.4\include
 
 

@@ -57,7 +57,7 @@ WaveEditor::WaveEditor( wxWindow* parent,
 		gg_tl_dat leftTrim,
 		gg_tl_dat rightTrim,
 		wxWindowID id )
-	:wxPanel(parent, id, wxDefaultPosition, wxDefaultSize, wxCLIP_CHILDREN)
+	:wxPanel(parent, id, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE)
 {
 	m_buffer = buffer;
 	m_len = len;

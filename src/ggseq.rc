@@ -1,4 +1,5 @@
-aaaaaaaa ICON "sample.ico"
-sample ICON "sample.ico"
+aaaaaaaa ICON "../icons/ggseq_256.ico"
+ggseq_32 ICON "../icons/ggseq_256.ico"
+document ICON "../icons/ggseq_document_256.ico"
 #define wxUSE_NO_MANIFEST 1
 #include "wx/msw/wx.rc"

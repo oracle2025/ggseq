@@ -237,7 +237,7 @@ void TLPanel::OnMouseUp( wxMouseEvent& event )
 		return;
 	}*/
   if ( m_dragHandler ) {
-    m_dragHandler->OnDrop( event.m_x, event.m_y, event.ControlDown()/*event.RightUp()*/ );
+    m_dragHandler->OnDrop( event.m_x, event.m_y, event.RightUp() );
     delete m_dragHandler;
     m_dragHandler = NULL;
     ResetScrollBar();
@@ -265,11 +265,17 @@ void TLPanel::OnMouseDown( wxMouseEvent& event )
 	m_DragY = event.m_y;
 	if( g_ggseqProps.GetMiniPlayer() )
 		g_ggseqProps.GetMiniPlayer()->Stop();
-	if ( event.RightDown() )
+	if ( event.LeftDown() )
 	{
 		m_EditItem = m_view->GetDragItem( m_DragX, m_DragY );
 		if (!m_EditItem)
 			return;
+		wxRect b = m_view->GetItemBoundaries(m_EditItem);
+		if ( !(m_DragX > b.x + b.width - 7 && m_DragX < b.x + b.width
+				&& m_DragY > b.y + b.height - 7
+				&& m_DragY < b.y + b.height )) {
+			return;
+		}
 		wxMenu popup;
 		popup.Append( ID_PopupMenu, wxT("Edit Sample...") );
 		popup.AppendCheckItem( ID_PopupMenuEnvelope, wxT("Envelope") );
@@ -295,10 +301,14 @@ void TLPanel::OnDoubleClick( wxMouseEvent& event )
 void TLPanel::OnScroll2( wxScrollEvent& event )
 {
 	m_view->SetYScrollPosition( event.GetPosition() );
+#ifndef __WXMSW__
 	this->Freeze();
+#endif
 	m_view->UpdateDialsAndButtons();
-	Refresh();
+	Refresh(true);
+#ifndef __WXMSW__
 	this->Thaw();
+#endif
 }
 void TLPanel::OnScroll( wxScrollEvent& event )
 {
