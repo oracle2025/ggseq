@@ -509,7 +509,7 @@ GgseqApp::GgseqApp()
 wxString app_path;
 wxString wxFindAppPath(const wxString& argv0, const wxString& cwd)
 {
- 
+    wxString str; 
 #if defined(__WXMAC__) && !defined(__DARWIN__)
     // On Mac, the current directory is the relevant one when
     // the application starts.

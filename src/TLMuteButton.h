@@ -20,7 +20,10 @@
 #ifndef _TL_MUTE_BUTTON_H_
 #define _TL_MUTE_BUTTON_H_
 
+
+
 #ifdef __WXMSW__
+#include <wx/tglbtn.h>
 class TLMuteButton : public wxToggleButton
 #else
 class TLMuteButton : public wxBitmapButton

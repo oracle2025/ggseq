@@ -90,13 +90,13 @@ class TLPanel : public wxPanel
 
 		void AddControls(TLTrack *track);
 		void DeleteControls(TLTrack *track);
+		TLData *m_data;
 	private:
 		void DrawCaret(wxDC& dc);
 		void UpdateRulerTicks();
-		TLView *m_view;
 		BigScrollBar *m_scrollBar;
 		wxScrollBar *m_scrollBar2;
-		TLData *m_data;
+		TLView *m_view;
 		TLLoadSaveManager *m_loadSaveManager;
 		TLItem *m_EditItem;
 #ifdef __WXMSW__ 

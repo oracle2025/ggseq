@@ -89,7 +89,7 @@ BEGIN_EVENT_TABLE(TLPanel, wxPanel)
 END_EVENT_TABLE()
 
 TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar, Ruler *ruler, wxScrollBar *scrollbar2, wxWindowID id)
-:wxPanel(parent, id, wxDefaultPosition, wxSize(100,200), wxCLIP_CHILDREN)
+:wxPanel(parent, id, wxDefaultPosition, wxSize(100,200),wxFULL_REPAINT_ON_RESIZE)
 {
 	m_view = 0;
 	m_EditItem = 0;
@@ -305,7 +305,7 @@ void TLPanel::OnScroll2( wxScrollEvent& event )
 	this->Freeze();
 #endif
 	m_view->UpdateDialsAndButtons();
-	Refresh(true);
+	Refresh();
 #ifndef __WXMSW__
 	this->Thaw();
 #endif
@@ -447,15 +447,17 @@ void TLPanel::StopAll()
 {
 	g_ggseqProps.GetSoundManager()->Stop();
 }
+extern wxString app_path;
 void TLPanel::ImportPackage( wxString package, wxString contents )
 {
 	wxFileName fn( package );
 	wxString cont_path = contents + wxFileName::GetPathSeparator() + fn.GetName();
 	wxMkdir( cont_path );
 	wxSetWorkingDirectory( cont_path );
+	package = wxString(wxT("\"")) + package + wxT("\"");
 	wxString cmd = wxString( wxT("unzip ") ) + package;
 #ifdef __WXMSW__
-	cmd = app_path + wxFILE_SEP_PATH + "bin" + wxFILE_SEP_PATH + cmd;
+	cmd = app_path + wxFILE_SEP_PATH + wxT("bin") + wxFILE_SEP_PATH + cmd;
 #endif
 	wxExecute( cmd, wxEXEC_SYNC );
 	wxArrayString files;
