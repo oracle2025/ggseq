@@ -173,8 +173,8 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     GetDirtree()->SetPath(conf->Read(wxT("MiniFilerDirectory"), wxT("/")));
 
     // GUI - Hints
-    GetMenuBar()->Enable( ID_MOVE_TRACK_UP, false );
-    GetMenuBar()->Enable( ID_MOVE_TRACK_DOWN, false );
+//    GetMenuBar()->Enable( ID_MOVE_TRACK_UP, false );
+//    GetMenuBar()->Enable( ID_MOVE_TRACK_DOWN, false );
     GetToolBar()->EnableTool( ID_UNDO, false );
     GetToolBar()->EnableTool( ID_REDO, false );
     GetMenuBar()->Enable( ID_UNDO, false );

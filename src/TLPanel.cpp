@@ -89,7 +89,7 @@ BEGIN_EVENT_TABLE(TLPanel, wxPanel)
 END_EVENT_TABLE()
 
 TLPanel::TLPanel(wxWindow* parent, BigScrollBar *scrollbar, Ruler *ruler, wxScrollBar *scrollbar2, wxWindowID id)
-:wxPanel(parent, id, wxDefaultPosition, wxSize(100,200),wxFULL_REPAINT_ON_RESIZE)
+:wxPanel(parent, id, wxDefaultPosition, wxSize(100,200),wxCLIP_CHILDREN)
 {
 	m_view = 0;
 	m_EditItem = 0;

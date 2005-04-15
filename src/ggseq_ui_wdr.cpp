@@ -670,8 +670,6 @@ wxMenuBar *MyMenuBarFunc()
     item2->AppendSeparator();
     item2->Append( ID_ADD_TRACK, wxT("Add Track"), wxT("") );
     item2->Append( ID_DELETE_TRACK, wxT("Delete Track"), wxT("") );
-    item2->Append( ID_MOVE_TRACK_UP, wxT("Move Track Up"), wxT("") );
-    item2->Append( ID_MOVE_TRACK_DOWN, wxT("Move Track Down"), wxT("") );
     item2->AppendSeparator();
     item2->Append( ID_PREFERENCES, wxT("Preferences..."), wxT("") );
     item0->Append( item2, wxT("&Edit") );
