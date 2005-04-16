@@ -688,6 +688,7 @@ void TLPanel::SetZoom( float zoom )
 	ResetScrollBar();
 	m_ruler->SetSnap( (long)( m_view->GetSnapValue() / m_view->GetRealZoom() ) );
 	m_view->SetPosition( m_scrollBar->GetBigThumbPosition() );
+	m_ruler->Refresh();
 }
 void TLPanel::OnToggleEnvelope(wxCommandEvent& event)
 {

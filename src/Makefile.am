@@ -99,15 +99,7 @@ ggseq_SOURCES = PreferencesDialog.h\
                 TLView.h\
                 TLXmlLoader2.h\
 		TLMuteButton.h
-                #MiniFilerTest.cpp
 
-#ggseq_LDFLAGS = $(CLIBS) @SNDFILE_LIBS@ @SAMPLERATE_LIBS@ -lportaudio `wx-config --libs` 
-ggseq_LDFLAGS = $(CLIBS) -lportaudio
-ggseq_LDADD = -lSoundTouch
-#ggseq_LDADD = /usr/local/lib/libSoundTouch.a  
-#ggseq_LDFLAGS = $(CLIBS)  `wx-config --libs`
-#ggseq_LDADD = /usr/lib/libsndfile.a /usr/lib/libsamplerate.a /usr/local/lib/libportaudio.a /tmp/wx_static/lib/libwx_gtk-2.4.a 
 
 AM_CPPFLAGS = @CPPFLAGS@ -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons 
-#AM_CPPFLAGS = @CPPFLAGS@ @SNDFILE_CFLAGS@ @SAMPLERATE_CFLAGS@ @SOUNDTOUCH_CXXFLAGS@ -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons 
 

@@ -30,7 +30,8 @@ dnl ---------------------------------------------------------------------
 AC_HEADER_STDC
 
 AC_LANG(C++)
-
+dnl needed for portaudio
+AC_CHECK_LIB(pthread, pthread_create)
 
 
 dnl now extentions X soundcard etc..
@@ -57,6 +58,9 @@ LDFLAGS="$LDFLAGS $SAMPLERATE_LIBS"
 
 AC_CHECK_HEADERS(portaudio.h,,
   AC_MSG_ERROR([*** portaudio.h not found - this program requires portaudio http://www.portaudio.com/ ***]))
+
+AC_CHECK_LIB([portaudio],[Pa_StreamActive],[],
+  AC_MSG_ERROR([*** libportaudio not found or wrong version this program requires portaudio v18 http://www.portaudio.com/ ***]))
   
 dnl and last check  your(our) own things like wxWindows ....
 dnl ----------------------------------------------------------------------
@@ -101,6 +105,15 @@ dnl checking for needed features
 
  AC_CHECK_HEADER(soundtouch/SoundTouch.h,,
   AC_MSG_ERROR([*** soundtouch/SoundTouch.h not found - this program requires the SoundTouch Audio Processing Library http://www.iki.fi/oparviai/soundtouch ***]))
+
+AC_CHECK_LIB([SoundTouch],[soundtouch_ac_test],[],[])
+AC_CHECK_LIB([soundtouch],[soundtouch_ac_test],[],[])
+
+if test "x$HAVE_LIBSoundTouch" == "xno";then
+  if test "x$HAVE_LIBsoundtouch" == "xno"; then
+    AC_MSG_ERROR([*** libsoundtouch not found - this program requieres the SoundTouch Audio Processing Library http://www.iki.fi/oparviai/soundtouch ***])
+  fi
+fi
 
 
 # AC_CHECK_HEADER(soundtouch/SoundTouch.h,,
