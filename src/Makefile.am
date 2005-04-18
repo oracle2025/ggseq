@@ -101,5 +101,5 @@ ggseq_SOURCES = PreferencesDialog.h\
 		TLMuteButton.h
 
 
-AM_CPPFLAGS = @CPPFLAGS@ -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons 
-
+AM_CPPFLAGS = @CPPFLAGS@ -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons -ggdb
+LD_FLAGS= -ggdb

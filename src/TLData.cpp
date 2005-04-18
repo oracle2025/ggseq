@@ -361,16 +361,12 @@ bool TLData::printXML(wxString filename, bool relative, wxString tmp_path)
 
 	for ( TLTrackList::Node *node = m_trackList->GetFirst(); node; node = node->GetNext() ) {
 		TLTrack *current = node->GetData();
-		current->addXmlData(tracks);
+		current->addXmlData( tracks );
 	}
-
-	if(!doc.SaveFile()) {
-		wxLogError(wxT("Could not save File \"%s\""),filename.c_str());
+	if( !doc.SaveFile() ) {
+		wxLogError( wxT( "Could not save File \"%s\"" ), filename.c_str() );
 		return false;
 	}
-
-	m_filename=filename;
-	m_changed=false;
 	return true;
 }
 
@@ -384,14 +380,18 @@ wxString TLData::GetFilename()
 }
 bool TLData::Save(wxString filename)
 {
-	return printXML(filename);
-//	m_filename=filename;
-//	m_changed=false;
+	if ( printXML(filename) ) {
+		m_filename = filename;
+		m_changed = false;
+		return true;
+	}
+	return false;
+//	return printXML(filename);
 }
 bool TLData::Save()
 {
-	return printXML(m_filename);
-//	m_changed=false;
+	return Save(m_filename);
+//	return printXML(m_filename);
 }
 void TLData::Load(wxString filename)
 {

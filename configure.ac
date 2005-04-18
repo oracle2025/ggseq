@@ -60,7 +60,7 @@ AC_CHECK_HEADERS(portaudio.h,,
   AC_MSG_ERROR([*** portaudio.h not found - this program requires portaudio http://www.portaudio.com/ ***]))
 
 AC_CHECK_LIB([portaudio],[Pa_StreamActive],[],
-  AC_MSG_ERROR([*** libportaudio not found or wrong version this program requires portaudio v18 http://www.portaudio.com/ ***]))
+  AC_MSG_ERROR([*** libportaudio not found or wrong version - this program requires portaudio v18 http://www.portaudio.com/ ***]))
   
 dnl and last check  your(our) own things like wxWindows ....
 dnl ----------------------------------------------------------------------
@@ -68,10 +68,10 @@ dnl ----------------------------------------------------------------------
 dnl Check for XML support
 dnl ---------------------
 
-AC_PATH_PROG(XML_CONFIG,xml2-config,no)
-if test "x$XML_CONFIG" == "xno";then
-  AC_MSG_ERROR([*** xml2-config not found - but needed look at http://xmlsoft.org/***])
-fi
+#AC_PATH_PROG(XML_CONFIG,xml2-config,no)
+#if test "x$XML_CONFIG" == "xno";then
+#  AC_MSG_ERROR([*** xml2-config not found - but needed look at http://xmlsoft.org/***])
+#fi
 
 dnl Check for wxWIN
 dnl ---------------
@@ -92,7 +92,7 @@ AC_MSG_ERROR([
 	Please check that wx-config is in path, the directory
 	where wxWindows libraries are installed (returned by
 	'wx-config --libs' command) is in LD_LIBRARY_PATH or
-	equivalent variable and wxWindows version is 2.3.4 or above.
+	equivalent variable and wxWindows version is 2.4.2 or above.
 ])
 fi
 CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"

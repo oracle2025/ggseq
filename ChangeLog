@@ -1,3 +1,9 @@
+2005-04-18  Richard Spindler <richard.spindler AT gmail.com>
+
+ * Some Fixes (Copy Sample, keep Filename on package Export)
+ * various fixes were made over the last days, but I'm to lasy to record all
+ of them :P
+
 2005-04-06  Richard Spindler <richard.spindler AT gmail.com>
 
  * Fixed win32 Redraw Errors

@@ -339,7 +339,15 @@ void TLView::DoDrop( long x, long y, TLItem *item, long x_offset, bool copy )
 	} else if ( track < 0 )
 		return;
 	if ( copy ) {
-		AddItem( item->GetSample(), x, track );
+//		AddItem( item->GetSample(), x, track );
+		m_docManager->SubmitCommand(
+			new GgseqAddItemCommand(
+				m_TlData, item,
+				GetSnap( FromScreenXtoTL( x ) ),
+				track
+				)
+			);
+		//TODO: SubmitAddItem( item ) 
 	} else {
 		m_docManager->SubmitCommand(
 			new GgseqMoveItemCommand(

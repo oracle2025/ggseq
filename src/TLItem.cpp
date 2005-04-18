@@ -381,6 +381,9 @@ void TLItem::SetTrimNStretch( gg_tl_dat leftTrim,
 {
 	m_leftTrim = leftTrim;
 	m_rightTrim = rightTrim;
+	if ( m_rightTrim < 0 ) {
+		m_rightTrim = GetBufferLen() / 2;
+	}
 	m_timestretch = timestretch;
 	if ( m_stretchedBuffer ) {
 		delete [] m_stretchedBuffer;

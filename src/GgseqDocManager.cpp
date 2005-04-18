@@ -173,6 +173,7 @@ GgseqAddItemCommand::GgseqAddItemCommand( TLData *doc, const wxString& filename,
                                           TLSample *sample )
 {
 	m_sample = sample;
+	m_item = NULL;
 	m_document = doc;
 	m_error = 0;
 	
@@ -180,10 +181,33 @@ GgseqAddItemCommand::GgseqAddItemCommand( TLData *doc, const wxString& filename,
 	m_essentials.filename = filename;
 	m_essentials.trackId = trackId;
 	m_essentials.referenceId = 0;
+
+	m_essentials.timestretch = 1.0;
+	m_essentials.toggleEnvelope = false;
+	m_essentials.leftTrim = 0;
+	m_essentials.rightTrim = -1;
+	m_essentials.nativeEnvData.leftFadeLevel  = 1.0;
+	m_essentials.nativeEnvData.leftFadePos    = 0.5;
+	m_essentials.nativeEnvData.middleLevel    = 1.0;
+	m_essentials.nativeEnvData.rightFadeLevel = 1.0;
+	m_essentials.nativeEnvData.rightFadePos   = 0.5;
 /*	m_filename = filename;
 	m_position = position;
 	m_trackId = trackId;
 	m_referenceId = 0;*/
+}
+GgseqAddItemCommand::GgseqAddItemCommand( TLData* doc, TLItem* item,
+                                          int64_t position, unsigned int trackId )
+{
+	m_document = doc;
+	m_error = 0;
+
+	//m_item = item;
+	item->GetEssentials( m_essentials );
+	m_essentials.referenceId = 0;
+	m_essentials.position = position;
+	m_essentials.trackId = trackId;
+	m_sample = NULL;
 }
 void GgseqAddItemCommand::Do()
 {
@@ -193,16 +217,20 @@ void GgseqAddItemCommand::Do()
 		m_document->AddItem( m_sample, m_essentials.position,
 				m_essentials.trackId, m_essentials.referenceId );
 	} else {
-		if (m_document->AddItem( m_essentials.filename,
+		if ( m_document->AddItem( m_essentials ) == NULL ) {
+			m_error = 1;
+		}
+/*		if (m_document->AddItem( m_essentials.filename,
 					m_essentials.position,
 					m_essentials.trackId,
 					m_essentials.referenceId ) == 0)
-			m_error = 1;
+			m_error = 1;*/
 	}
 }
 void GgseqAddItemCommand::Undo()
 {
 	TLItem *item = m_document->GetItem(m_essentials.referenceId);
+	wxASSERT_MSG( (item != NULL), "Item must not be NULL" );
 	m_document->DeleteItem( item , m_essentials.trackId );
 	m_sample = (TLSample*) 0;
 }
@@ -265,22 +293,15 @@ void GgseqMoveItemCommand::Do()
 	} else {
 		item = m_document->GetItem(m_essentials.referenceId);
 	}
-	//m_filename = item->GetSample()->GetFilename();
-	//item->GetEnvelopeData(m_envelopeData);
-	//m_toggleEnvelope = item->m_toggleEnvelope;
 	int64_t oldPositon = item->GetPosition();
 	unsigned int oldTrackId = item->GetTrack();
 	TLSample *sample = item->GetSample();
 	sample->Ref();
 	m_document->DeleteItem( item, oldTrackId );
-	
-	//m_document->AddItem( sample, m_position, m_trackId , m_referenceId, &m_envelopeData, m_toggleEnvelope );
-	m_document->AddItem( m_essentials );
-	
+	m_document->AddItem( m_essentials ); //TODO m_error = 1???
 	m_essentials.position = oldPositon;
 	m_essentials.trackId = oldTrackId;
 	sample->UnRef();
-	
 }
 void GgseqMoveItemCommand::Undo()
 {

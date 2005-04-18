@@ -93,6 +93,8 @@ class GgseqAddItemCommand : public GgseqSingleItemCommand
 		GgseqAddItemCommand( TLData *doc, const wxString& filename,
 		                     int64_t position, unsigned int trackId,
 		                     TLSample *sample = (TLSample*) 0 );
+		GgseqAddItemCommand( TLData *doc, TLItem* item,
+		                     int64_t position, unsigned int trackId );
 		void Do();
 		void Undo();
 	private:
