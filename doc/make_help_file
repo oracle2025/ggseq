@@ -1,0 +1,3 @@
+#!/bin/sh
+zip ggseq.zip ggseq.hhc ggseq.hhk ggseq.hhp *.html pics/*
+mv ggseq.zip ggseq.htb

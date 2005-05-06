@@ -1,0 +1,13 @@
+--- STTypes.h	2005-05-06 17:07:06.141980824 +0200
++++ STTypes_new.h	2005-05-06 17:08:07.120710648 +0200
+@@ -58,8 +58,8 @@
+     /// Enable one of the following defines to choose either 16bit integer or
+     /// 32bit float sample type. If you don't have opinion, using integer samples
+     /// is generally faster.
+-    #define INTEGER_SAMPLES       //< 16bit integer samples
+-    //#define FLOAT_SAMPLES       //< 32bit float samples
++    //#define INTEGER_SAMPLES       //< 16bit integer samples
++    #define FLOAT_SAMPLES       //< 32bit float samples
+ 
+ 
+     /// Define this to allow CPU-specific assembler optimizations. Notice that 

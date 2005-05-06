@@ -1,0 +1,20 @@
+<ul>
+    <li>
+      <object type="text/sitemap">
+        <param name="Name" value="Tutorial">
+        <param name="Local" value="tutorial.html">
+      </object>
+    </li>
+    <li>
+      <object type="text/sitemap">
+        <param name="Name" value="Sound Formats">
+        <param name="Local" value="sound_formats.html">
+      </object>
+    </li>
+    <li>
+      <object type="text/sitemap">
+        <param name="Name" value="Keyboard Shortcuts">
+        <param name="Local" value="keyboard.html">
+      </object>
+    </li>
+  </ul>
