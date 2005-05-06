@@ -59,13 +59,14 @@ class wxDial : public wxControl
 		void SetValue(int value);
 		void OnPaint(wxPaintEvent& event);
 		void OnEraseBackground(wxEraseEvent& event);
-//		void OnMouseMotion(wxMouseEvent& event);
+		void OnMouseMotion(wxMouseEvent& event);
 		void OnMouseDown(wxMouseEvent& event);
-//		void OnMouseUp(wxMouseEvent& event);
+		void OnMouseUp(wxMouseEvent& event);
 		void TipEventMotion(wxPoint point);
 		void TipEventLeftUp(wxPoint point);
 		void DrawBgCircle(wxDC *dc);
 		int GetDialMinSize();
+		void NoPopup();
 	private:
 		void DrawDialTip();
 		double CalcAngle(int center_x, int center_y, int pos_x, int pos_y);

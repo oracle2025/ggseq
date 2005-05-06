@@ -71,7 +71,8 @@ TrimmerDialog::TrimmerDialog( wxWindow *parent,
     m_len         = len;
     m_timestretch = timestretch;
     new WaveEditor( this, buffer, len, leftTrim, rightTrim, ID_WAVE_EDITOR );
-    new wxDial( this, ID_TIMESTRETCH_DIAL, 50, 0, 100);
+    wxDial *o   = new wxDial( this, ID_TIMESTRETCH_DIAL, 50, 0, 100);
+    o->NoPopup();
     
     // WDR: dialog function TrimmerDialogFunc for TrimmerDialog
     TrimmerDialogFunc2( this, TRUE ); 

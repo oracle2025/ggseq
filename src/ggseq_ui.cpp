@@ -272,8 +272,8 @@ void MyFrame::OnHelp( wxCommandEvent &event )
 		}
 		if ( help_file.IsEmpty() ) {
 			help_file = wxFileSelector(
-					"Help File could not be found",
-					"", "", "htb", "ggseq.htb",
+					wxT("Help File could not be found"),
+					wxT(""), wxT(""), wxT("htb"), wxT("ggseq.htb"),
 					wxFILE_MUST_EXIST );
 			conf->Write( wxT("help_file_location"), help_file );
 		}

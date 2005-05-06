@@ -104,5 +104,4 @@ ggseq_SOURCES = PreferencesDialog.h\
 
 ggseq_LDADD = portaudio/libportaudio.a SoundTouch/libSoundTouch.a
 
-AM_CPPFLAGS = @CPPFLAGS@ -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons -ggdb -DINSTALL_PREFIX="\"$(prefix)\""
-LD_FLAGS= -ggdb
+AM_CPPFLAGS = @CPPFLAGS@ -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons -DINSTALL_PREFIX="\"$(prefix)\""

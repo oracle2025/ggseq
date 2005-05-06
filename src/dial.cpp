@@ -72,8 +72,8 @@ BEGIN_EVENT_TABLE(wxDial, wxControl)
 	EVT_PAINT(wxDial::OnPaint)
 	EVT_ERASE_BACKGROUND(wxDial::OnEraseBackground)
 	EVT_LEFT_DOWN(wxDial::OnMouseDown)
-//	EVT_MOTION(wxDial::OnMouseMotion)
-//	EVT_LEFT_UP(wxDial::OnMouseUp)
+	EVT_MOTION(wxDial::OnMouseMotion)
+	EVT_LEFT_UP(wxDial::OnMouseUp)
 END_EVENT_TABLE()
 
 bool wxDial::Create(wxWindow* parent,
@@ -85,6 +85,7 @@ bool wxDial::Create(wxWindow* parent,
 				const wxString& name)
 {
 	bool RetVal = wxControl::Create(parent, id, pos, size, style|wxNO_BORDER);
+	
 	SetSizeHints(25,25);
 	m_Value = value;
 	m_MinValue = minValue;
@@ -102,6 +103,21 @@ bool wxDial::Create(wxWindow* parent,
 wxDial::~wxDial()
 {
 }
+void wxDial::NoPopup()
+{
+	delete m_dialTip;
+	m_dialTip = NULL;
+}
+void wxDial::OnMouseMotion(wxMouseEvent& event)
+{
+	if (event.m_leftDown || event.LeftUp())
+		TipEventMotion(ClientToScreen(wxPoint(event.m_x,event.m_y)));
+}
+void wxDial::OnMouseUp(wxMouseEvent& event)
+{
+	TipEventLeftUp(ClientToScreen(wxPoint(event.m_x,event.m_y)));
+}
+
 
 void wxDial::SetValue(int value)
 {
@@ -193,19 +209,29 @@ void wxDial::TipEventMotion(wxPoint point)
 }
 void wxDial::TipEventLeftUp(wxPoint point)
 {
-	m_dialTip->ReleaseMouse();
-	m_dialTip->Hide();
+	if (m_dialTip) {
+		m_dialTip->ReleaseMouse();
+		m_dialTip->Hide();
+	} else {
+		ReleaseMouse();
+	}
 }
 void wxDial::OnMouseDown(wxMouseEvent& event)
 {
 	wxPoint pos=ClientToScreen(wxPoint(0,0));
-	m_dialTip->SetSize(pos.x,pos.y+GetSize().GetHeight(),40,15);
-	m_dialTip->Show();
-	m_dialTip->CaptureMouse();
-	DrawDialTip();
+	if (m_dialTip) {
+		m_dialTip->SetSize(pos.x,pos.y+GetSize().GetHeight(),40,15);
+		m_dialTip->Show();
+		m_dialTip->CaptureMouse();
+		DrawDialTip();
+	} else {
+		CaptureMouse();
+	}
 }
 void wxDial::DrawDialTip() /*die events motion und left-up mussen verfolgt werden*/
 {
+	if (!m_dialTip)
+		return;
 	wxClientDC dc(m_dialTip);
 	dc.DrawRectangle(0,0,40,15);
 	wxString gg;
