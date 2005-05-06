@@ -1,3 +1,8 @@
+2005-05-06  Richard Spindler <richard.spindler AT gmail.com>
+
+ * Some Automake-Magic added to install help files
+ * Integrated SoundTouch and portaudio int Sourc-Tree
+
 2005-04-18  Richard Spindler <richard.spindler AT gmail.com>
 
  * Some Fixes (Copy Sample, keep Filename on package Export)
