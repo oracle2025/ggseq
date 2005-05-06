@@ -2,6 +2,8 @@
 
  * Some Automake-Magic added to install help files
  * Integrated SoundTouch and portaudio int Sourc-Tree
+ * A Fix to work around a wx26 Misfeature or Bug? (Dial in Trimmer dialog
+ grabs focus)
 
 2005-04-18  Richard Spindler <richard.spindler AT gmail.com>
 
