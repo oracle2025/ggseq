@@ -180,8 +180,6 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     SetSizeHints(470,460);
     GetMainSplitter()->SetSashPosition(200);
     GetTlPanel()->SetFocus();//Nötig, damit unter wxGTK die Cursor funktionieren.
-
-//   wxLogError( wxT( INSTALL_PREFIX ) );
 }
 void MyFrame::OnActivate( wxActivateEvent &event ) //Evil and Ugly Hack, but neccessary because wx is broken >:(
 {
@@ -278,7 +276,6 @@ void MyFrame::OnHelp( wxCommandEvent &event )
 					"", "", "htb", "ggseq.htb",
 					wxFILE_MUST_EXIST );
 			conf->Write( wxT("help_file_location"), help_file );
-			wxLogError(help_file);
 		}
 		if ( !help_file.IsEmpty() ) {
 			m_HtmlHelp.Initialize( help_file );
