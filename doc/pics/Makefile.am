@@ -8,5 +8,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-EXTRA_DIST = ggseq_colours.png ggseq_icon.png ggseq_move_copy.png ggseq_select.png ggseq_tree.png ggseq_delete.png ggseq_info_panel.png ggseq_mute_volume.png ggseq_small.png ggseq_DnD.png ggseq_miniplayer.png ggseq.png ggseq_snap.png gun_girl.png
+EXTRA_DIST = 10.png  13.png  16.png  1.png  4.png\
+   7.png  ggseq_3d_icon_32.png\
+   11.png  14.png  17.png  2.png  5.png  8.png  ggseq_3d_icon.png\
+   12.png  15.png  18.png  3.png  6.png  9.png
 SUBDIRS =

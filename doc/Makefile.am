@@ -8,5 +8,13 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-EXTRA_DIST = ggseq.html shortcuts.html tutorial.html formats.html
+EXTRA_DIST = contents.html keyboard.html tutorial.html sound_formats.html ggseq.hhp ggseq.hhk ggseq.hhc ggseq.htb make_help_file
 SUBDIRS = pics
+
+# Use Variable instead of ggseq below
+
+install-data-local:
+	$(mkinstalldirs) $(prefix)/share/doc/ggseq/
+	$(INSTALL_DATA) $(srcdir)/ggseq.htb $(prefix)/share/doc/ggseq/ggseq.htb
+
+#$(sharedstatedir)

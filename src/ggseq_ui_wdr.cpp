@@ -279,7 +279,7 @@ wxSizer *PreferencesFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
     wxNotebook *item2 = new wxNotebook( parent, ID_NOTEBOOK, wxDefaultPosition, wxSize(200,160), 0 );
-    wxNotebookSizer *item1 = new wxNotebookSizer( item2 );
+//    wxNotebookSizer *item1 = new wxNotebookSizer( item2 );
 
     wxPanel *item3 = new wxPanel( item2, -1 );
     SetSnapFunc( item3, FALSE );
@@ -293,7 +293,7 @@ wxSizer *PreferencesFunc( wxWindow *parent, bool call_fit, bool set_sizer )
     MiscOptsDlgFunc( item5, FALSE );
     item2->AddPage( item5, wxT("Misc. Options") );
 
-    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+    item0->Add( item2, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
     wxBoxSizer *item6 = new wxBoxSizer( wxHORIZONTAL );
 

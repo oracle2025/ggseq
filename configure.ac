@@ -9,11 +9,14 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AC_INIT([ggseq],
-        [0.2.0cvs],
+        [0.3.0],
         [Richard Spindler oracle2025@gmx.de],
         [ggseq])
 AC_CONFIG_AUX_DIR(config)
 AM_CONFIG_HEADER(config.h)
+
+AM_PROG_LIBTOOL
+
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 
 dnl then we have to ask if any compatible compiler and installer is installed
@@ -59,8 +62,8 @@ LDFLAGS="$LDFLAGS $SAMPLERATE_LIBS"
 AC_CHECK_HEADERS(portaudio.h,,
   AC_MSG_ERROR([*** portaudio.h not found - this program requires portaudio http://www.portaudio.com/ ***]))
 
-AC_CHECK_LIB([portaudio],[Pa_StreamActive],[],
-  AC_MSG_ERROR([*** libportaudio not found or wrong version - this program requires portaudio v18 http://www.portaudio.com/ ***]))
+#AC_CHECK_LIB([portaudio],[Pa_StreamActive],[],
+#  AC_MSG_ERROR([*** libportaudio not found or wrong version - this program requires portaudio v18 http://www.portaudio.com/ ***]))
   
 dnl and last check  your(our) own things like wxWindows ....
 dnl ----------------------------------------------------------------------
@@ -103,17 +106,17 @@ LDFLAGS="$LDFLAGS $WX_LIBS"
 
 dnl checking for needed features
 
- AC_CHECK_HEADER(soundtouch/SoundTouch.h,,
-  AC_MSG_ERROR([*** soundtouch/SoundTouch.h not found - this program requires the SoundTouch Audio Processing Library http://www.iki.fi/oparviai/soundtouch ***]))
+# AC_CHECK_HEADER(soundtouch/SoundTouch.h,,
+#  AC_MSG_ERROR([*** soundtouch/SoundTouch.h not found - this program requires the SoundTouch Audio Processing Library http://www.iki.fi/oparviai/soundtouch ***]))
 
-AC_CHECK_LIB([SoundTouch],[soundtouch_ac_test],[],[])
-AC_CHECK_LIB([soundtouch],[soundtouch_ac_test],[],[])
+#AC_CHECK_LIB([SoundTouch],[soundtouch_ac_test],[],[])
+#AC_CHECK_LIB([soundtouch],[soundtouch_ac_test],[],[])
 
-if test "x$HAVE_LIBSoundTouch" == "xno";then
-  if test "x$HAVE_LIBsoundtouch" == "xno"; then
-    AC_MSG_ERROR([*** libsoundtouch not found - this program requieres the SoundTouch Audio Processing Library http://www.iki.fi/oparviai/soundtouch ***])
-  fi
-fi
+#if test "x$HAVE_LIBSoundTouch" == "xno";then
+#  if test "x$HAVE_LIBsoundtouch" == "xno"; then
+#    AC_MSG_ERROR([*** libsoundtouch not found - this program requieres the SoundTouch Audio Processing Library http://www.iki.fi/oparviai/soundtouch ***])
+#  fi
+#fi
 
 
 # AC_CHECK_HEADER(soundtouch/SoundTouch.h,,
@@ -157,6 +160,8 @@ dnl --------------------------------------------------------------------------
 AC_CONFIG_FILES([
    Makefile
    src/Makefile
+   src/portaudio/Makefile
+   src/SoundTouch/Makefile
    config/Makefile
    icons/Makefile
    doc/Makefile
@@ -217,6 +222,8 @@ echo ""
 #echo "$SOUNDTOUCH_CXXFLAGS"
 #echo -n "SoundTouch libs     ........... "
 #echo "$SOUNDTOUCH_LIBS"
+echo -n "Install Prefix      ........... "
+echo "$prefix"
 
 echo ""
 echo "now you can run make to build Gungirl Sequencer"

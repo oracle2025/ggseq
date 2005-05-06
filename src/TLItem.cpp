@@ -26,7 +26,8 @@
 
 #include <math.h>
 #include <sndfile.h>
-#include <soundtouch/SoundTouch.h>
+//#include <soundtouch/SoundTouch.h>
+#include "SoundTouch/SoundTouch.h"
 
 #include "stuff.h"
 #include "TLItem.h"

@@ -37,7 +37,8 @@ void GetRectsFromEnv( const NativeEnvData& e, gg_tl_dat SampleLength, wxRect *re
 void GetEnvFromRects( NativeEnvData& e, const wxRect* rect, gg_tl_dat SampleLength );
 void GetSampleEnvelope( EnvelopePoint *result, const NativeEnvData& e, gg_tl_dat SampleLength );
 
-#include <soundtouch/SoundTouch.h>
+//#include <soundtouch/SoundTouch.h>
+#include "SoundTouch/SoundTouch.h"
 
 class TLSample;
 class GetItemTrackListener;

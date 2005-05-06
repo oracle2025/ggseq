@@ -8,6 +8,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+SUBDIRS = portaudio SoundTouch
+
 bin_PROGRAMS = ggseq
 ggseq_SOURCES = PreferencesDialog.h\
                 PreferencesDialog.cpp\
@@ -100,6 +102,7 @@ ggseq_SOURCES = PreferencesDialog.h\
                 TLXmlLoader2.h\
 		TLMuteButton.h
 
+ggseq_LDADD = portaudio/libportaudio.a SoundTouch/libSoundTouch.a
 
-AM_CPPFLAGS = @CPPFLAGS@ -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons -ggdb
+AM_CPPFLAGS = @CPPFLAGS@ -DLOCALEDIR=\"$(NLSDIR)\"  -I$(top_srcdir)/icons -ggdb -DINSTALL_PREFIX="\"$(prefix)\""
 LD_FLAGS= -ggdb

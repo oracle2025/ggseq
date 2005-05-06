@@ -17,7 +17,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include <soundtouch/SoundTouch.h>
+#include "SoundTouch/SoundTouch.h"
+//#include <soundtouch/SoundTouch.h>
 
 #include "SampleEdit.h"
 
@@ -43,7 +44,8 @@ void SampleEdit::SetTrims( int start, int end )
 }
 float *SampleEdit::Convert( int &len )
 {
-#ifdef __WXMSW__
+//#ifdef __WXMSW__
+#if 1
 	soundtouch::SoundTouch pSoundTouch;
 #else
 	SoundTouch pSoundTouch;

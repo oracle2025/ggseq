@@ -173,8 +173,6 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     GetDirtree()->SetPath(conf->Read(wxT("MiniFilerDirectory"), wxT("/")));
 
     // GUI - Hints
-//    GetMenuBar()->Enable( ID_MOVE_TRACK_UP, false );
-//    GetMenuBar()->Enable( ID_MOVE_TRACK_DOWN, false );
     GetToolBar()->EnableTool( ID_UNDO, false );
     GetToolBar()->EnableTool( ID_REDO, false );
     GetMenuBar()->Enable( ID_UNDO, false );
@@ -182,9 +180,8 @@ MyFrame::MyFrame( wxWindow *parent, wxWindowID id, const wxString &title,
     SetSizeHints(470,460);
     GetMainSplitter()->SetSashPosition(200);
     GetTlPanel()->SetFocus();//Nötig, damit unter wxGTK die Cursor funktionieren.
-//    GetTimelineSplitter()->SetSashPosition(300);
-    m_HtmlHelp.Initialize(wxT("../doc/ggseq.htb"));
-    
+
+//   wxLogError( wxT( INSTALL_PREFIX ) );
 }
 void MyFrame::OnActivate( wxActivateEvent &event ) //Evil and Ugly Hack, but neccessary because wx is broken >:(
 {
@@ -265,7 +262,32 @@ void MyFrame::Stop()
 
 void MyFrame::OnHelp( wxCommandEvent &event )
 {
-    m_HtmlHelp.DisplayContents();
+	static bool init = true;
+	if (init) {
+		wxString help_file;
+    		wxConfigBase *conf=wxConfigBase::Get();
+		if ( conf->HasEntry( wxT("help_file_location") ) ) {
+			help_file = conf->Read( wxT("help_file_location"), wxT("") );
+		} else {
+			help_file = wxString( wxT(INSTALL_PREFIX) ) + wxT("/share/doc/ggseq/ggseq.htb");
+			if ( !wxFileExists( help_file ) ) help_file = wxT("");
+		}
+		if ( help_file.IsEmpty() ) {
+			help_file = wxFileSelector(
+					"Help File could not be found",
+					"", "", "htb", "ggseq.htb",
+					wxFILE_MUST_EXIST );
+			conf->Write( wxT("help_file_location"), help_file );
+			wxLogError(help_file);
+		}
+		if ( !help_file.IsEmpty() ) {
+			m_HtmlHelp.Initialize( help_file );
+			init = false;
+		} else {
+			return;
+		}
+	}
+	m_HtmlHelp.DisplayContents();
 }
 
 void MyFrame::OnTimelineSplitterChanging( wxSplitterEvent &event )

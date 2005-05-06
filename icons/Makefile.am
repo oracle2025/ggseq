@@ -8,7 +8,12 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-EXTRA_DIST = colours2.xpm       new1.xpm  play.xpm    save.xpm dir.xpm        null.xpm  rewind.xpm  stop.xpm dndfile.xpm     open.xpm  saveas.xpm  wav_export.xpm ggseq_32.xpm snap.xpm  mute_off.xpm mute_on.xpm play_12.xpm stop_12.xpm prefs_misc.xpm gun_girl.xpm help.xpm undo.xpm redo.xpm  drop_down_mini.xpm
+EXTRA_DIST = colours2.xpm       new1.xpm  play.xpm    save.xpm dir.xpm \
+        null.xpm  rewind.xpm  stop.xpm dndfile.xpm     open.xpm  saveas.xpm \
+				wav_export.xpm ggseq_32.xpm snap.xpm  mute_off.xpm mute_on.xpm \
+				play_12.xpm stop_12.xpm prefs_misc.xpm gun_girl.xpm help.xpm \
+				undo.xpm redo.xpm  drop_down_mini.xpm ggseq_128.png \
+				ggseq_document_256.ico ggseq_256.ico uninst_256.ico
 SUBDIRS =
 # -- the following would install the app icon, but I have to
 # -- ask georg if this is the 'right' way to do things :)

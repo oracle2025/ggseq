@@ -104,6 +104,10 @@ void TLLoadSaveManager::Load()
 	//wxConfig config(wxT("ggseq"));
 	wxString lastFolder = conf->Read(wxT("LastLoadFolder"), wxT(""));
 
+// wxGTK26 has now wxHIDE_READONLY
+#ifndef wxHIDE_READONLY
+#define wxHIDE_READONLY 0
+#endif
 	wxString filename = wxFileSelector(wxT("Open File"),lastFolder,wxT(""),wxT("ggseq"),GG_FILE_EXTS,wxOPEN|wxHIDE_READONLY,m_parent);
 	if ( !filename.empty() ) {
 		wxString dir;

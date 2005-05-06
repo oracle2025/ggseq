@@ -23,7 +23,7 @@
     #include "wx/wx.h"
 #endif
 
-#include <portaudio.h>
+#include "portaudio/portaudio.h"
 #include "stuff.h"
 #include "TLItem.h"
 #include "TLData.h"
