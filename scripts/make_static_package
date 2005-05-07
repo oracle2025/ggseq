@@ -1,0 +1,13 @@
+#!/bin/sh
+
+VERSION=0.3.0
+
+mkdir ggseq-${VERSION}
+cp ../doc/ggseq.htb ./ggseq-${VERSION}
+cp ../src/ggseq ./ggseq-${VERSION}
+strip ggseq-${VERSION}/ggseq
+cp ../COPYING ./ggseq-${VERSION}
+cp ../ggseq.desktop ./ggseq-${VERSION}
+cp ../icons/ggseq_32.xpm ./ggseq-${VERSION}
+cp ../icons/ggseq_128.png ./ggseq-${VERSION}
+cp INSTALL_static_bin ./ggseq-${VERSION}/INSTALL

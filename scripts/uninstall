@@ -1,0 +1,28 @@
+#!/bin/bash
+USER=`whoami`
+if [ "$USER" != "root" ]
+then
+  echo "Error: must be user 'root' for uninstallation"
+  exit 1
+fi
+if test -e "/usr/bin/ggseq"  &&  test -e "/usr/share/icons/ggseq_32.xpm" && test -e "/usr/share/applications/ggseq.desktop"
+then
+  if test -L "/usr/bin/ggseq"  &&  test -L "/usr/share/icons/ggseq_32.xpm" &&  test -L "/usr/share/applications/ggseq.desktop"
+  then
+    echo "Deleting symbolic link /usr/bin/ggseq"
+    rm /usr/bin/ggseq
+    echo "Deleting symbolic link /usr/share/icons/ggseq_32.xpm"
+    rm /usr/share/icons/ggseq_32.xpm
+    echo "Deleting symbolic link /usr/share/applications/ggseq.desktop"
+    rm /usr/share/applications/ggseq.desktop
+    echo
+    echo "= Uninstall finished ="
+    echo
+  else
+    echo "Error: ggseq was not installed by these scripts!"
+    exit 1
+  fi
+else
+  echo "Error: ggseq is not installed!"
+  exit 1
+fi

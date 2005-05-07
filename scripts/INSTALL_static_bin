@@ -1,0 +1,21 @@
+Hi,
+
+this the static binary Release of ggseq.
+
+Installation:
+
+copy this folder ("ggseq-0.3.0") to /opt
+and run the ./install script
+
+
+Uninstall:
+
+goto /opt/ggseq-0.3.0 and
+run ./uninstall
+
+
+-Richard Spindler
+
+richard.spindler AT gmail.com
+
+
