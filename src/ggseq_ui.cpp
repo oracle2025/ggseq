@@ -64,6 +64,7 @@
 #include "ggseq_32.xpm"
 #include "dndfile.xpm"
 
+wxString app_path;
 class DropFiles: public wxFileDropTarget
 {
     public:
@@ -267,7 +268,13 @@ void MyFrame::OnHelp( wxCommandEvent &event )
 		if ( conf->HasEntry( wxT("help_file_location") ) ) {
 			help_file = conf->Read( wxT("help_file_location"), wxT("") );
 		} else {
+
+#ifdef __WXMSW__
+			help_file = app_path + wxFILE_SEP_PATH + wxT("ggseq.htb");
+#else
 			help_file = wxString( wxT(INSTALL_PREFIX) ) + wxT("/share/doc/ggseq/ggseq.htb");
+#endif
+			
 			if ( !wxFileExists( help_file ) ) help_file = wxT("");
 		}
 		if ( help_file.IsEmpty() ) {
@@ -525,7 +532,6 @@ IMPLEMENT_APP(GgseqApp)
 GgseqApp::GgseqApp()
 {
 }
-wxString app_path;
 wxString wxFindAppPath(const wxString& argv0, const wxString& cwd)
 {
     wxString str; 

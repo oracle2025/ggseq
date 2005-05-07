@@ -26,8 +26,11 @@
 
 #include <math.h>
 #include <sndfile.h>
-//#include <soundtouch/SoundTouch.h>
-#include "SoundTouch/SoundTouch.h"
+#ifdef __WXMSW__
+	#include <soundtouch/SoundTouch.h>
+#else
+	#include "SoundTouch/SoundTouch.h"
+#endif
 
 #include "stuff.h"
 #include "TLItem.h"

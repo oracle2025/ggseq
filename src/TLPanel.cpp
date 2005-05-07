@@ -457,7 +457,7 @@ void TLPanel::ImportPackage( wxString package, wxString contents )
 	package = wxString(wxT("\"")) + package + wxT("\"");
 	wxString cmd = wxString( wxT("unzip ") ) + package;
 #ifdef __WXMSW__
-	cmd = app_path + wxFILE_SEP_PATH + wxT("bin") + wxFILE_SEP_PATH + cmd;
+	cmd = wxString(wxT("\"")) + app_path + wxFILE_SEP_PATH + wxT("bin") + wxFILE_SEP_PATH + wxString( wxT("unzip\" ") ) + package;
 #endif
 	wxExecute( cmd, wxEXEC_SYNC );
 	wxArrayString files;

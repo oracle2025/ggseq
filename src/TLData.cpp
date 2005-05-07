@@ -331,7 +331,7 @@ bool TLData::ExportPackage(wxString filename)//TODO: Konflikte bei gleichnamigen
 	filename = wxString(wxT("\"")) + filename + wxT("\"");
 	wxString cmd = wxString(wxT("zip ")) + filename + wxT(" -r .");
 #ifdef __WXMSW__
-	cmd = app_path + wxFILE_SEP_PATH + wxT("bin") + wxFILE_SEP_PATH + cmd;
+	cmd = wxString(wxT("\"")) + app_path + wxFILE_SEP_PATH + wxT("bin") + wxFILE_SEP_PATH + wxString(wxT("zip\" ")) + filename + wxT(" -r .");
 #endif
 	wxExecute(cmd, wxEXEC_SYNC);
 //	wxExecute(wxString(wxT("rm -R ")) + tmp_dir, wxEXEC_SYNC);
