@@ -10,8 +10,8 @@ HOWTO Compile?
 Download and install the following libraries
 
 wxWindows http://www.wxwindows.org/               (2.4.2)
-libsndfile http://www.mega-nerd.com/libsndfile/   (1.0.11)
-libsamplerate http://www.mega-nerd.com/SRC/       (0.1.2)
+libsndfile http://www.mega-nerd.com/libsndfile/   (1.0.10)
+libsamplerate http://www.mega-nerd.com/SRC/       (0.1.0)
 
 The following libraries are included within the tarball, no need for downloading.
 
@@ -22,7 +22,7 @@ And then:
 Thanks to Georg,
 The usual ./configure and make stuff.
 
-Hint: Drag a simple with [Ctrl] pressed, to copy it.
+Hint: Drag a simple with the right Mousebutton, to copy it.
 
 Richard Spindler <richard.spindler AT gmail.com>
 
