@@ -137,6 +137,8 @@ PreferencesDialog::PreferencesDialog( wxWindow *parent, wxWindowID id, int frame
     conf->Read( wxT("LoadLastProject"), &loadLastProject );
     GetLoadLastCheckbox()->SetValue(loadLastProject);
     GetColourDirtree()->SetPath( path );
+
+    SetSizeHints( 400, 300 );
 }
 PreferencesDialog::~PreferencesDialog()
 {
