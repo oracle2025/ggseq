@@ -1,7 +1,7 @@
 Summary : Gungirl Sequencer
 Name: ggseq
-Version: 0.2.0
-Release: cvs.20051902
+Version: 0.3.0
+Release: 1
 Vendor: Richard  Spindler <oracle2025@gmx.de>
 Packager: Richard Spindler <oracle2025@gmx.de>, Georg E Schneider <georg@georgs.org>
 License: GPL
@@ -10,7 +10,7 @@ Source: http:/dl.sf.net/%{name}/%{name}-%{version}.tar.bz2
 URL: http://ggseq.sourceforge.net/
 BuildRoot: %{_tmppath}/%{name}-root
 
-BuildRequires: portaudio-devel libsndfile-devel wxGTK-devel >= 2.4.0 samplerate-devel >= 0.0.15 libxml2-devel
+BuildRequires: libsndfile-devel wxGTK-devel >= 2.4.0 samplerate-devel >= 0.0.15
 
 %description
 Gungirl Sequencer is NOT a midi seqencer. 
@@ -39,7 +39,9 @@ rm -rf $RPM_BUILD_ROOT
 %makeinstall
 mkdir -p %{buildroot}%{_datadir}/icons/
 mkdir -p %{buildroot}%{_datadir}/applications/
+mkdir -p %{buildroot}%{_datadir}/doc/ggseq/
 install -m 644 icons/ggseq_32.xpm %{buildroot}%{_datadir}/icons/
+install -m 644 doc/ggseq.htb %{buildroot}%{_datadir}/doc/ggseq/
 desktop-file-install --dir %{buildroot}%{_datadir}/applications/ --vendor="Richard Spindler <oracle2025@gmx.de>" -m 644 ggseq.desktop
 cd %{buildroot}%{_datadir}/icons/;rm -f c* d* m* n* o* p* r* s* w*
 
@@ -52,9 +54,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/ggseq
 %{_datadir}/icons/ggseq_32.xpm
 %{_datadir}/applications/*
+%{_datadir}/doc/ggseq/ggseq.htb
 
 
 %changelog
+* Sat May 07 2005 Richard Spindler <richard.spindler AT gmail.com>
+- removed dependencies
+- changed version number
+
 * Sat Feb 19 2005 Georg E Schneider <georg@georgs.org>
 - build from cvs
 - Added "include <math.h>" src/WaveEditor.cpp

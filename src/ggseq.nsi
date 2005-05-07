@@ -55,6 +55,7 @@ Section "Gungirl Sequencer"
   SetOutPath $INSTDIR
   
   ; Put file there
+  file mingwm10.dll
   File ggseq.exe
   File libsndfile-1.dll
   File libsamplerate.dll
@@ -111,7 +112,7 @@ Section "Uninstall"
 
   ; Remove files and uninstaller
   Delete $INSTDIR\ggseq.exe
-;  Delete $INSTDIR\mingwm10.dll
+  Delete $INSTDIR\mingwm10.dll
   Delete $INSTDIR\libsndfile-1.dll
   Delete $INSTDIR\libsamplerate.dll
   Delete $INSTDIR\ggseq.htb
