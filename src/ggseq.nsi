@@ -58,7 +58,8 @@ Section "Gungirl Sequencer"
   File ggseq.exe
   File libsndfile-1.dll
   File libsamplerate.dll
-;  File ggseq.htb
+  File ..\doc\ggseq.htb
+  File ..\COPYING
   
     ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\NSIS_ggseq-${VERSION} "Install_Dir" "$INSTDIR"
@@ -113,7 +114,8 @@ Section "Uninstall"
 ;  Delete $INSTDIR\mingwm10.dll
   Delete $INSTDIR\libsndfile-1.dll
   Delete $INSTDIR\libsamplerate.dll
-;  Delete $INSTDIR\ggseq.htb
+  Delete $INSTDIR\ggseq.htb
+  Delete $INSTDIR\COPYING
   Delete $INSTDIR\uninstall.exe
 
   SetShellVarContext all
