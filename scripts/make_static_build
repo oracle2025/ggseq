@@ -1,0 +1,11 @@
+#!/bin/sh
+cd ..
+make distclean
+export APBUILD_INCLUDE="/usr/local/gtk-headers/2.2:${HOME}/lib/wxGTK26/include/wx-2.6"
+export APBUILD_STATIC="sndfile samplerate"
+export PATH="/home/oracle/lib/wxGTK26/bin:$PATH:${HOME}/.local/bin"
+CC=apgcc CXX=apg++ ./configure
+CC=apgcc CXX=apg++ make
+cd src
+/bin/sh ../libtool --mode=link apg++  -g -O2 -I/home/oracle/lib/wxGTK26/lib/wx/include/gtk2-unicode-release-static-2.6 -I/home/oracle/lib/wxGTK26/include/wx-2.6 -DGTK_NO_CHECK_CASTS -D__WXGTK__ -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D_LARGEFILE_SOURCE=1 -lsndfile   -lsamplerate   -L/home/oracle/lib/wxGTK26/lib   -L/usr/X11R6/lib  /home/oracle/lib/wxGTK26/lib/libwx_gtk2u-2.6.a -Wl,--export-dynamic -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgdk_pixbuf-2.0 -lm -lpangoxft-1.0 -lpangox-1.0 -lpango-1.0 -lgobject-2.0 -lgmodule-2.0 -ldl -lglib-2.0 -lXinerama -lXxf86vm -lm  -o ggseq  PreferencesDialog.o SampleEdit.o PlayerInterface.o ggseq_ui.o MouseDragHandler.o SelectionDragHandler.o RubberDragHandler.o EnvelopeDragHandler.o TrimmerDialog.o WaveEditor.o ggseq_ui_wdr.o colour_helper.o ui_helper.o tinyxmlparser.o TLMiniFiler2.o TLSelectionSet.o SoundManager.o TLColourManager.o TLPanel.o TLTrack.o tinystr.o TLData.o TLSample.o TLView.o tinyxml.o TLItem.o TLSampleManager.o TLXmlLoader2.o tinyxmlerror.o TLLoadSaveManager.o GgseqGlobalProps.o TLMuteButton.o dial.o TLTrackVolumeDial.o MiniPlayer.o Ruler.o UpdateListener.o StatusProgressBar.o DisableListener.o SidePanel.o FileInfoPanel.o ggEvtHandler.o BigScrollBar.o GgseqDocManager.o ImportPackDialog.o portaudio/libportaudio.a SoundTouch/libSoundTouch.a -lpthread -lpng
+strip ggseq
