@@ -11,3 +11,6 @@ cp ../ggseq.desktop ./ggseq-${VERSION}
 cp ../icons/ggseq_32.xpm ./ggseq-${VERSION}
 cp ../icons/ggseq_128.png ./ggseq-${VERSION}
 cp INSTALL_static_bin ./ggseq-${VERSION}/INSTALL
+cp uninstall ./ggseq-${VERSION}
+cp install ./ggseq-${VERSION}
+tar czf ggseq-${VERSION}.tar.gz ggseq-${VERSION}

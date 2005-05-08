@@ -316,11 +316,11 @@ void MyFrame::OnImportPack( wxCommandEvent &event )
         //puts(dlg.GetContentsPath().mb_str());
         //puts(dlg.GetPackageFile().mb_str());
 	if ( !wxFileExists( dlg.GetPackageFile() ) ) {
-		wxLogError("Package File does not exist");
+		wxLogError(wxT("Package File does not exist"));
 		return;
 	}
 	if ( !wxDirExists( dlg.GetContentsPath() ) ) {
-		wxLogError("Import Folder does not exist");
+		wxLogError(wxT("Import Folder does not exist"));
 		return;
 	}
     	GetTlPanel()->ImportPackage(dlg.GetPackageFile(), dlg.GetContentsPath());
