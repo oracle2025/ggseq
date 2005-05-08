@@ -45,8 +45,6 @@ dnl Soundkarte sndfile und portaudio
  AC_CHECK_HEADER(sys/soundcard.h,,
   AC_MSG_ERROR([*** sys/soundcard.h not found - this program requires the Open Sound System (http://4front-tech.com) or compatible (http://www.alsa-project.com) ***]))
 
-#AC_CHECK_HEADERS(sndfile.h,,
-#  AC_MSG_ERROR([*** sndfile.h not found - this program requires libsndfile http://www.zip.com.au/~erikd/libsndfile/ ***]))
 
 PKG_CHECK_MODULES(SNDFILE, sndfile > 1.0.0,,
   AC_MSG_ERROR([*** libsndfile not found - this program requires libsndfile http://www.mega-nerd.com/libsndfile/ ***]))
@@ -59,8 +57,8 @@ PKG_CHECK_MODULES(SAMPLERATE, samplerate >= 0.0.15,, AC_MSG_ERROR([*** libsample
 CPPFLAGS="$CPPFLAGS $SAMPLERATE_CFLAGS"
 LDFLAGS="$LDFLAGS $SAMPLERATE_LIBS"
 
-AC_CHECK_HEADERS(portaudio.h,,
-  AC_MSG_ERROR([*** portaudio.h not found - this program requires portaudio http://www.portaudio.com/ ***]))
+#AC_CHECK_HEADERS(portaudio.h,,
+#  AC_MSG_ERROR([*** portaudio.h not found - this program requires portaudio http://www.portaudio.com/ ***]))
 
 #AC_CHECK_LIB([portaudio],[Pa_StreamActive],[],
 #  AC_MSG_ERROR([*** libportaudio not found or wrong version - this program requires portaudio v18 http://www.portaudio.com/ ***]))

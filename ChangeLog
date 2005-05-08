@@ -1,6 +1,7 @@
 2005-05-08  Richard Spindler <richard.spindler AT gmail.com>
 
  * fixed endless loop in import package
+ * uncommented portaudio test in configure.ac
 
 2005-05-06  Richard Spindler <richard.spindler AT gmail.com>
 
