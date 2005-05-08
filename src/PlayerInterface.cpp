@@ -100,6 +100,8 @@ SamplePlayer::~SamplePlayer()
 int SamplePlayer::FillBuffer( float *buffer, unsigned long frames )
 {
 	//float *out = (float*)outputBuffer;
+	if (!m_sample)
+		return 1;
 	unsigned int res = FillBuffer_Sample( buffer, frames * 2 );
 	if (res < frames*2) {
 		//for (int i=res;i<framesPerBuffer*2;i++) {

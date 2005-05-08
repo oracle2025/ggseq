@@ -117,9 +117,7 @@ void MiniPlayer::SetSample(TLSample *sample)
 }
 void MiniPlayer::Play()
 {
-	TLSample *sample = m_sample;
 	Stop();
-	m_sample=sample;
 	m_stopButton->Enable(true);
 	m_playButton->Enable(false);
 	if (m_sample) {
