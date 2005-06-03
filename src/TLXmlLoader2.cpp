@@ -24,12 +24,38 @@
 #include "wx/encconv.h"
 #include "stuff.h"
 
+#include <iostream>
+
+
 #include "TLData.h"
 #include "TLSampleManager.h"
 #include "tinyxml.h"
 #include "UpdateListener.h"
 
 #include "TLXmlLoader2.h"
+
+using namespace std;
+
+double get_dbl( const char* str )
+{
+	wxString s;
+	s << str;
+	char seperator = s.Contains( wxT(",") ) ? ',' : '.';
+	
+	wxString s1;
+	wxString s2;
+	s1 = s.BeforeFirst( seperator );
+	s2 = s.AfterLast( seperator );
+	double tail;
+	s2.ToDouble(&tail);
+	tail = tail / pow( 10, (double)s2.Length() );
+	double start;
+	s1.ToDouble(&start);
+	double all;
+	all = start + tail;
+
+	return all;
+}
 
 TLXMLLoader2::TLXMLLoader2(TLData *data, TLSampleManager *sm)
 {
@@ -234,13 +260,19 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 					Error(filename);
 					return;
 				}
-				e.timestretch = tmp2;
+				//e.timestretch = tmp2;
+				e.timestretch = get_dbl( element_item->Attribute( "timestretch" ) );
 				
-				
+				/*cout << "Timestretch: " << e.timestretch << endl;
+				cout << element_item->Attribute( "timestretch" ) << endl;
+				cout << strtod( element_item->Attribute( "timestretch" ), 0 ) << endl;
+				cout << strtod( "0,10001", 0 ) << endl;
+				cout << "get_dbl: " << get_dbl( element_item->Attribute( "timestretch" ) ) << endl;*/
 				if (element_item->Attribute("sample",&id)==NULL) {
 					Error(filename);
 					return;
 				}
+				cout << "ID: " << id << endl;
 				strncpy(buffer,element_item->Attribute("pos"),sizeof(buffer));
 				if (buffer==NULL) { //TODO: Da ist doch was im Argen
 					Error(filename);

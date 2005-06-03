@@ -393,6 +393,9 @@ void TLItem::SetTrimNStretch( gg_tl_dat leftTrim,
 		delete [] m_stretchedBuffer;
 		m_stretchedBuffer = 0;
 	}
+	if (m_sample == 0) {
+		wxLogError(wxT("m_sample == NULL"));
+	}
 	if ( leftTrim == 0 && rightTrim*2 == m_sample->GetLength() && m_timestretch == 1.0 ) {
 		return;
 	}
