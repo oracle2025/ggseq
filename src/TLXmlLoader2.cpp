@@ -36,11 +36,23 @@
 
 using namespace std;
 
+wxString conv_str( const char* s )
+{
+/*	wxString res;
+	wxChar out[strlen(s) + 1];
+	wxEncodingConverter conv;
+	conv.Init(wxFONTENCODING_ISO8859_2,wxFONTENCODING_UNICODE);
+	conv.Convert(s, out);
+	res << out;
+	return res;*/
+	return wxString( s, *wxConvCurrent );
+}
+
 double get_dbl( const char* str )
 {
-	wxString s;
-	s << str;
-	char seperator = s.Contains( wxT(",") ) ? ',' : '.';
+	wxString s = conv_str(str);
+//	s.Printf(wxT("%s"), str);
+	wxChar seperator = s.Contains( wxT(",") ) ? ',' : '.';
 	
 	wxString s1;
 	wxString s2;
@@ -62,6 +74,14 @@ TLXMLLoader2::TLXMLLoader2(TLData *data, TLSampleManager *sm)
 	m_data=data;
 	m_sampleManager=sm;
 }
+
+#define READ_XML_FLOAT(a,b) \
+	p = element_item->Attribute(b); \
+	if ( p == NULL ) { \
+		Error(filename); \
+		return; \
+	} \
+	a = get_dbl(p);
 
 void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 {
@@ -230,38 +250,18 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 					return;
 				}
 				e.rightTrim = strtoll(buffer,NULL,10);
-				double tmp2;
-				if ( element_item->Attribute( "leftFadeLevel", &tmp2 ) == NULL ) {
-					Error(filename);
-					return;
+//				double tmp2;
+				const char *p;
+				READ_XML_FLOAT( e.nativeEnvData.leftFadeLevel, "leftFadeLevel" )
+				READ_XML_FLOAT( e.nativeEnvData.leftFadePos,"leftFadePos" )
+				READ_XML_FLOAT( e.nativeEnvData.middleLevel,"middleLevel" )
+				READ_XML_FLOAT( e.nativeEnvData.rightFadeLevel,"rightFadeLevel" )
+				READ_XML_FLOAT( e.nativeEnvData.rightFadePos,"rightFadePos" )
+				READ_XML_FLOAT( e.timestretch,"timestretch" )
+				if (e.timestretch == 0.0) {
+					wxLogError(wxT("Timestretch must not be 0"));
+					e.timestretch = 1.0;
 				}
-				e.nativeEnvData.leftFadeLevel = tmp2;
-				if ( element_item->Attribute( "leftFadePos", &tmp2 ) == NULL ) {
-					Error(filename);
-					return;
-				}
-				e.nativeEnvData.leftFadePos = tmp2;
-				if ( element_item->Attribute( "middleLevel", &tmp2 ) == NULL ) {
-					Error(filename);
-					return;
-				}
-				e.nativeEnvData.middleLevel = tmp2;
-				if ( element_item->Attribute( "rightFadeLevel", &tmp2 ) == NULL ) {
-					Error(filename);
-					return;
-				}
-				e.nativeEnvData.rightFadeLevel = tmp2;
-				if ( element_item->Attribute( "rightFadePos", &tmp2 ) == NULL ) {
-					Error(filename);
-					return;
-				}
-				e.nativeEnvData.rightFadePos = tmp2;
-				if ( element_item->Attribute( "timestretch", &tmp2 ) == NULL ) {
-					Error(filename);
-					return;
-				}
-				//e.timestretch = tmp2;
-				e.timestretch = get_dbl( element_item->Attribute( "timestretch" ) );
 				
 				/*cout << "Timestretch: " << e.timestretch << endl;
 				cout << element_item->Attribute( "timestretch" ) << endl;
@@ -272,7 +272,7 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 					Error(filename);
 					return;
 				}
-				cout << "ID: " << id << endl;
+				//cout << "ID: " << id << endl;
 				strncpy(buffer,element_item->Attribute("pos"),sizeof(buffer));
 				if (buffer==NULL) { //TODO: Da ist doch was im Argen
 					Error(filename);
