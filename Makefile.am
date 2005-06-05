@@ -8,7 +8,7 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-EXTRA_DIST = reconf configure rpm_build.sh ggseq.spec ggseq.desktop FAQ acinclude.m4
+EXTRA_DIST = reconf configure rpm_build.sh ggseq.spec ggseq.desktop FAQ acinclude.m4 ggseq-0.3.1.ebuild
 SUBDIRS = src icons doc config
 
 #TODO Remove reconf from Dist
