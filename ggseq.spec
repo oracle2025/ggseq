@@ -1,6 +1,6 @@
 Summary : Gungirl Sequencer
 Name: ggseq
-Version: 0.3.0
+Version: 0.3.1
 Release: 1
 Vendor: Richard  Spindler <oracle2025@gmx.de>
 Packager: Richard Spindler <oracle2025@gmx.de>, Georg E Schneider <georg@georgs.org>

@@ -273,7 +273,7 @@ void MyFrame::OnHelp( wxCommandEvent &event )
 			help_file = app_path + wxFILE_SEP_PATH + wxT("ggseq.htb");
 #else
 			help_file = wxString( wxT(INSTALL_PREFIX) ) + wxT("/share/doc/ggseq/ggseq.htb");
-			//help_file = wxT("/opt/ggseq-0.3.0/ggseq.htb");
+			//help_file = wxT("/opt/ggseq-" GG_VERSION "-i386/ggseq.htb");
 #endif
 			
 			if ( !wxFileExists( help_file ) ) help_file = wxT("");

@@ -1,8 +1,11 @@
 #!/bin/bash
+VERSION=0.3.0
+ARCH=i386
+
 PWD=`pwd`
-if [ "$PWD" != "/opt/ggseq-0.3.0" ]
+if [ "$PWD" != "/opt/ggseq-${VERSION}-${ARCH}" ]
 then
-  echo "Error: please copy this folder (ggseq-0.3.0) to /opt"
+  echo "Error: please copy this folder (ggseq-${VERSION}-${ARCH}) to /opt"
   exit 1
 fi
 if test -e "/usr/bin/ggseq" || test -e "/usr/share/icons/ggseq_32.xpm" || test -e "/usr/share/applications/ggseq.desktop"
@@ -17,11 +20,11 @@ then
   exit 1
 fi
 echo "Linking ggseq to /usr/bin/ggseq"
-ln -s /opt/ggseq-0.3.0/ggseq /usr/bin/ggseq
+ln -s /opt/ggseq-${VERSION}-${ARCH}/ggseq /usr/bin/ggseq
 echo "Linking ggseq_32.xpm to /usr/share/icons/ggseq_32.xpm"
-ln -s /opt/ggseq-0.3.0/ggseq_32.xpm /usr/share/icons/ggseq_32.xpm
+ln -s /opt/ggseq-${VERSION}-${ARCH}/ggseq_32.xpm /usr/share/icons/ggseq_32.xpm
 echo "Linking ggseq.desktop to /usr/share/applications/ggseq.desktop"
-ln -s /opt/ggseq-0.3.0/ggseq.desktop /usr/share/applications/ggseq.desktop
+ln -s /opt/ggseq-${VERSION}-${ARCH}/ggseq.desktop /usr/share/applications/ggseq.desktop
 echo
 echo "= Installation finished ="
 echo

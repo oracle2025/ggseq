@@ -9,7 +9,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AC_INIT([ggseq],
-        [0.3.0],
+        [0.3.1],
         [Richard Spindler oracle2025@gmx.de],
         [ggseq])
 AC_CONFIG_AUX_DIR(config)

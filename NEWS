@@ -7,6 +7,10 @@ Please send ggseq bug reports to "richard.spindler AT gmail.com"
 
 Version 0.3.0
 
+* fixed Issue with Fileformat from different locales
+
+Version 0.3.0
+
 * Unlimited Undo-Redo
 * Fade-In/Fade-Out
 * Sample Stretching and Trimming

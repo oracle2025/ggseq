@@ -113,7 +113,7 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 		tt << out;
 /*-*/
 		version_string=tt;
-		if (version_string!=wxT("0.1") && version_string!=wxT("0.1.1") && version_string!=wxT(GG_VERSION)) {
+		if (version_string!=wxT("0.1") && version_string!=wxT("0.1.1") && version_string!=wxT("0.3.0") && version_string!=wxT(GG_VERSION)) {
 			wxLogError(wxT("Couldn't load file \"%s\"\nSaved with wrong Program Version"),filename.c_str());
 			m_data->Clear();
 			return;

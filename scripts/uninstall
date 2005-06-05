@@ -1,4 +1,8 @@
 #!/bin/bash
+VERSION=0.3.0
+ARCH=i386
+
+
 USER=`whoami`
 if [ "$USER" != "root" ]
 then
