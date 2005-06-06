@@ -4,13 +4,13 @@ this the static binary Release of ggseq.
 
 Installation:
 
-copy this folder ("ggseq-0.3.0-i386") to /opt
+copy this folder ("ggseq-0.3.1-i386") to /opt
 and run the ./install script
 
 
 Uninstall:
 
-goto /opt/ggseq-0.3.0-i386 and
+goto /opt/ggseq-0.3.1-i386 and
 run ./uninstall
 
 

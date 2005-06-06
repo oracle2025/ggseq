@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.3.0
+VERSION=0.3.1
 ARCH=i386
 
 mkdir ggseq-${VERSION}-${ARCH}
@@ -11,7 +11,7 @@ cp ../COPYING ./ggseq-${VERSION}-${ARCH}
 cp ../ggseq.desktop ./ggseq-${VERSION}-${ARCH}
 cp ../icons/ggseq_32.xpm ./ggseq-${VERSION}-${ARCH}
 cp ../icons/ggseq_128.png ./ggseq-${VERSION}-${ARCH}
-cp INSTALL_static_bin ./ggseq-${VERSION}/INSTALL
+cp INSTALL_static_bin ./ggseq-${VERSION}-${ARCH}/INSTALL
 cp uninstall ./ggseq-${VERSION}-${ARCH}
 cp install ./ggseq-${VERSION}-${ARCH}
 tar czf ggseq-${VERSION}-${ARCH}.tar.gz ggseq-${VERSION}-${ARCH}
