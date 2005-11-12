@@ -226,4 +226,4 @@ echo "$prefix"
 
 echo ""
 echo "now you can run make to build Gungirl Sequencer"
-echo "and make intall to install it" 
+echo "and make install to install it" 
