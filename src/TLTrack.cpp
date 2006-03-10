@@ -180,6 +180,7 @@ void TLTrack::addXmlData(TiXmlElement *tracks)
 		item->SetAttribute("timestretch", wxString::Format( wxT("%.30e"), e.timestretch ).mb_str() );*/
 		item->SetAttribute("leftTrim", wxString::Format( wxT("%lld"), e.leftTrim ).mb_str() );
 		item->SetAttribute("rightTrim", wxString::Format( wxT("%lld"), e.rightTrim ).mb_str() );
+		item->SetAttribute("extended", e.extended );
 	}
 
 }

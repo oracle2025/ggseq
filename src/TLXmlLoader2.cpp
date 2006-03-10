@@ -269,6 +269,11 @@ void TLXMLLoader2::LoadFile(wxString filename, UpdateListener* updateListener)
 				cout << strtod( element_item->Attribute( "timestretch" ), 0 ) << endl;
 				cout << strtod( "0,10001", 0 ) << endl;
 				cout << "get_dbl: " << get_dbl( element_item->Attribute( "timestretch" ) ) << endl;*/
+				if (element_item->Attribute("extended",&tmp)==NULL) {
+					e.extended = 1;
+				} else {
+					e.extended = tmp;
+				}
 				if (element_item->Attribute("sample",&id)==NULL) {
 					Error(filename);
 					return;
