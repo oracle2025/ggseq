@@ -14,6 +14,8 @@ bin_PROGRAMS = ggseq
 ggseq_SOURCES = PreferencesDialog.h\
                 PreferencesDialog.cpp\
 		SampleEdit.cpp\
+		SampleExtendingHandler.cpp\
+		SampleExtendingHandler.h\
 		Listeners.h\
 		SampleEdit.h\
 		PlayerInterface.h\

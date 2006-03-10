@@ -56,6 +56,7 @@ typedef struct { // Store everything important for UndoRedo of an Item.
 	gg_tl_dat rightTrim;
 	wxString filename; // empty in TLItem
 	int trackId;       // empty in TLItem
+	int extended;
 } ItemEssentials;
 
 
@@ -103,6 +104,10 @@ class TLItem // Should not contain UI-relevant Data. ( Envelope Rects? )
 		gg_tl_dat GetLeftTrim();
 		gg_tl_dat GetRightTrim();
 		float     GetTimestretch();
+		int       GetExtended();
+		void      SetExtended( int ext );
+		gg_tl_dat GetExtEndPosition();
+		gg_tl_dat GetExtLen();
 		void      SetTrimNStretch( gg_tl_dat leftTrim,
 				gg_tl_dat rightTrim, float timestretch );
 	
@@ -134,5 +139,6 @@ class TLItem // Should not contain UI-relevant Data. ( Envelope Rects? )
 		gg_tl_dat m_rightTrim;
 		float *m_stretchedBuffer;
 		gg_tl_dat m_stretchedLen;
+		int m_extended;
 };
 #endif /*_TLITEM_H_*/

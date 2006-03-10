@@ -97,6 +97,7 @@ TLItem::TLItem(TLSample *sample , gg_tl_dat position, long reference, GetItemTra
 	m_rightTrim = m_sample->GetLength() / 2;
 	GetRectsFromEnv( m_nativeEnvData, GetLen(), m_guiEnvData );
 	GetSampleEnvelope( m_sampleEnvData, m_nativeEnvData, GetLen() );
+	m_extended = 1;
 
 }
 TLItem::TLItem( TLSample *sample, const ItemEssentials& e, GetItemTrackListener* trackListener )
@@ -119,6 +120,7 @@ TLItem::TLItem( TLSample *sample, const ItemEssentials& e, GetItemTrackListener*
 		 
 	GetRectsFromEnv( m_nativeEnvData, GetLen(), m_guiEnvData );
 	GetSampleEnvelope( m_sampleEnvData, m_nativeEnvData, GetLen() );
+	m_extended = e.extended;
 }
 void DrawWxRect( wxDC &dc, const wxRect &rect ) // TODO make Helper Functions File
 {
@@ -265,7 +267,7 @@ float TLItem::GetEnvelopValue( int position )
 	}
 	EnvelopePoint *envelope = m_sampleEnvData;
 	int p = 0;
-	while ( envelope[p + 1].x < position) {
+	while ( envelope[p + 1].x < position) { //FIXME: segfault likely
 		p++;
 		if ( LEN_ENVELOPE - 1 == p ) {
 			return 0.0; // Error
@@ -282,29 +284,29 @@ void TLItem::GuiEnvToDataEnv()
 }
 unsigned int TLItem::FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int count, bool mute, double volume)
 {
-	unsigned int written=0;
-	float *buffer;
-	if (m_stretchedBuffer) {
+	unsigned int written = 0;
+	float* buffer;
+	if ( m_stretchedBuffer ) {
 		buffer = m_stretchedBuffer;
 	} else {
 		buffer = m_sample->GetBuffer();
 	}
 	//float env[count];
-	if (m_position+GetLen()<pos)
-	{
+	gg_tl_dat ext_len = GetLen() * GetExtended();
+	gg_tl_dat len = GetLen();
+
+	if ( m_position + ext_len < pos ) {
 		return 0;
 	}
-	if (m_position>=pos)
-	{
-		for (unsigned int i=pos; i < m_position && written < count; i++)
-		{
-			outBuffer[i-pos]=0.0;
+	if ( m_position >= pos ) {
+		for ( unsigned int i = pos; i < m_position && written < count; i++ ) {
+			outBuffer[i - pos] = 0.0;
 			written++;
 		}
 	}
-	gg_tl_dat playingOffset = pos-m_position;
-	if (playingOffset<0) //ASSERT: shouldn't happen ?
-		playingOffset=0;
+	gg_tl_dat playingOffset = pos - m_position;
+	if ( playingOffset < 0 ) //ASSERT: shouldn't happen ?
+		playingOffset = 0;
 	//TODO: Generate Envelope
 	/*
 	 * Wir sind genau hier im OutputFrame:
@@ -319,24 +321,21 @@ unsigned int TLItem::FillBuffer(float* outBuffer, gg_tl_dat pos, unsigned int co
 	 * size
 	 * Rest mit 1 auffüllen
 	 */
-	while(written<count && playingOffset<GetLen())
-	{
-		if (mute) {
-			outBuffer[written]=0.0;
+	while( written < count && playingOffset < ext_len ) {
+		if ( mute ) {
+			outBuffer[written] = 0.0;
 		} else {
 			//Generate_envelope(env, ...)
-			outBuffer[written]=buffer[playingOffset] * volume * GetEnvelopValue(playingOffset);
-			//TODO: implement Envelope here
+			outBuffer[written] = buffer[playingOffset % len] * volume * GetEnvelopValue( playingOffset % len );
 		}
 		written++;
 		playingOffset++;
 	}
 	return written;
-
 }
 gg_tl_dat TLItem::GetLen()
 {
-	if (m_stretchedBuffer) {
+	if ( m_stretchedBuffer ) {
 		return m_stretchedLen;
 	} else {
 		return m_sample->GetLength();
@@ -505,4 +504,21 @@ void TLItem::GetEssentials( ItemEssentials &e )
 	e.rightTrim = m_rightTrim;
 	e.filename = m_sample->GetFilename();
 	e.trackId = GetTrack();
+	e.extended = m_extended;
+}
+int TLItem::GetExtended() { return m_extended; }
+void TLItem::SetExtended( int ext )
+{
+	m_extended = ext;
+	if ( m_extended < 1 ) {
+		m_extended = 1;
+	}
+}
+gg_tl_dat TLItem::GetExtEndPosition()
+{
+	return m_position + GetExtLen();
+}
+gg_tl_dat TLItem::GetExtLen()
+{
+	return GetLen() * m_extended;
 }

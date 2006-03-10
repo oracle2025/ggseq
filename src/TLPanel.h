@@ -58,7 +58,6 @@ class TLPanel : public wxPanel
 		void OnScroll2(wxScrollEvent& event);
 		void OnEdit(wxCommandEvent& event);
 		void OnToggleEnvelope(wxCommandEvent& event);
-//		void OnActivate( wxActivateEvent& event );
 		void ResetScrollBar();
 		void DropFileAt(int x, int y, wxString filename);
 		bool New();

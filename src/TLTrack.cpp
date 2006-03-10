@@ -69,8 +69,9 @@ TLItem *TLTrack::ItemAtPos(gg_tl_dat Position)
 {
 	for ( TLItemList::Node *node = m_itemList->GetLast(); node; node = node->GetPrevious() ) {
 		TLItem *current = node->GetData();
-		if ((current->GetPosition()<Position)&&(current->GetEndPosition()/*+current->GetLength()*/>Position))
+		if ( ( current->GetPosition() < Position ) && ( current->GetExtEndPosition() > Position ) ) {
 			return current;
+		}
 	}
 	return (TLItem*)NULL;
 }

@@ -194,7 +194,7 @@ void TLView::DrawItem(wxDC& dc, TLItem* item, long left, long delta_left, long t
 bool TLView::ItemVisible( TLItem* item )
 {
 	gg_tl_dat i_left = item->GetPosition();
-	gg_tl_dat i_right = item->GetEndPosition();
+	gg_tl_dat i_right = item->GetEndPosition() + item->GetExtended() * item->GetLen();
 	gg_tl_dat vis_right = m_PositionVisible + VisibleLength();
 	gg_tl_dat vis_left = m_PositionVisible;
 	if ( (i_left  >= vis_left && i_left  <= vis_right) ||
@@ -230,6 +230,9 @@ long TLView::DrawTrack(wxDC& dc, long yoffset, TLTrack* track)
 		long width      = (long) ( ( end - start ) /  GetRealZoom() );
 		long height     = track->GetHeight();
 		DrawItem( dc, current, left, delta_left, top, width, height );
+		for ( int i = 1; i < current->GetExtended(); i++ ) {
+			DrawItem( dc, current, ( ( current->GetPosition() - m_PositionVisible ) / GetRealZoom() ) + VIEW_LEFT_BORDER + ( i * ( current->GetLen() / GetRealZoom() ) ), 0, top, ( current->GetLen() / GetRealZoom() ), height );
+		}
 	}
 	return yoffset + track->GetHeight() + m_TrackDrawDist;
 }

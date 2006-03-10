@@ -62,6 +62,7 @@
 #include "EnvelopeDragHandler.h"  //TODO Alle Handler in MouseDragHandler.h?
 #include "TrimmerDialog.h"
 #include "PlayerInterface.h"
+#include "SampleExtendingHandler.h"
 
 #define LEFT_OFFSET_TRACKS 52
 
@@ -223,27 +224,29 @@ void TLPanel::OnMouseMotion( wxMouseEvent& event )
 			);
 		return;
 	}
+	long p = m_view->FromTLtoScreenX( item->GetExtEndPosition() );
+	if ( m_DragX > p - 5 ) {
+		m_dragHandler = new SampleExtendingHandler( this, item, m_view, event.m_x, event.m_y );
+		return;
+	}
 	m_dragHandler = new SampleDragHandler( this, item, m_view, event.m_x, event.m_y );
 }
 void TLPanel::OnMouseUp( wxMouseEvent& event )
 {
-	if ( event.m_shiftDown )
+	if ( event.m_shiftDown ) {
 		m_view->SuspendSnap();
-	else
+	} else {
 		m_view->ResumeSnap();
+	}
 
-/*	if ( m_rubberDrag ) {
-		EndRubberFrame( event.m_x, event.m_y );
+	if ( m_dragHandler ) {
+		m_dragHandler->OnDrop( event.m_x, event.m_y, event.RightUp() );
+		delete m_dragHandler;
+		m_dragHandler = NULL;
+		ResetScrollBar();
+		Refresh();
 		return;
-	}*/
-  if ( m_dragHandler ) {
-    m_dragHandler->OnDrop( event.m_x, event.m_y, event.RightUp() );
-    delete m_dragHandler;
-    m_dragHandler = NULL;
-    ResetScrollBar();
-    Refresh();
-    return;
-  }
+	}
 	if ( event.LeftUp() ) {
 		m_view->ClearSelection();
 		m_view->SelectTrack( event.m_y );
@@ -258,9 +261,6 @@ void TLPanel::OnMouseUp( wxMouseEvent& event )
 }
 void TLPanel::OnMouseDown( wxMouseEvent& event )
 {
-	//TODO: Prüfen ob Cursor im kleinen menü-Eck ist, und ggfls. POP-Up öffnen
-//TODO	if ( event.m_x < Left Border??)	
-//		return;
 	m_DragX = event.m_x;
 	m_DragY = event.m_y;
 	if( g_ggseqProps.GetMiniPlayer() )
@@ -317,12 +317,6 @@ void TLPanel::OnScroll( wxScrollEvent& event )
 	UpdateRulerTicks();
 	Refresh();
 }
-/*void TLPanel::OnActivate( wxActivateEvent& event )
-{
-	for ( wxWindowList::Node *node = GetChildren().GetFirst(); node; node = node->GetNext() ) {
-		node->GetData()->Refresh();
-	}
-}*/
 
 void TLPanel::DrawCaret(wxDC& dc)
 {
@@ -698,8 +692,6 @@ void TLPanel::OnToggleEnvelope(wxCommandEvent& event)
 }
 void TLPanel::OnEdit(wxCommandEvent& event)
 {
-	//Open super funky Sample-Editor Window
-	//m_EditItem;
 	TrimmerDialog dlg( this->GetParent()->GetParent()->GetParent()->GetParent()->GetParent(),
 			m_EditItem->GetBuffer(),
 			m_EditItem->GetBufferLen(),

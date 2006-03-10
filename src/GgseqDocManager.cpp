@@ -191,6 +191,7 @@ GgseqAddItemCommand::GgseqAddItemCommand( TLData *doc, const wxString& filename,
 	m_essentials.nativeEnvData.middleLevel    = 1.0;
 	m_essentials.nativeEnvData.rightFadeLevel = 1.0;
 	m_essentials.nativeEnvData.rightFadePos   = 0.5;
+	m_essentials.extended = 1;
 /*	m_filename = filename;
 	m_position = position;
 	m_trackId = trackId;
